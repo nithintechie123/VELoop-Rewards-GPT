@@ -221,17 +221,25 @@ export default function GiveawayDetailsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.1 }}
           >
-            <div className={styles.statusRow}>
+            {/* Requirement 81: Individual Giveaway Page Header */}
+            <div className={styles.badgeStripRow}>
+              <span className={styles.exclusiveBadge}>
+                <Sparkles size={13} className={styles.sparkleIcon} /> 🎁 EXCLUSIVE GIVEAWAY
+              </span>
               <span className={styles.liveStatusPill}>
-                <span className={styles.pulseDot}></span> GIVEAWAY LIVE
+                <span className={styles.pulseDot}></span> ● GIVEAWAY LIVE
               </span>
               <span className={styles.valueTag}>
                 Retail Value: <strong>₹{(giveaway.valueUSD || 44900).toLocaleString('en-IN')}</strong>
               </span>
             </div>
 
-            <h1 className={styles.heading}>{giveaway.title}</h1>
-            <p className={styles.description}>{giveaway.description || giveaway.subtitle}</p>
+            <h1 className={styles.heading}>
+              Win an {giveaway.title.replace(/^Win an?\s+/i, '')}
+            </h1>
+            <p className={styles.description}>
+              Join this exclusive giveaway for a chance to win an {giveaway.title.replace(/^Win an?\s+/i, '')}. {giveaway.description || giveaway.subtitle}
+            </p>
 
             {/* Requirement 80: High-Visibility Cost & Currency Callout Banner */}
             <div className={styles.costCalloutBanner}>
@@ -254,7 +262,7 @@ export default function GiveawayDetailsPage() {
             {/* Countdown Box */}
             <div className={styles.countdownWrapper}>
               <span className={styles.countdownLabel}>
-                <Clock size={14} /> TIME REMAINING UNTIL DRAW
+                <Clock size={14} /> Ends in
               </span>
               <Countdown targetDate={giveaway.endDate || giveaway.endsAt} />
             </div>
