@@ -272,8 +272,15 @@ export default function ParticipationModal({
                 className={styles.coinsWrap}
               >
                 <div className={styles.userCoinsIndicator}>
-                  <span>Your Balance:</span>
-                  <strong>{(userState.coins || 0).toLocaleString()} VELoop Coins</strong>
+                  <div>
+                    <span>Your Balance: </span>
+                    <strong>{(userState.coins || 0).toLocaleString()} VELoop Coins</strong>
+                  </div>
+                  {userState.coins >= selectedCoinTier ? (
+                    <span className={styles.balanceStatusSuccess}>✓ You have enough VEs</span>
+                  ) : (
+                    <span className={styles.balanceStatusWarning}>Need +{(selectedCoinTier - (userState.coins || 0)).toLocaleString()} VEs</span>
+                  )}
                 </div>
 
                 <div className={styles.coinPacksGrid}>

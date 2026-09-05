@@ -10,28 +10,28 @@ export default function HowToParticipate({ onOpenRules }) {
       title: 'Sign Up / Login',
       desc: 'Create your VELoop account or sign in to activate your daily free entry tier.',
       color: 'purple',
-      icon: <UserCheck size={18} />
+      icon: <UserCheck size={15} />
     },
     {
       code: '02',
       title: 'Complete Tasks',
       desc: 'Engage in daily login streaks, community channels, and partner activities.',
       color: 'blue',
-      icon: <Target size={18} />
+      icon: <Target size={15} />
     },
     {
       code: '03',
       title: 'Earn Entries',
       desc: 'Collect guaranteed serialized tickets (#VEL-XXXXX-IN) & coin booster packs.',
       color: 'green',
-      icon: <Ticket size={18} />
+      icon: <Ticket size={15} />
     },
     {
       code: '04',
       title: 'Win Rewards',
       desc: 'Winners are selected randomly through transparent, unalterable SHA-256 draws.',
       color: 'orange',
-      icon: <Trophy size={18} />
+      icon: <Trophy size={15} />
     }
   ];
 

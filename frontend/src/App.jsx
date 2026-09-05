@@ -5,6 +5,7 @@ import './styles/customBootstrap.css';
 import './styles/index.css';
 
 const GiveawayDetailsPage = lazy(() => import('./pages/GiveawayDetails/GiveawayDetailsPage'));
+const LoginPage = lazy(() => import('./pages/Auth/LoginPage'));
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<GiveawayPage />} />
             <Route path="/giveaway/:slug" element={<GiveawayDetailsPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

@@ -41,6 +41,7 @@ export const PRIZE_TYPE_CONFIGS = Object.freeze({
   },
   [PRIZE_TYPES.GIFT_CARD]: {
     type: PRIZE_TYPES.GIFT_CARD,
+    isGiftCard: true,
     label: 'Digital Gift Voucher',
     shortLabel: 'Gift Card',
     badgeText: 'INSTANT DIGITAL VOUCHER',
@@ -192,4 +193,55 @@ export function isDigitalPrize(prize) {
 export function getClaimRequiredFields(prize) {
   const config = getPrizeTypeConfig(prize);
   return config.claimFields;
+}
+
+export const CURRENCY_TYPES = Object.freeze({
+  VES: 'VEs',
+  SVES: 'SVEs',
+  TOKENS: 'Tokens'
+});
+
+/**
+ * Requirement 89: Currency-Specific Validation
+ * Validates whether a user's wallet has sufficient balance in the giveaway's required currency:
+ * - iPhone: VEs >= 250
+ * - Apple Watch: VEs >= 200
+ * - AirPods: SVEs >= 500
+ * - ₹2,000 Amazon Voucher: VEs >= 500
+ * - ₹500 Amazon Voucher: VEs >= 300
+ * - ₹20 Flash Voucher: Tokens >= 2,000
+ *
+ * @param {object} userState
+ * @param {object} giveaway
+ * @returns {object} Validation result
+ */
+export function validateUserCurrencyBalance(userState = {}, giveaway = {}) {
+  const feeUnit = giveaway.entryFeeUnit || 'VEs';
+  const feeAmount = giveaway.entryFee || giveaway.coinCost || 250;
+
+  let currentBalance = 0;
+  if (feeUnit === 'SVEs') {
+    currentBalance = userState.sveCoins !== undefined ? userState.sveCoins : 1200;
+  } else if (feeUnit === 'Tokens') {
+    currentBalance = userState.tokens !== undefined ? userState.tokens : 5000;
+  } else {
+    // Default VEs (VELoop Coins)
+    currentBalance = userState.veloopCoins !== undefined ? userState.veloopCoins : 850;
+  }
+
+  const isValid = currentBalance >= feeAmount;
+  const difference = feeAmount - currentBalance;
+
+  return {
+    feeUnit,
+    feeAmount,
+    currentBalance,
+    isValid,
+    hasEnoughBalance: isValid,
+    difference: difference > 0 ? difference : 0,
+    statusText: isValid ? `✓ You have enough ${feeUnit}` : `⚠️ Insufficient ${feeUnit}`,
+    descriptionText: isValid
+      ? `Your ${feeUnit} balance (${currentBalance.toLocaleString()} ${feeUnit}) meets the entry requirement.`
+      : `You need ${difference.toLocaleString()} more ${feeUnit} to participate.`
+  };
 }

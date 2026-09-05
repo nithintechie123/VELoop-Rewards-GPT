@@ -38,6 +38,9 @@ export const mockPrizes = [
     valueUSD: 134900,
     accentTheme: "purple",
     badge: "1st Prize",
+    entryFee: 250,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "250 VEs",
     isGiftCard: false,
     isInstantWin: false
   },
@@ -60,6 +63,9 @@ export const mockPrizes = [
     valueUSD: 44900,
     accentTheme: "blue",
     badge: "2nd Prize",
+    entryFee: 200,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "200 VEs",
     isGiftCard: false,
     isInstantWin: false
   },
@@ -82,6 +88,9 @@ export const mockPrizes = [
     valueUSD: 24900,
     accentTheme: "green",
     badge: "3rd Prize",
+    entryFee: 500,
+    entryFeeUnit: "SVEs",
+    joiningRequirement: "500 SVEs",
     isGiftCard: false,
     isInstantWin: false
   },
@@ -104,6 +113,9 @@ export const mockPrizes = [
     valueUSD: 2000,
     accentTheme: "orange",
     badge: "Lucky Draw",
+    entryFee: 500,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "500 VEs",
     isGiftCard: true,
     isInstantWin: true
   },
@@ -126,6 +138,9 @@ export const mockPrizes = [
     valueUSD: 500,
     accentTheme: "orange",
     badge: "Community Draw",
+    entryFee: 300,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "300 VEs",
     isGiftCard: true,
     isInstantWin: true
   },
@@ -148,6 +163,9 @@ export const mockPrizes = [
     valueUSD: 20,
     accentTheme: "gold",
     badge: "Flash Drop",
+    entryFee: 2000,
+    entryFeeUnit: "Tokens",
+    joiningRequirement: "2,000 Tokens",
     isGiftCard: true,
     isInstantWin: true
   }
@@ -180,6 +198,7 @@ export const mockCurrentGiveawayApiResponse = {
  */
 export const mockHeroGiveaway = {
   id: "GW-2026-08",
+  slug: "creator-bundle",
   isHero: true,
   title: "Summer Rewards Giveaway - Apple Studio Ultimate Creator Bundle",
   subtitle: "Space Black MacBook Pro M3 Max (36GB/1TB) + Apple 27\" 5K Studio Display + AirPods Max with Smart Case.",
@@ -202,6 +221,9 @@ export const mockHeroGiveaway = {
   drawType: "Guaranteed SHA-256 Verified",
   sponsor: "Apple Authorized Loyalty Partner",
   badge: "Flagship Mega Draw",
+  entryFee: 250,
+  entryFeeUnit: "VEs",
+  joiningRequirement: "250 VEs",
   prizes: mockPrizes
 };
 
@@ -241,6 +263,9 @@ export const mockActiveGiveaways = [
     winnerCount: 1,
     winnerLabel: "1 Winner",
     badge: "1st Prize",
+    entryFee: 250,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "250 VEs",
     isInstantWin: false
   },
   {
@@ -275,6 +300,9 @@ export const mockActiveGiveaways = [
     winnerCount: 3,
     winnerLabel: "3 Winners",
     badge: "2nd Prize",
+    entryFee: 200,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "200 VEs",
     isInstantWin: false
   },
   {
@@ -309,6 +337,9 @@ export const mockActiveGiveaways = [
     winnerCount: 5,
     winnerLabel: "5 Winners",
     badge: "3rd Prize",
+    entryFee: 500,
+    entryFeeUnit: "SVEs",
+    joiningRequirement: "500 SVEs",
     isInstantWin: false
   },
   {
@@ -343,6 +374,9 @@ export const mockActiveGiveaways = [
     winnerCount: 10,
     winnerLabel: "10 Winners",
     badge: "Lucky Draw",
+    entryFee: 500,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "500 VEs",
     isInstantWin: true
   },
   {
@@ -377,6 +411,9 @@ export const mockActiveGiveaways = [
     winnerCount: 25,
     winnerLabel: "25 Winners",
     badge: "Community Draw",
+    entryFee: 300,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "300 VEs",
     isInstantWin: true
   },
   {
@@ -411,6 +448,9 @@ export const mockActiveGiveaways = [
     winnerCount: 100,
     winnerLabel: "100 Winners",
     badge: "Flash Drop",
+    entryFee: 2000,
+    entryFeeUnit: "Tokens",
+    joiningRequirement: "2,000 Tokens",
     isInstantWin: true
   },
   {
@@ -431,20 +471,23 @@ export const mockActiveGiveaways = [
     category: "Gaming & VR",
     filterTag: "active",
     image: "/assets/images/ps5_gaming_bundle.jpg",
-    valueUSD: 119900,
+    valueUSD: 69900,
     status: "active",
-    statusLabel: "Giveaway Live",
+    statusLabel: "Grand Draw",
     startDate: "2026-08-01T00:00:00.000Z",
-    endDate: new Date(Date.now() + 8 * 86400000 + 10 * 3600000).toISOString(),
-    endsAt: new Date(Date.now() + 8 * 86400000 + 10 * 3600000).toISOString(),
-    participants: 3900,
-    totalParticipants: 3900,
-    totalTickets: 21200,
-    totalTicketsEntered: 21200,
-    poolCap: 35000,
+    endDate: new Date(Date.now() + 8 * 86400000 + 14 * 3600000).toISOString(),
+    endsAt: new Date(Date.now() + 8 * 86400000 + 14 * 3600000).toISOString(),
+    participants: 1980,
+    totalParticipants: 1980,
+    totalTickets: 11200,
+    totalTicketsEntered: 11200,
+    poolCap: 25000,
     winnerCount: 1,
     winnerLabel: "1 Winner",
     badge: "Grand Prize",
+    entryFee: 400,
+    entryFeeUnit: "VEs",
+    joiningRequirement: "400 VEs",
     isInstantWin: false
   }
 ];

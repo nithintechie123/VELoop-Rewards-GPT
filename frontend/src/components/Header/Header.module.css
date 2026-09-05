@@ -104,6 +104,65 @@
   color: var(--color-gold);
 }
 
+/* Requirement 82: Individual Page Return Navigation */
+.detailNavWrap {
+  display: flex;
+  align-items: center;
+}
+
+.homeReturnBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+
+.homeReturnBtn:hover {
+  background: #10b981;
+  color: #021a12;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+  transform: translateX(-2px);
+}
+
+.homeReturnIcon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.homeReturnBtn:hover .homeReturnIcon {
+  transform: translateX(-3px);
+}
+
+.desktopNavLabel {
+  display: inline-block;
+}
+
+.mobileNavLabel {
+  display: none;
+}
+
+@media (max-width: 580px) {
+  .desktopNavLabel {
+    display: none;
+  }
+  .mobileNavLabel {
+    display: inline-block;
+  }
+  .homeReturnBtn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+  }
+}
+
 .userActions {
   display: flex;
   align-items: center;

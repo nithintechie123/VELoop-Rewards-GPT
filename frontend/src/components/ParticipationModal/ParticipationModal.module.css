@@ -265,6 +265,26 @@
   color: var(--color-gold);
 }
 
+.balanceStatusSuccess {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.balanceStatusWarning {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
 .coinPacksGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

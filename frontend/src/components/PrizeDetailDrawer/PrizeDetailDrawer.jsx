@@ -19,7 +19,7 @@ import {
   Award
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
-import { getPrizeTypeConfig } from '../../utils/prizeTypeUtils';
+import { getPrizeTypeConfig, validateUserCurrencyBalance } from '../../utils/prizeTypeUtils';
 import styles from './PrizeDetailDrawer.module.css';
 
 /**
@@ -63,6 +63,7 @@ export default function PrizeDetailDrawer({
 
   if (!isOpen || !prize) return null;
 
+  const entryRequirement = prize.joiningRequirement || (prize.entryFee ? `${prize.entryFee} ${prize.entryFeeUnit || 'VEs'}` : '250 VEs');
   const prizeConfig = getPrizeTypeConfig(prize);
   const totalTickets = prize.totalTickets || totalPoolTickets || 14200;
   const userTickets = userEntryCount;
@@ -329,7 +330,7 @@ export default function PrizeDetailDrawer({
                 style={{ padding: '0.65rem 1.4rem', fontSize: '0.9rem' }}
               >
                 <Zap size={16} />
-                <span>{userTickets > 0 ? 'Earn More Entries →' : 'Enter Giveaway Free →'}</span>
+                <span>{userTickets > 0 ? 'Earn More Entries →' : `Join for ${entryRequirement}`}</span>
               </button>
             </div>
           </div>

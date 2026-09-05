@@ -23,6 +23,8 @@ const ProvablyFairModal = lazy(() => import('../../components/ProvablyFairModal/
 const GiveawayRules = lazy(() => import('../../components/GiveawayRules/GiveawayRules'));
 const WinnerRevealModal = lazy(() => import('../../components/WinnerReveal/WinnerRevealModal'));
 const PrizeDetailDrawer = lazy(() => import('../../components/PrizeDetailDrawer/PrizeDetailDrawer'));
+const EntryFeeConfirmationModal = lazy(() => import('../../components/EntryFeeConfirmationModal/EntryFeeConfirmationModal'));
+const LoginRequiredModal = lazy(() => import('../../components/LoginRequiredModal/LoginRequiredModal'));
 import ErrorState from '../../components/ErrorState/ErrorState';
 import {
   HeroSkeleton,
@@ -61,6 +63,9 @@ export default function GiveawayPage() {
     userId: 'VE10025',
     isLoggedIn: true,
     coins: 1450,
+    veloopCoins: 850,
+    sveCoins: 1200,
+    tokens: 5000,
     activeTickets: 12,
     soundEnabled: true,
     userEntries: {
@@ -82,6 +87,8 @@ export default function GiveawayPage() {
   // Modal States
   const [isParticipationOpen, setIsParticipationOpen] = useState(false);
   const [activeModalGiveaway, setActiveModalGiveaway] = useState(null);
+  const [confirmFeeGiveaway, setConfirmFeeGiveaway] = useState(null);
+  const [isLoginRequiredOpen, setIsLoginRequiredOpen] = useState(false);
   const [selectedDrawerPrize, setSelectedDrawerPrize] = useState(null);
   const [isClaimOpen, setIsClaimOpen] = useState(false);
   const [claimPrizeTitle, setClaimPrizeTitle] = useState('Apple Watch Series 9');
@@ -176,8 +183,10 @@ export default function GiveawayPage() {
     }
     if (!gw) return;
 
-    if (userState.isLoggedIn === false) {
-      showToast('🔒 Account Required', 'Please login or create an account to participate.', 'info');
+    if (!userState.isLoggedIn) {
+      setActiveModalGiveaway(gw);
+      setIsLoginRequiredOpen(true);
+      return;
     }
 
     setActiveModalGiveaway(gw);
@@ -255,6 +264,40 @@ export default function GiveawayPage() {
 
     showToast('🏆 Quest Finished!', `+${task.rewardTickets} Tickets & +${task.rewardCoins} Coins earned!`, 'info');
     return ticketId;
+  };
+
+  // Requirement 94: Handle Confirmation Modal Entry
+  const handleConfirmFeeJoin = ({ giveawayId, feeAmount, feeUnit, newBalance }) => {
+    soundFx.playCelebration();
+    ConfettiManager.burst();
+
+    const randomHex = Math.floor(10000 + Math.random() * 90000);
+    const ticketId = `#VEL-${randomHex}-US`;
+
+    setUserState(prev => {
+      const balanceField = feeUnit === 'SVEs' ? 'sveCoins' : feeUnit === 'Tokens' ? 'tokens' : 'coins';
+      const prevTickets = prev.userEntries[giveawayId]?.tickets || 0;
+      return {
+        ...prev,
+        [balanceField]: newBalance,
+        activeTickets: prev.activeTickets + 1,
+        userEntries: {
+          ...prev.userEntries,
+          [giveawayId]: {
+            tickets: prevTickets + 1,
+            oddsMultiplier: 2.0
+          }
+        }
+      };
+    });
+
+    setGiveaways(prev => prev.map(g => g.id === giveawayId ? { ...g, totalTicketsEntered: (g.totalTicketsEntered || 0) + 1 } : g));
+    if (heroGiveaway && heroGiveaway.id === giveawayId) {
+      setHeroGiveaway(prev => ({ ...prev, totalTicketsEntered: (prev.totalTicketsEntered || 0) + 1 }));
+    }
+
+    setConfirmFeeGiveaway(null);
+    showToast('🎉 Participation Confirmed!', `Allocated ticket ${ticketId}. Remaining balance: ${newBalance.toLocaleString()} ${feeUnit}.`, 'success');
   };
 
   // Promo Code Redemption
@@ -681,7 +724,7 @@ export default function GiveawayPage() {
         {/* 4. Reference-Inspired Exclusive Giveaway Banner */}
         <ExclusiveBanner
           onClaimCodeSuccess={handleClaimCodeSuccess}
-          onOpenParticipation={handleOpenParticipation}
+          onOpenParticipation={handleNavigateToDetails}
         />
 
         {/* 5. Flagship Hero Giveaway with Countdown & Odds (Requirement 65: HeroSkeleton) */}
@@ -692,7 +735,7 @@ export default function GiveawayPage() {
             giveaway={heroGiveaway}
             userEntryCount={userState.userEntries[heroGiveaway?.id]?.tickets || 0}
             isLoggedIn={userState.isLoggedIn !== false}
-            onEnter={handleOpenParticipation}
+            onEnter={() => handleNavigateToDetails(heroGiveaway?.slug || heroGiveaway?.id)}
             onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
             onOpenReveal={() => setIsRevealOpen(true)}
             onNavigateToWinners={() => {
@@ -910,10 +953,30 @@ export default function GiveawayPage() {
             poolCapacity={selectedDrawerPrize?.poolCap || 25000}
             onEnter={(id) => {
               setSelectedDrawerPrize(null);
-              handleOpenParticipation(id);
+              handleNavigateToDetails(id);
             }}
             onOpenRules={() => setIsRulesOpen(true)}
             onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
+          />
+        )}
+
+        {/* 7. Entry Fee Confirmation Modal (Requirement 94) */}
+        {confirmFeeGiveaway && (
+          <EntryFeeConfirmationModal
+            isOpen={Boolean(confirmFeeGiveaway)}
+            onClose={() => setConfirmFeeGiveaway(null)}
+            giveaway={confirmFeeGiveaway}
+            userState={userState}
+            onConfirmJoin={handleConfirmFeeJoin}
+          />
+        )}
+
+        {/* 8. Login Requirement Modal (Requirement 98) */}
+        {isLoginRequiredOpen && (
+          <LoginRequiredModal
+            isOpen={isLoginRequiredOpen}
+            onClose={() => setIsLoginRequiredOpen(false)}
+            giveawayTitle={activeModalGiveaway?.title}
           />
         )}
       </Suspense>

@@ -5,7 +5,7 @@
    ========================================================================== */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-/* Responsive Container System */
+/* Responsive Container System - Expansive Viewport Utilization */
 .container-custom {
   width: 100%;
   margin-left: auto;
@@ -26,36 +26,36 @@
 /* Tablet (768px - 1023px) */
 @media (min-width: 768px) {
   .container-custom {
-    max-width: 740px;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    max-width: 100%;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 
 /* Laptop (1024px - 1439px) */
 @media (min-width: 1024px) {
   .container-custom {
-    max-width: 1000px;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    max-width: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
 /* Desktop (1440px - 1919px) */
 @media (min-width: 1440px) {
   .container-custom {
-    max-width: 1360px;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    max-width: 100%;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
   }
 }
 
 /* Large Screens (1920px+) */
 @media (min-width: 1920px) {
   .container-custom {
-    max-width: 1580px;
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
+    max-width: 1840px;
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 }
 

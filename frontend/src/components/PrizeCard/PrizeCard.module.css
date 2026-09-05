@@ -136,9 +136,9 @@
 }
 
 .tier_purple {
-  background: rgba(245, 158, 11, 0.25);
-  border: 1px solid rgba(245, 158, 11, 0.7);
-  color: #fbbf24;
+  background: rgba(168, 85, 247, 0.25);
+  border: 1px solid rgba(168, 85, 247, 0.7);
+  color: #c084fc;
 }
 
 .tier_blue {
@@ -159,6 +159,12 @@
   color: #fb923c;
 }
 
+.tier_gold {
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.7);
+  color: #fbbf24;
+}
+
 .theme_purple {
   background: radial-gradient(circle at 50% 60%, rgba(168, 85, 247, 0.25) 0%, #0d061c 80%);
 }
@@ -175,8 +181,13 @@
   background: radial-gradient(circle at 50% 60%, rgba(249, 115, 22, 0.25) 0%, #1f0e04 80%);
 }
 
+.theme_gold {
+  background: radial-gradient(circle at 50% 60%, rgba(245, 158, 11, 0.25) 0%, #1f1404 80%);
+}
+
 .joinBtn {
   flex: 1;
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
   color: #ffffff;
   border: none;
   font-weight: 800;
@@ -194,6 +205,7 @@
 .btn_purple {
   background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   box-shadow: 0 4px 18px rgba(168, 85, 247, 0.35);
+  color: #ffffff;
 }
 .btn_purple:hover {
   background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
@@ -203,6 +215,7 @@
 .btn_blue {
   background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   box-shadow: 0 4px 18px rgba(14, 165, 233, 0.35);
+  color: #ffffff;
 }
 .btn_blue:hover {
   background: linear-gradient(135deg, #38bdf8 0%, #0369a1 100%);
@@ -212,6 +225,7 @@
 .btn_green {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+  color: #ffffff;
 }
 .btn_green:hover {
   background: linear-gradient(135deg, #34d399 0%, #047857 100%);
@@ -221,10 +235,21 @@
 .btn_orange {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   box-shadow: 0 4px 18px rgba(249, 115, 22, 0.35);
+  color: #ffffff;
 }
 .btn_orange:hover {
   background: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
   box-shadow: 0 6px 22px rgba(249, 115, 22, 0.55);
+}
+
+.btn_gold {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+  color: #ffffff;
+}
+.btn_gold:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #b45309 100%);
+  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.55);
 }
 
 .btn_ended {

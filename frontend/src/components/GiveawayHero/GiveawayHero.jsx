@@ -43,6 +43,7 @@ export default function GiveawayHero({
   };
 
   const winnerLabel = giveaway.winnerLabel || (giveaway.winnerCount ? `${giveaway.winnerCount} Winner${giveaway.winnerCount > 1 ? 's' : ''}` : '1 Winner');
+  const entryRequirement = giveaway.joiningRequirement || (giveaway.entryFee ? `${giveaway.entryFee} ${giveaway.entryFeeUnit || 'VEs'}` : '250 VEs');
   const isEnded = giveaway.status === 'ended';
   const isUpcoming = giveaway.status === 'upcoming';
   const isActive = giveaway.status === 'active' || (!isEnded && !isUpcoming);
@@ -378,7 +379,7 @@ export default function GiveawayHero({
                         ? 'Login / Signup to Participate →'
                         : userEntryCount > 0
                         ? 'Earn More Entries →'
-                        : 'Enter Giveaway Free →'}
+                        : `Join for ${entryRequirement} →`}
                     </span>
                   </motion.button>
                 )}
@@ -402,7 +403,6 @@ export default function GiveawayHero({
                 src={giveaway.image}
                 alt={giveaway.title}
                 className={styles.heroImg}
-                fetchPriority="high"
                 decoding="async"
                 whileHover={{ scale: 1.04 }}
                 transition={{ duration: 0.4 }}

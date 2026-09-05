@@ -52,8 +52,8 @@ export default function WinnerClaimBanner({
 
   const handleExploreClick = () => {
     soundFx.playClick();
-    if (onExploreNextGiveaway) {
-      onExploreNextGiveaway();
+    if (onExploreGiveaways) {
+      onExploreGiveaways();
     } else {
       const el = document.getElementById('active-giveaways') || document.querySelector('#featured-giveaways');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -127,10 +127,11 @@ export default function WinnerClaimBanner({
      WINNER-SPECIFIC CLAIM AREA (Requirements 26, 32, 34, 69)
      currentUserId === winner.userId matched!
      ========================================================================= */
-  const prizeConfig = getPrizeTypeConfig(winningRecord);
-  const prizeTitle = winningRecord.prize || winningRecord.title || 'Apple Watch Series 9';
-  const prizeVal = winningRecord.value || '₹44,900';
-  const ticketCode = winningRecord.ticket || '#VEL-10025-IN';
+  const prizeConfig = getPrizeTypeConfig(winningRecord || {});
+  const isGiftCard = prizeConfig?.type === 'GIFT_CARD' || prizeConfig?.requiresDigitalEmail || false;
+  const prizeTitle = winningRecord?.prize || winningRecord?.title || 'Apple Watch Series 9';
+  const prizeVal = winningRecord?.value || '₹44,900';
+  const ticketCode = winningRecord?.ticket || '#VEL-10025-IN';
 
   return (
     <section className={styles.claimSection} aria-label="Winner Celebration and Claim Area">

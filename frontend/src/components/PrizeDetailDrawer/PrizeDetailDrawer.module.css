@@ -81,6 +81,12 @@
   border: 1px solid rgba(249, 115, 22, 0.4);
 }
 
+.tier_gold {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
 .winnerCountBadge {
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;

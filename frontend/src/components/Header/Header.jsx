@@ -1,15 +1,19 @@
 import React from 'react';
-import { Gift, Coins, Ticket, Volume2, VolumeX, Sparkles, Award, Sun, Moon, LogIn, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Gift, Coins, Ticket, Volume2, VolumeX, Sparkles, Award, Sun, Moon, LogIn, User, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './Header.module.css';
 
 /**
  * Requirement 55: Visitor State & Logged-In Header
+ * Requirement 82: Individual Page Navigation & Clear Back Return
  * Displays "Login / Signup to Participate" when in visitor mode.
+ * Displays "← Giveaway Home" (or "← Giveaway" on mobile) on detail pages.
  */
 
 export default function Header({
   userState,
+  isDetailPage = false,
   theme = 'dark',
   onToggleTheme,
   onToggleSound,
@@ -17,14 +21,14 @@ export default function Header({
   onOpenRules,
   onLoginClick
 }) {
-  const isVisitor = userState.isLoggedIn === false;
+  const isVisitor = userState?.isLoggedIn === false;
 
   return (
     <header className={styles.header}>
       <div className="container-custom">
         <div className={styles.navRow}>
-          {/* Brand Logo */}
-          <div className={styles.brand}>
+          {/* Brand Logo & Home Link */}
+          <Link to="/" className={styles.brand} title="Return to VELoop Rewards Giveaway Home">
             <div className={styles.logoBadge}>
               <Gift size={22} className={styles.giftIcon} />
             </div>
@@ -34,17 +38,27 @@ export default function Header({
               </span>
               <span className={styles.brandTagline}>Official Prize Vault & Loyalty Hub</span>
             </div>
-          </div>
+          </Link>
 
-          {/* Navigation Links */}
-          <nav className={styles.navLinks}>
-            <a href="#active-giveaways" className={styles.navLink}>Giveaways</a>
-            <a href="#how-it-works" className={styles.navLink}>How It Works</a>
-            <a href="#winners-section" className={styles.navLink}>Winners & Proof</a>
-            <button onClick={onOpenRules} className={styles.navLinkBtn}>
-              <Award size={15} /> Official Rules
-            </button>
-          </nav>
+          {/* Navigation Links or Detail Page Return */}
+          {isDetailPage ? (
+            <div className={styles.detailNavWrap}>
+              <Link to="/" className={styles.homeReturnBtn} aria-label="Return to Giveaway Home">
+                <ArrowLeft size={16} className={styles.homeReturnIcon} />
+                <span className={styles.desktopNavLabel}>Giveaway Home</span>
+                <span className={styles.mobileNavLabel}>Giveaway</span>
+              </Link>
+            </div>
+          ) : (
+            <nav className={styles.navLinks}>
+              <a href="#active-giveaways" className={styles.navLink}>Giveaways</a>
+              <a href="#how-it-works" className={styles.navLink}>How It Works</a>
+              <a href="#winners-section" className={styles.navLink}>Winners & Proof</a>
+              <button onClick={onOpenRules} className={styles.navLinkBtn}>
+                <Award size={15} /> Official Rules
+              </button>
+            </nav>
+          )}
 
           {/* User Rewards Pill & Actions */}
           <div className={styles.userActions}>

@@ -49,6 +49,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
   };
 
   const winnerLabel = giveaway.winnerLabel || (giveaway.winnerCount ? `${giveaway.winnerCount} Winner${giveaway.winnerCount > 1 ? 's' : ''}` : '1 Winner');
+  const entryRequirement = giveaway.joiningRequirement || (giveaway.entryFee ? `${giveaway.entryFee} ${giveaway.entryFeeUnit || 'VEs'}` : '250 VEs');
 
   return (
     <motion.div
@@ -256,10 +257,10 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleJoinClick}
-              aria-label={`Join giveaway ${giveaway.title}`}
+              aria-label={`Join giveaway for ${entryRequirement}`}
             >
               <Zap size={16} />
-              <span>Join Now →</span>
+              <span>Join for {entryRequirement} →</span>
             </motion.button>
           )}
 
