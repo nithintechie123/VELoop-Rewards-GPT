@@ -21,6 +21,7 @@ const PrizeClaimModal = lazy(() => import('../../components/PrizeClaimModal/Priz
 const ProvablyFairModal = lazy(() => import('../../components/ProvablyFairModal/ProvablyFairModal'));
 const GiveawayRules = lazy(() => import('../../components/GiveawayRules/GiveawayRules'));
 const WinnerRevealModal = lazy(() => import('../../components/WinnerReveal/WinnerRevealModal'));
+const PrizeDetailDrawer = lazy(() => import('../../components/PrizeDetailDrawer/PrizeDetailDrawer'));
 import ErrorState from '../../components/ErrorState/ErrorState';
 import {
   HeroSkeleton,
@@ -80,6 +81,7 @@ export default function GiveawayPage() {
   // Modal States
   const [isParticipationOpen, setIsParticipationOpen] = useState(false);
   const [activeModalGiveaway, setActiveModalGiveaway] = useState(null);
+  const [selectedDrawerPrize, setSelectedDrawerPrize] = useState(null);
   const [isClaimOpen, setIsClaimOpen] = useState(false);
   const [claimPrizeTitle, setClaimPrizeTitle] = useState('Apple Watch Series 9');
   const [isFairOpen, setIsFairOpen] = useState(false);
@@ -714,7 +716,10 @@ export default function GiveawayPage() {
                   userEntries={userState.userEntries}
                   isLoggedIn={userState.isLoggedIn !== false}
                   onEnterGiveaway={handleOpenParticipation}
-                  onViewDetails={handleOpenParticipation}
+                  onViewDetails={(prize) => {
+                    soundFx.playClick();
+                    setSelectedDrawerPrize(prize);
+                  }}
                 />
               )}
             </div>
@@ -881,6 +886,24 @@ export default function GiveawayPage() {
               const el = document.getElementById('winners-section');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
+          />
+        )}
+
+        {/* 6. Interactive Prize Detail Drawer (Requirement 78) */}
+        {selectedDrawerPrize && (
+          <PrizeDetailDrawer
+            isOpen={Boolean(selectedDrawerPrize)}
+            onClose={() => setSelectedDrawerPrize(null)}
+            prize={selectedDrawerPrize}
+            userEntryCount={userState.userEntries[selectedDrawerPrize?.id]?.tickets || 0}
+            totalPoolTickets={selectedDrawerPrize?.totalTickets || 14200}
+            poolCapacity={selectedDrawerPrize?.poolCap || 25000}
+            onEnter={(id) => {
+              setSelectedDrawerPrize(null);
+              handleOpenParticipation(id);
+            }}
+            onOpenRules={() => setIsRulesOpen(true)}
+            onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
           />
         )}
       </Suspense>
