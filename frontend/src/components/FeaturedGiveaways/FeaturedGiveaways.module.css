@@ -1,0 +1,284 @@
+.section {
+  margin: 3.5rem 0 4.5rem;
+}
+
+.sectionHeader {
+  margin-bottom: 1.75rem;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sectionTag {
+  color: var(--color-primary-dark);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-transform: uppercase;
+}
+[data-theme="dark"] .sectionTag {
+  color: var(--color-primary-light);
+}
+
+.sectionTitle {
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-weight: 800;
+  color: var(--text-heading);
+}
+
+.sectionSubtitle {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  max-width: 580px;
+}
+
+.toolbar {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.tabsList {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tabsList::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch-friendly tab buttons (min-height 44px on mobile) */
+.tabBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.tabBtn:hover {
+  color: var(--text-heading);
+  background: var(--bg-surface-hover);
+}
+
+.tabActive {
+  background: rgba(16, 185, 129, 0.16);
+  color: var(--color-primary-dark);
+  border-color: rgba(16, 185, 129, 0.45);
+}
+[data-theme="dark"] .tabActive {
+  color: var(--color-primary-light);
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 0.9rem 0.45rem 2.2rem;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  width: 200px;
+  min-height: 40px;
+  transition: all 0.2s ease;
+}
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px var(--color-primary-glow);
+  width: 230px;
+}
+
+.sortWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sortIcon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.sortSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem 0.45rem 2.1rem;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  outline: none;
+  min-height: 40px;
+}
+.sortSelect:focus {
+  border-color: var(--color-primary);
+}
+
+.swipeHint {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-cyan);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+.emptyState {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+.emptyIcon {
+  color: var(--text-muted);
+}
+.emptyState h4 {
+  font-size: 1.2rem;
+  color: var(--text-heading);
+}
+.emptyState p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Tablet Design (641px - 1024px) - Balanced 2x2 Grid (Requirement 41)
+   ========================================================================== */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ==========================================================================
+   Mobile Design & Carousel Mode (Requirement 40)
+   ========================================================================== */
+@media (max-width: 900px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .controlsRow {
+    width: 100%;
+    display: flex;
+  }
+  .searchWrap {
+    flex: 1;
+  }
+  .searchInput {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    margin: 2rem 0 3rem;
+  }
+
+  .swipeHint {
+    display: flex;
+  }
+
+  /* Horizontal Snap-Scroll Carousel Mode for Mobile */
+  .grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.15rem;
+    padding-bottom: 1.25rem;
+    padding-left: 2px;
+    margin: 0 -0.85rem;
+    padding: 0 0.85rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .grid > * {
+    flex: 0 0 84vw;
+    max-width: 320px;
+    scroll-snap-align: start;
+  }
+
+  .controlsRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .sortWrap {
+    width: 100%;
+  }
+  .sortSelect {
+    width: 100%;
+  }
+}
+

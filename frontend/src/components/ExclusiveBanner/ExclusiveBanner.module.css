@@ -1,0 +1,505 @@
+.sectionWrap {
+  padding: 1.5rem 0 2rem;
+}
+
+.bannerCard {
+  position: relative;
+  background: radial-gradient(circle at 50% 30%, #1e103c 0%, #0d061c 70%, #070310 100%);
+  border: 1.5px solid rgba(168, 85, 247, 0.45);
+  border-radius: 26px;
+  padding: 1.75rem 2.25rem 2rem;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(147, 51, 234, 0.25);
+}
+
+/* Ambient Glows */
+.glowLeft {
+  position: absolute;
+  top: 15%;
+  left: 5%;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.glowRight {
+  position: absolute;
+  bottom: 10%;
+  right: 8%;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.25) 0%, transparent 70%);
+  filter: blur(45px);
+  pointer-events: none;
+}
+
+.glowCenter {
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  width: 450px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 75%);
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+/* Top Bar */
+.topBar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  position: relative;
+  z-index: 5;
+}
+
+.codePillBtn {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #e9d5ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+.codePillBtn:hover {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: #c084fc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35);
+}
+
+.codeIcon {
+  color: #c084fc;
+}
+
+/* Main Grid Layout */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 200px 1fr 180px;
+  gap: 1.5rem;
+  align-items: center;
+  position: relative;
+  z-index: 4;
+}
+
+/* Left 3D Gift Box Stage */
+.leftVisual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.giftStage {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.giftPedestal {
+  position: absolute;
+  bottom: 12px;
+  width: 120px;
+  height: 25px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(168, 85, 247, 0.7);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8), inset 0 0 10px rgba(168, 85, 247, 0.5);
+  animation: pedestalGlow 3s infinite alternate ease-in-out;
+}
+
+@keyframes pedestalGlow {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  100% { transform: scale(1.05); opacity: 1; }
+}
+
+.giftBoxWrapper {
+  width: 140px;
+  height: 140px;
+  position: relative;
+  z-index: 2;
+}
+
+.giftSvg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.7));
+}
+
+/* Floating Particle Accents */
+.particle1, .particle2, .particle3, .particle4,
+.particleRight1, .particleRight2 {
+  position: absolute;
+  font-weight: bold;
+  pointer-events: none;
+  animation: floatParticle 3.5s infinite ease-in-out alternate;
+}
+
+.particle1 { top: 10px; left: 15px; color: #fde68a; font-size: 0.95rem; }
+.particle2 { top: 25px; right: 10px; color: #fbbf24; font-size: 0.85rem; animation-delay: 0.5s; }
+.particle3 { bottom: 30px; left: 5px; color: #c084fc; font-size: 0.8rem; animation-delay: 1.2s; }
+.particle4 { bottom: 45px; right: 8px; color: #fde68a; font-size: 0.9rem; animation-delay: 0.8s; }
+
+.particleRight1 { top: -10px; right: 15px; color: #fde68a; font-size: 1.1rem; }
+.particleRight2 { bottom: 0px; left: -10px; color: #c084fc; font-size: 0.9rem; animation-delay: 0.7s; }
+
+@keyframes floatParticle {
+  0% { transform: translateY(0px) scale(0.9); opacity: 0.6; }
+  100% { transform: translateY(-8px) scale(1.15); opacity: 1; }
+}
+
+/* Center Content */
+.centerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.subtag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #c084fc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.sparkleStar {
+  color: #fde68a;
+}
+
+.mainHeading {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.purpleGradientText {
+  background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  line-height: 1.5;
+  max-width: 580px;
+  margin: 0;
+}
+.description strong {
+  color: #f3e8ff;
+}
+
+/* 3 Features Row */
+.featuresRow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.featurePill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.45rem 0.85rem;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.featureIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cyanIcon { color: #38bdf8; }
+.goldIcon { color: #fbbf24; }
+
+.featureText {
+  display: flex;
+  flex-direction: column;
+}
+
+.featureText strong {
+  font-size: 0.78rem;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.featureText span {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+/* CTA Row */
+.ctaRow {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.enterBtn {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.65rem;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(147, 51, 234, 0.5);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.enterBtn:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #818cf8 100%);
+  box-shadow: 0 8px 30px rgba(147, 51, 234, 0.7);
+  transform: translateY(-2px);
+}
+
+.btnArrow {
+  transition: transform 0.2s ease;
+}
+.enterBtn:hover .btnArrow {
+  transform: translateX(3px);
+}
+
+.quickCodeBtn {
+  background: transparent;
+  border: none;
+  color: #c084fc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+.quickCodeBtn:hover {
+  color: #fde68a;
+}
+
+/* Right Visual (Golden Ticket) */
+.rightVisual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ticketHolder {
+  width: 160px;
+  position: relative;
+}
+
+.ticketSvg {
+  width: 100%;
+  height: auto;
+}
+
+/* Code Redemption Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.modalBox {
+  background: #110926;
+  border: 1.5px solid rgba(168, 85, 247, 0.5);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(147, 51, 234, 0.3);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modalTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.modalTitleWrap h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modalCloseBtn:hover {
+  color: #ffffff;
+}
+
+.modalBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.modalDesc {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.inputGroup label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #d1d5db;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.codeInput {
+  background: #080314;
+  border: 1.5px solid rgba(168, 85, 247, 0.4);
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  outline: none;
+}
+.codeInput:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.successBox {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.errorBox {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+}
+
+.codePillsQuick {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.codePillsQuick button {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.codePillsQuick button:hover {
+  background: rgba(168, 85, 247, 0.35);
+  color: #ffffff;
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .centerContent {
+    align-items: center;
+  }
+  .featuresRow {
+    justify-content: center;
+  }
+  .ctaRow {
+    justify-content: center;
+  }
+  .leftVisual, .rightVisual {
+    display: none;
+  }
+}
