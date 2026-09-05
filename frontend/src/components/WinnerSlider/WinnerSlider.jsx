@@ -2,28 +2,33 @@ import React from 'react';
 import { Trophy, Sparkles } from 'lucide-react';
 import styles from './WinnerSlider.module.css';
 
-export default function WinnerSlider() {
+export default function WinnerSlider({ isLiveBackend = false }) {
   const winnerAnnouncements = [
-    { text: 'User VE****72 won an iPhone 15 Pro', time: '2m ago', emoji: '🎉' },
-    { text: 'User VE****49 won an Apple Watch', time: '5m ago', emoji: '🎉' },
-    { text: 'User VE****15 won AirPods Pro', time: '11m ago', emoji: '🎉' },
-    { text: 'User VE****88 won an Amazon Gift Card', time: '18m ago', emoji: '🎉' },
-    { text: 'User VE****91 claimed Apple Studio Bundle', time: '26m ago', emoji: '🏆' },
-    { text: 'User VE****63 won ₹25,000 Electronics Voucher', time: '35m ago', emoji: '🎉' }
+    { text: 'VE****21 won an iPhone 15 Pro!', time: '2m ago', emoji: '🎉' },
+    { text: 'VE****83 won an Apple Watch!', time: '5m ago', emoji: '🎉' },
+    { text: 'VE****54 won AirPods Pro!', time: '11m ago', emoji: '🎉' },
+    { text: 'VE****92 won an Amazon Gift Card!', time: '18m ago', emoji: '🎉' },
+    { text: 'VE****42 won an Apple Studio Creator Bundle!', time: '26m ago', emoji: '🏆' },
+    { text: 'VE****77 won a Sony PlayStation 5 Pro!', time: '35m ago', emoji: '🎉' }
   ];
 
   return (
     <div
       className={styles.tickerBar}
       role="region"
-      aria-label="Live Winner Announcements"
+      aria-label="Winner Announcements Feed"
       tabIndex="0"
     >
       <div className={styles.badgeWrap}>
-        <span className={styles.liveBadge}>
+        <span
+          className={styles.liveBadge}
+          title={isLiveBackend ? 'Real-time backend winner event stream' : 'Simulated sample feed for development (Backend connection ready)'}
+        >
           <span className={styles.pulseDot}></span>
           <Sparkles size={12} className={styles.sparkleIcon} />
-          <span className={styles.badgeLabel}>WINNER ALERTS</span>
+          <span className={styles.badgeLabel}>
+            {isLiveBackend ? 'LIVE ALERTS' : 'SAMPLE FEED (DEMO)'}
+          </span>
         </span>
       </div>
 

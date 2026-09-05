@@ -86,6 +86,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
           alt={giveaway.title}
           className={styles.mediaImg}
           loading="lazy"
+          decoding="async"
           animate={{ scale: isHovered ? 1.05 : 1, y: isHovered ? -3 : 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
         />
@@ -117,7 +118,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               initial={{ scale: 0.85 }}
               animate={{ scale: 1 }}
             >
-              <Ticket size={12} /> {userEntryCount} Active Ticket{userEntryCount > 1 ? 's' : ''}
+              <Ticket size={12} /> You're Participating ✓ (Your Entries: {userEntryCount})
             </motion.span>
           ) : (
             <span className={styles.ticketPillEmpty}>
@@ -173,10 +174,16 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               </div>
 
               <div className={styles.metaBoxRight}>
-                <span className={styles.metaLabel}>PARTICIPANTS</span>
+                <span className={styles.metaLabel}>{userEntryCount > 0 ? 'YOUR ENTRIES' : 'PARTICIPANTS'}</span>
                 <span className={styles.metaVal}>
-                  <Users size={13} className={styles.iconMuted} />
-                  {(giveaway.totalParticipants || 1200).toLocaleString()} Users
+                  {userEntryCount > 0 ? (
+                    <strong style={{ color: '#34d399' }}>{userEntryCount} Entries</strong>
+                  ) : (
+                    <>
+                      <Users size={13} className={styles.iconMuted} />
+                      {(giveaway.totalParticipants || 1200).toLocaleString()} Users
+                    </>
+                  )}
                 </span>
               </div>
             </>
@@ -189,6 +196,8 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
             <Sparkles size={12} className={styles.sparkleIcon} />
             {giveaway.status === 'upcoming'
               ? 'VIP Pre-Registration Open (Zero Cost)'
+              : userEntryCount > 0
+              ? `You're Participating ✓ (${userEntryCount} Active Tickets)`
               : '1 Free Entry Daily • No Purchase Necessary'}
           </span>
         </div>
@@ -226,9 +235,9 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleJoinClick}
-              aria-label={`Login to participate in ${giveaway.title}`}
+              aria-label={`Login or signup to participate in ${giveaway.title}`}
             >
-              <span>Login to Participate →</span>
+              <span>Login / Signup to Participate →</span>
             </motion.button>
           ) : userEntryCount > 0 ? (
             <motion.button
@@ -236,10 +245,10 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleJoinClick}
-              aria-label={`Add more entries for ${giveaway.title}`}
+              aria-label={`Earn more entries for ${giveaway.title}`}
             >
               <Zap size={16} />
-              <span>You're Participating ✓</span>
+              <span>Earn More Entries →</span>
             </motion.button>
           ) : (
             <motion.button

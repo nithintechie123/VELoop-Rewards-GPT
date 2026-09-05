@@ -36,6 +36,14 @@ export default function ProvablyFairModal({ isOpen, onClose, winnerData }) {
     }, 600);
   };
 
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
     <motion.div
       className={styles.overlay}
@@ -43,6 +51,9 @@ export default function ProvablyFairModal({ isOpen, onClose, winnerData }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="provably-fair-title"
     >
       <motion.div
         className={styles.modal}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Gift } from 'lucide-react';
 
 import Header from '../../components/Header/Header';
@@ -15,11 +15,20 @@ import TrustSection from '../../components/TrustSection/TrustSection';
 import PreFooterCTA from '../../components/PreFooterCTA/PreFooterCTA';
 import FAQ from '../../components/FAQ/FAQ';
 
-import ParticipationModal from '../../components/ParticipationModal/ParticipationModal';
-import PrizeClaimModal from '../../components/PrizeClaimModal/PrizeClaimModal';
-import ProvablyFairModal from '../../components/ProvablyFairModal/ProvablyFairModal';
-import GiveawayRules from '../../components/GiveawayRules/GiveawayRules';
-import WinnerRevealModal from '../../components/WinnerReveal/WinnerRevealModal';
+// Requirement 68: Lazy-load heavy modals on demand to reduce initial payload
+const ParticipationModal = lazy(() => import('../../components/ParticipationModal/ParticipationModal'));
+const PrizeClaimModal = lazy(() => import('../../components/PrizeClaimModal/PrizeClaimModal'));
+const ProvablyFairModal = lazy(() => import('../../components/ProvablyFairModal/ProvablyFairModal'));
+const GiveawayRules = lazy(() => import('../../components/GiveawayRules/GiveawayRules'));
+const WinnerRevealModal = lazy(() => import('../../components/WinnerReveal/WinnerRevealModal'));
+import ErrorState from '../../components/ErrorState/ErrorState';
+import {
+  HeroSkeleton,
+  StatsSkeleton,
+  PrizeCardSkeleton,
+  WinnerCardSkeleton,
+  PreviousWinnerSkeleton
+} from '../../components/Skeletons/Skeletons';
 
 import { apiService } from '../../services/api';
 import {
@@ -131,6 +140,19 @@ export default function GiveawayPage() {
     );
   };
 
+  // Login Helper (Requirement 55)
+  const handleLogin = () => {
+    soundFx.playSuccess();
+    setUserState(prev => ({
+      ...prev,
+      isLoggedIn: true,
+      userId: 'VE10025',
+      name: 'Alex Thorne'
+    }));
+    setCurrentUserId('VE10025');
+    showToast('👤 Logged In as Member', 'Welcome back, Alex Thorne (VE10025)! Free daily entries unlocked.', 'success');
+  };
+
   // Participation Handlers
   const handleOpenParticipation = (giveawayId) => {
     soundFx.playClick();
@@ -141,6 +163,10 @@ export default function GiveawayPage() {
       gw = giveaways.find(g => g.id === giveawayId);
     }
     if (!gw) return;
+
+    if (userState.isLoggedIn === false) {
+      showToast('🔒 Account Required', 'Please login or create an account to participate.', 'info');
+    }
 
     setActiveModalGiveaway(gw);
     setIsParticipationOpen(true);
@@ -282,14 +308,14 @@ export default function GiveawayPage() {
       setGiveaways(mockActiveGiveaways.map(g => ({ ...g, status: 'active' })));
       showToast('👤 State 2: Logged-In Non-Participant', 'Authenticated as VE10025 with 0 active tickets.', 'info');
     } else if (nextPreset === 3) {
-      // State 3: Logged-in participant (Active Tickets > 0)
+      // State 3: Logged-in participant (Active Tickets > 0, Requirement 56)
       const heroId = mockHeroGiveaway.id || 'GW-2026-08';
       setUserState(prev => ({
         ...prev,
         isLoggedIn: true,
         userId: 'VE10025',
         name: 'Alex Thorne',
-        userEntries: { [heroId]: { tickets: 3 }, 'gw-sony-ps5': { tickets: 2 } }
+        userEntries: { [heroId]: { tickets: 24 }, 'gw-sony-ps5': { tickets: 12 }, 'gw-macbook-pro': { tickets: 8 } }
       }));
       setCurrentUserId('VE10025');
       setHeroGiveaway({
@@ -298,7 +324,7 @@ export default function GiveawayPage() {
         endsAt: new Date(Date.now() + 3 * 86400000).toISOString()
       });
       setGiveaways(mockActiveGiveaways.map(g => ({ ...g, status: 'active' })));
-      showToast('🎟️ State 3: Logged-In Participant', 'Member has 3 active tickets in current pool.', 'success');
+      showToast('🎟️ State 3: Participant', "You're Participating ✓ (Your Entries: 24). CTA: Earn More Entries →", 'success');
     } else if (nextPreset === 4) {
       // State 4: Winner
       setUserState(prev => ({
@@ -426,12 +452,15 @@ export default function GiveawayPage() {
 
   const [lifecycleStage, setLifecycleStage] = useState(1);
 
+  // Requirement 61: Previous Winner Transition Lifecycle
+  // Current Giveaway -> Giveaway Ends -> Winners Announced -> Move to Previous Winners -> New Giveaway Becomes Current
   const handleCycleLifecycleStage = () => {
     soundFx.playClick();
-    const nextStage = lifecycleStage === 4 ? 1 : lifecycleStage + 1;
+    const nextStage = lifecycleStage === 5 ? 1 : lifecycleStage + 1;
     setLifecycleStage(nextStage);
 
     if (nextStage === 1) {
+      // 1. Current Giveaway
       setGiveaways(mockActiveGiveaways.map(g => ({
         ...g,
         status: 'active',
@@ -443,8 +472,9 @@ export default function GiveawayPage() {
         status: 'active',
         endsAt: new Date(Date.now() + 3 * 86400000 + 14 * 3600000).toISOString()
       });
-      showToast('🟢 Stage 1: ACTIVE', 'Current Giveaway is live with active countdown & participation open.', 'info');
+      showToast('🟢 Step 1: Current Giveaway', 'Active giveaway is live with countdown running and entries open.', 'info');
     } else if (nextStage === 2) {
+      // 2. Giveaway Ends
       setGiveaways(mockActiveGiveaways.map(g => ({
         ...g,
         status: 'ended',
@@ -455,51 +485,61 @@ export default function GiveawayPage() {
       setHeroGiveaway({
         ...mockHeroGiveaway,
         status: 'ended',
-        winnerName: 'VE****91',
+        winnerName: 'VE****82',
         endsAt: new Date(Date.now() - 1000).toISOString()
       });
-      setIsRevealOpen(true);
-      showToast('🏆 Stage 2: ENDED', 'Countdown reached 0. Winner Reveal sequence initiated!', 'gold');
+      showToast('⏳ Step 2: Giveaway Ends', 'Countdown timer reached 00:00:00. Pool locked for drawing.', 'gold');
     } else if (nextStage === 3) {
-      setGiveaways(mockActiveGiveaways.map(g => ({
-        ...g,
-        status: 'upcoming',
-        statusLabel: 'Next Giveaway Starts In',
-        startsIn: '3 Days'
-      })));
-      setHeroGiveaway({
-        ...mockHeroGiveaway,
-        status: 'upcoming',
-        startsIn: '3 Days'
-      });
-      showToast('⏳ Stage 3: UPCOMING', 'Next Giveaway Starts In 3 Days. Pre-registration & notifications open.', 'info');
+      // 3. Winners Announced
+      setActiveWinnersTab('spotlight');
+      setIsRevealOpen(true);
+      showToast('🏆 Step 3: Winners Announced', 'Provably fair winners picked & announced across platform.', 'gold');
     } else if (nextStage === 4) {
+      // 4. Current Winners Move to Previous Winners
+      setArchiveWinners(prev => {
+        const newArchived = [
+          {
+            id: `arch-${Date.now()}`,
+            giveawayName: 'August Flagship Tech Drop',
+            user: 'VE****82',
+            prize: 'iPhone 15 Pro Titanium',
+            val: '₹1,34,900',
+            ticket: '#VEL-82194-IN',
+            date: 'August 10, 2026',
+            category: 'Flagship Mobile',
+            status: 'Delivered & Verified',
+            tracking: 'FDX-8829-9140'
+          },
+          ...prev.filter(w => w.ticket !== '#VEL-82194-IN')
+        ];
+        return newArchived;
+      });
+      setActiveWinnersTab('archive');
+      showToast('📜 Step 4: Move to Previous Winners', 'Concluded winners immutably archived into Previous Winners registry.', 'info');
+    } else if (nextStage === 5) {
+      // 5. New Giveaway Becomes Current
+      const nextEndDate = new Date(Date.now() + 7 * 86400000).toISOString();
       setGiveaways(mockActiveGiveaways.map(g => ({
         ...g,
         status: 'active',
         statusLabel: 'Giveaway Live',
-        endsAt: new Date(Date.now() + 7 * 86400000).toISOString()
+        totalTicketsEntered: 0,
+        endsAt: nextEndDate
       })));
       setHeroGiveaway({
         ...mockHeroGiveaway,
+        id: `GW-2026-${Date.now().toString().slice(-4)}`,
+        title: 'Fall Creator Series - Apple Studio & Pro Studio Display',
         status: 'active',
-        endsAt: new Date(Date.now() + 6 * 86400000).toISOString()
+        totalTicketsEntered: 0,
+        endsAt: nextEndDate
       });
-      setArchiveWinners(prev => [
-        {
-          id: `arch-${Date.now()}`,
-          giveawayName: 'August Reward Rush',
-          user: 'VE****82',
-          prize: 'iPhone 15 Pro',
-          val: '₹1,34,900',
-          ticket: '#VEL-82194-IN',
-          date: '05 Aug 2026',
-          status: 'Delivered & Verified',
-          tracking: 'FDX-8829-9140'
-        },
-        ...prev
-      ]);
-      showToast('🚀 Stage 4: NEW CYCLE', 'New Giveaway started! Concluded winners archived to Previous Winners tab.', 'success');
+      setUserState(prev => ({
+        ...prev,
+        userEntries: {}
+      }));
+      setActiveWinnersTab('current');
+      showToast('🚀 Step 5: New Giveaway Becomes Current', 'Fresh prize cycle activated! Ready for new daily free and bonus entries.', 'success');
     }
   };
 
@@ -528,15 +568,50 @@ export default function GiveawayPage() {
     showToast('🔄 State Reset', 'Demo data reset to initial values', 'info');
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  const handleToggleLoading = () => {
+    soundFx.playClick();
+    setIsLoading(prev => {
+      const next = !prev;
+      showToast(next ? '⏳ Skeletons Active' : '✨ Content Loaded', next ? 'Viewing simulated skeleton loading states across all cards' : 'Live data restored', 'info');
+      return next;
+    });
+  };
+
+  const handleToggleError = () => {
+    soundFx.playClick();
+    setHasError(prev => {
+      const next = !prev;
+      showToast(next ? '⚠️ Error State Simulated' : '✨ Error Cleared', next ? 'Displaying friendly error screen with Try Again recovery' : 'Normal platform view restored', 'info');
+      return next;
+    });
+  };
+
+  const handleRetry = () => {
+    soundFx.playSuccess();
+    setHasError(false);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      showToast('✨ Connected', 'Giveaway data retrieved successfully!', 'success');
+    }, 600);
+  };
+
   return (
     <div className={styles.pageWrap}>
-      {/* 1. Interactive Demo Simulation Toolbar (Requirements 32, 33, 34, 46, 47, 54) */}
+      {/* 1. Interactive Demo Simulation Toolbar (Requirements 32, 33, 34, 46, 47, 54, 65, 66) */}
       <SimulationToolbar
         isLoggedIn={userState.isLoggedIn !== false}
         currentUserId={currentUserId}
         currentStage={lifecycleStage}
         claimState={claimState}
         activeUserStatePreset={activeUserStatePreset}
+        isLoading={isLoading}
+        hasError={hasError}
+        onToggleLoading={handleToggleLoading}
+        onToggleError={handleToggleError}
         onSelectUserState={handleCycleUserStatePreset}
         onCycleLifecycleStage={handleCycleLifecycleStage}
         onCycleUserIdentity={handleCycleUserIdentity}
@@ -555,6 +630,7 @@ export default function GiveawayPage() {
         onToggleSound={handleToggleSound}
         onOpenClaim={() => handleOpenClaim(winningRecord?.prize || 'Apple Watch Series 9')}
         onOpenRules={() => setIsRulesOpen(true)}
+        onLoginClick={handleLogin}
       />
 
       {/* 3. Live Winner Announcement Slider */}
@@ -562,18 +638,33 @@ export default function GiveawayPage() {
 
       {/* Main Content Sections */}
       <main className={styles.mainContainer}>
-        {/* Winner Claim Area or Non-Winner Experience (Requirements 26, 32, 33, 34) */}
-        <WinnerClaimBanner
-          isLoggedIn={userState.isLoggedIn !== false}
-          currentUserId={currentUserId}
-          winningRecord={winningRecord}
-          claimState={claimState}
-          onClaimPrize={handleOpenClaim}
-          onExploreNextGiveaway={() => {
-            const el = document.getElementById('active-giveaways') || document.querySelector('#featured-giveaways');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }}
-        />
+        {/* Requirement 66: Error State View */}
+        {hasError ? (
+          <ErrorState
+            title="We couldn't load the giveaway information."
+            subtitle="Something went wrong while connecting to the prize vault. Please check your network or try again."
+            onRetry={handleRetry}
+            onReset={handleResetData}
+          />
+        ) : (
+          <>
+            {/* Winner Claim Area or Non-Winner Experience (Requirements 26, 32, 33, 34, 58) */}
+            <WinnerClaimBanner
+              isLoggedIn={userState.isLoggedIn !== false}
+              currentUserId={currentUserId}
+              winningRecord={winningRecord}
+              claimState={claimState}
+              onClaimPrize={handleOpenClaim}
+              onViewWinners={() => {
+                setActiveWinnersTab('spotlight');
+                const el = document.getElementById('winners-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              onExploreNextGiveaway={() => {
+                const el = document.getElementById('active-giveaways') || document.querySelector('#featured-giveaways');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
 
         {/* 4. Reference-Inspired Exclusive Giveaway Banner */}
         <ExclusiveBanner
@@ -581,34 +672,51 @@ export default function GiveawayPage() {
           onOpenParticipation={handleOpenParticipation}
         />
 
-        {/* 5. Flagship Hero Giveaway with Countdown & Odds */}
-        <GiveawayHero
-          giveaway={heroGiveaway}
-          userEntryCount={userState.userEntries[heroGiveaway?.id]?.tickets || 0}
-          onEnter={handleOpenParticipation}
-          onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
-          onOpenReveal={() => setIsRevealOpen(true)}
-          onNavigateToWinners={() => {
-            setActiveWinnersTab('spotlight');
-            const el = document.getElementById('winners-section');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }}
-        />
+        {/* 5. Flagship Hero Giveaway with Countdown & Odds (Requirement 65: HeroSkeleton) */}
+        {isLoading ? (
+          <HeroSkeleton />
+        ) : (
+          <GiveawayHero
+            giveaway={heroGiveaway}
+            userEntryCount={userState.userEntries[heroGiveaway?.id]?.tickets || 0}
+            isLoggedIn={userState.isLoggedIn !== false}
+            onEnter={handleOpenParticipation}
+            onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
+            onOpenReveal={() => setIsRevealOpen(true)}
+            onNavigateToWinners={() => {
+              setActiveWinnersTab('spotlight');
+              const el = document.getElementById('winners-section');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+        )}
 
-        {/* 6. Metrics & Community Strip */}
-        <GiveawayStats />
+        {/* 6. Metrics & Community Strip (Requirement 65: StatsSkeleton) */}
+        {isLoading ? (
+          <StatsSkeleton />
+        ) : (
+          <GiveawayStats />
+        )}
 
         {/* 7. Dual Split Hub: Featured Giveaways & How To Participate */}
         <div className="container-custom" id="active-giveaways">
           <div className={styles.splitGiveawayHub}>
             <div className={styles.giveawaysCol}>
-              <FeaturedGiveaways
-                giveaways={giveaways}
-                userEntries={userState.userEntries}
-                isLoggedIn={userState.isLoggedIn !== false}
-                onEnterGiveaway={handleOpenParticipation}
-                onViewDetails={handleOpenParticipation}
-              />
+              {isLoading ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                  <PrizeCardSkeleton />
+                  <PrizeCardSkeleton />
+                  <PrizeCardSkeleton />
+                </div>
+              ) : (
+                <FeaturedGiveaways
+                  giveaways={giveaways}
+                  userEntries={userState.userEntries}
+                  isLoggedIn={userState.isLoggedIn !== false}
+                  onEnterGiveaway={handleOpenParticipation}
+                  onViewDetails={handleOpenParticipation}
+                />
+              )}
             </div>
             <div className={styles.howToCol}>
               <HowToParticipate onOpenRules={() => setIsRulesOpen(true)} />
@@ -617,16 +725,26 @@ export default function GiveawayPage() {
         </div>
 
         {/* 8. Verified Winners & Historical Archive */}
-        <WinnersTabs
-          giveaways={giveaways}
-          heroGiveaway={heroGiveaway}
-          spotlightWinners={spotlightWinners}
-          archiveWinners={archiveWinners}
-          currentTab={activeWinnersTab}
-          onInspectProof={handleInspectProof}
-          onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
-          onEnterGiveaway={handleOpenParticipation}
-        />
+        {isLoading ? (
+          <div className="container-custom" style={{ margin: '2rem auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+              <WinnerCardSkeleton />
+              <WinnerCardSkeleton />
+              <WinnerCardSkeleton />
+            </div>
+          </div>
+        ) : (
+          <WinnersTabs
+            giveaways={giveaways}
+            heroGiveaway={heroGiveaway}
+            spotlightWinners={spotlightWinners}
+            archiveWinners={archiveWinners}
+            currentTab={activeWinnersTab}
+            onInspectProof={handleInspectProof}
+            onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
+            onEnterGiveaway={handleOpenParticipation}
+          />
+        )}
 
         {/* 9. Trust & Security Badges (Requirement 43) */}
         <TrustSection onOpenRules={() => setIsRulesOpen(true)} />
@@ -640,6 +758,8 @@ export default function GiveawayPage() {
 
         {/* 11. FAQ Section */}
         <FAQ />
+          </>
+        )}
       </main>
 
       {/* Footer */}
@@ -700,57 +820,70 @@ export default function GiveawayPage() {
         </div>
       </footer>
 
-      {/* MODALS */}
-      {/* 1. Participation Modal */}
-      <ParticipationModal
-        giveaway={activeModalGiveaway}
-        userState={userState}
-        isOpen={isParticipationOpen}
-        onClose={() => setIsParticipationOpen(false)}
-        onClaimFreeEntry={handleClaimFreeEntry}
-        onClaimCoinBooster={handleClaimCoinBooster}
-        onCompleteQuest={handleCompleteQuest}
-      />
+      {/* MODALS (Requirement 68: Lazy-loaded with Suspense) */}
+      <Suspense fallback={null}>
+        {/* 1. Participation Modal */}
+        {isParticipationOpen && (
+          <ParticipationModal
+            giveaway={activeModalGiveaway}
+            userState={userState}
+            isOpen={isParticipationOpen}
+            onClose={() => setIsParticipationOpen(false)}
+            onClaimFreeEntry={handleClaimFreeEntry}
+            onClaimCoinBooster={handleClaimCoinBooster}
+            onCompleteQuest={handleCompleteQuest}
+            onLogin={handleLogin}
+          />
+        )}
 
-      {/* 2. Prize Claim Modal (Physical, Gift Card, or Digital) */}
-      <PrizeClaimModal
-        isOpen={isClaimOpen}
-        onClose={() => setIsClaimOpen(false)}
-        defaultPrize={claimPrizeTitle || winningRecord?.prize || 'Apple Watch Series 9'}
-        prizeType={winningRecord?.type || winningRecord?.prizeType || 'PHYSICAL'}
-        giveawayName={winningRecord?.giveawayName || 'Summer Rewards'}
-        defaultTicket={winningRecord?.ticket || '#VEL-10025-IN'}
-        onSubmitClaim={(claimData) => {
-          setClaimState('submitted');
-          showToast('🎉 Prize Claim Registered!', `Tracking/Voucher: ${claimData.tracking}`, 'success');
-        }}
-      />
+        {/* 2. Prize Claim Modal (Physical, Gift Card, or Digital) */}
+        {isClaimOpen && (
+          <PrizeClaimModal
+            isOpen={isClaimOpen}
+            onClose={() => setIsClaimOpen(false)}
+            defaultPrize={claimPrizeTitle || winningRecord?.prize || 'Apple Watch Series 9'}
+            prizeType={winningRecord?.type || winningRecord?.prizeType || 'PHYSICAL'}
+            giveawayName={winningRecord?.giveawayName || 'Summer Rewards'}
+            defaultTicket={winningRecord?.ticket || '#VEL-10025-IN'}
+            onSubmitClaim={(claimData) => {
+              setClaimState('submitted');
+              showToast('🎉 Prize Claim Registered!', `Tracking/Voucher: ${claimData.tracking}`, 'success');
+            }}
+          />
+        )}
 
-      {/* 3. Provably Fair Verification Modal */}
-      <ProvablyFairModal
-        isOpen={isFairOpen}
-        onClose={() => setIsFairOpen(false)}
-        winnerData={inspectingWinner}
-      />
+        {/* 3. Provably Fair Verification Modal */}
+        {isFairOpen && (
+          <ProvablyFairModal
+            isOpen={isFairOpen}
+            onClose={() => setIsFairOpen(false)}
+            winnerData={inspectingWinner}
+          />
+        )}
 
-      {/* 4. Official Giveaway Rules Modal */}
-      <GiveawayRules
-        isOpen={isRulesOpen}
-        onClose={() => setIsRulesOpen(false)}
-      />
+        {/* 4. Official Giveaway Rules Modal */}
+        {isRulesOpen && (
+          <GiveawayRules
+            isOpen={isRulesOpen}
+            onClose={() => setIsRulesOpen(false)}
+          />
+        )}
 
-      {/* 5. Winner Reveal Sequence Modal (Requirement 47) */}
-      <WinnerRevealModal
-        isOpen={isRevealOpen}
-        onClose={() => setIsRevealOpen(false)}
-        giveaway={heroGiveaway}
-        onInspectProof={handleInspectProof}
-        onNavigateToWinners={() => {
-          setActiveWinnersTab('spotlight');
-          const el = document.getElementById('winners-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
+        {/* 5. Winner Reveal Sequence Modal (Requirement 47) */}
+        {isRevealOpen && (
+          <WinnerRevealModal
+            isOpen={isRevealOpen}
+            onClose={() => setIsRevealOpen(false)}
+            giveaway={heroGiveaway}
+            onInspectProof={handleInspectProof}
+            onNavigateToWinners={() => {
+              setActiveWinnersTab('spotlight');
+              const el = document.getElementById('winners-section');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+        )}
+      </Suspense>
 
       {/* Floating Toast Notification */}
       {toast && (

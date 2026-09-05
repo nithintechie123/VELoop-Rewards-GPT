@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Gift, Coins, Sparkles, CheckCircle2, Ticket, Flame, MessageSquare, Twitter, Users, ShieldCheck, Zap, Trophy } from 'lucide-react';
+import { X, Gift, Coins, Sparkles, CheckCircle2, Ticket, Flame, MessageSquare, Twitter, Users, ShieldCheck, Zap, Trophy, Lock, LogIn } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
 import styles from './ParticipationModal.module.css';
+
+/**
+ * Requirement 55: Visitor State Handling in Participation Modal
+ * If a visitor clicks participate:
+ * "Please login or create an account to participate."
+ */
 
 export default function ParticipationModal({
   giveaway,
@@ -12,13 +18,16 @@ export default function ParticipationModal({
   onClose,
   onClaimFreeEntry,
   onClaimCoinBooster,
-  onCompleteQuest
+  onCompleteQuest,
+  onLogin
 }) {
   if (!isOpen || !giveaway) return null;
 
   const [activeTab, setActiveTab] = useState('free'); // 'free' | 'coins' | 'quests'
   const [selectedCoinTier, setSelectedCoinTier] = useState(150);
   const [generatedTicket, setGeneratedTicket] = useState(null);
+
+  const isVisitor = userState.isLoggedIn === false;
 
   const coinPacks = [
     { coins: 50, tickets: 1, label: 'Single Booster' },
@@ -27,6 +36,13 @@ export default function ParticipationModal({
   ];
 
   const handleFreeEntry = () => {
+    if (isVisitor) {
+      soundFx.playClick();
+      alert('Please login or create an account to participate.');
+      if (onLogin) onLogin();
+      return;
+    }
+
     const ticketId = onClaimFreeEntry(giveaway.id);
     setGeneratedTicket({
       code: ticketId,
@@ -38,6 +54,13 @@ export default function ParticipationModal({
   };
 
   const handleCoinBoost = () => {
+    if (isVisitor) {
+      soundFx.playClick();
+      alert('Please login or create an account to participate.');
+      if (onLogin) onLogin();
+      return;
+    }
+
     if (userState.coins < selectedCoinTier) {
       soundFx.playClick();
       alert(`You need ${selectedCoinTier} VELoop Coins. Click "+1,000 Coins" in the demo bar!`);
@@ -56,10 +79,25 @@ export default function ParticipationModal({
   };
 
   const handleQuest = (task) => {
+    if (isVisitor) {
+      soundFx.playClick();
+      alert('Please login or create an account to participate.');
+      if (onLogin) onLogin();
+      return;
+    }
+
     const ticketId = onCompleteQuest(task, giveaway.id);
     soundFx.playSuccess();
     ConfettiManager.burst(window.innerWidth / 2, window.innerHeight / 2, 75);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   return (
     <motion.div
@@ -68,6 +106,9 @@ export default function ParticipationModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="participation-modal-title"
     >
       <motion.div
         className={styles.modal}
@@ -80,7 +121,7 @@ export default function ParticipationModal({
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h3 className={styles.title}>Participate & Enter Draw</h3>
+            <h3 className={styles.title} id="participation-modal-title">Participate & Enter Draw</h3>
             <p className={styles.subtitle}>Choose your entry method below</p>
           </div>
           <motion.button
@@ -94,9 +135,38 @@ export default function ParticipationModal({
           </motion.button>
         </div>
 
+        {/* Visitor Warning Gate Banner (Requirement 55) */}
+        {isVisitor && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.12)',
+            borderBottom: '1px solid rgba(239, 68, 68, 0.35)',
+            padding: '0.85rem 1.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Lock size={16} style={{ color: '#f87171', flexShrink: 0 }} />
+              <span style={{ fontSize: '0.84rem', color: '#fca5a5', fontWeight: 700 }}>
+                Please login or create an account to participate.
+              </span>
+            </div>
+            <button
+              className="btn-primary-glow btn-sm"
+              onClick={() => {
+                if (onLogin) onLogin();
+              }}
+            >
+              <LogIn size={13} /> Login / Signup Now
+            </button>
+          </div>
+        )}
+
         {/* Prize Summary Header */}
         <div className={styles.prizeSummary}>
-          <img src={giveaway.image} alt={giveaway.title} className={styles.prizeThumb} />
+          <img src={giveaway.image} alt={giveaway.title} className={styles.prizeThumb} loading="lazy" decoding="async" />
           <div className={styles.prizeMeta}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
               <h4 style={{ margin: 0 }}>{giveaway.title}</h4>
@@ -108,39 +178,53 @@ export default function ParticipationModal({
           </div>
         </div>
 
-        {/* Your Entries Status Bar */}
+        {/* Your Entries Status Bar (Requirements 56 & 64) */}
         <div className={styles.userEntriesBanner}>
           <div className={styles.entriesCountBox}>
-            <span className={styles.entriesLabel}>YOUR ENTRIES</span>
+            <span className={styles.entriesLabel}>
+              {(userState.userEntries?.[giveaway.id]?.tickets || 0) > 0 ? 'YOUR ENTRIES' : 'PARTICIPATION STATUS'}
+            </span>
             <div className={styles.entriesValRow}>
               <Ticket size={18} className={styles.ticketEmeraldIcon} />
               <strong className={styles.entriesNum}>
-                {userState.userEntries[giveaway.id]?.tickets || 0} Entries
+                {(userState.userEntries?.[giveaway.id]?.tickets || 0) > 0
+                  ? `${userState.userEntries[giveaway.id].tickets} Entries`
+                  : 'No Active Participation'}
               </strong>
             </div>
           </div>
           <div className={styles.entriesHelpText}>
-            <span>Complete eligible tasks or use coin boosters to earn more entries.</span>
+            <span>
+              {(userState.userEntries?.[giveaway.id]?.tickets || 0) > 0
+                ? 'You are currently participating. Complete more tasks or coin boosts to increase win probability.'
+                : 'Join the giveaway to start earning entries.'}
+            </span>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className={styles.tabsRow}>
+        {/* Tabs (Requirement 67) */}
+        <div className={styles.tabsRow} role="tablist" aria-label="Participation Options">
           <button
             className={`${styles.tabBtn} ${activeTab === 'free' ? styles.tabActive : ''}`}
             onClick={() => { setActiveTab('free'); soundFx.playClick(); }}
+            role="tab"
+            aria-selected={activeTab === 'free'}
           >
             <Gift size={15} /> 1. Free Daily Entry
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === 'coins' ? styles.tabActive : ''}`}
             onClick={() => { setActiveTab('coins'); soundFx.playClick(); }}
+            role="tab"
+            aria-selected={activeTab === 'coins'}
           >
             <Coins size={15} /> 2. Coin Boosters
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === 'quests' ? styles.tabActive : ''}`}
             onClick={() => { setActiveTab('quests'); soundFx.playClick(); }}
+            role="tab"
+            aria-selected={activeTab === 'quests'}
           >
             <Sparkles size={15} /> 3. Quests & Tasks
           </button>
@@ -172,7 +256,7 @@ export default function ParticipationModal({
                   whileTap={{ scale: 0.95 }}
                   onClick={handleFreeEntry}
                 >
-                  <Zap size={18} /> Claim Free Ticket Now
+                  <Zap size={18} /> {isVisitor ? 'Login / Signup to Participate' : 'Claim Free Ticket Now'}
                 </motion.button>
               </motion.div>
             )}
@@ -189,7 +273,7 @@ export default function ParticipationModal({
               >
                 <div className={styles.userCoinsIndicator}>
                   <span>Your Balance:</span>
-                  <strong>{userState.coins.toLocaleString()} VELoop Coins</strong>
+                  <strong>{(userState.coins || 0).toLocaleString()} VELoop Coins</strong>
                 </div>
 
                 <div className={styles.coinPacksGrid}>
@@ -216,7 +300,7 @@ export default function ParticipationModal({
                   whileTap={{ scale: 0.96 }}
                   onClick={handleCoinBoost}
                 >
-                  <Zap size={18} /> Redeem Booster (-{selectedCoinTier} Coins)
+                  <Zap size={18} /> {isVisitor ? 'Login / Signup to Participate' : `Redeem Booster (-${selectedCoinTier} Coins)`}
                 </motion.button>
               </motion.div>
             )}
@@ -234,7 +318,7 @@ export default function ParticipationModal({
                 <p className={styles.questIntro}>
                   Complete community quests to earn extra tickets and loyalty coins instantly:
                 </p>
-                {userState.quests.map(task => (
+                {(userState.quests || []).map(task => (
                   <div key={task.id} className={`${styles.questItem} ${task.completed ? styles.questDone : ''}`}>
                     <div className={styles.questLeft}>
                       <div className={styles.questIconBox}>

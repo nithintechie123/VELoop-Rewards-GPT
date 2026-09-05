@@ -6,6 +6,7 @@ import {
   mockWinnerLookup,
   mockQuestTasks
 } from '../data/giveawayData';
+import { getPrizeTypeConfig, PRIZE_TYPES } from '../utils/prizeTypeUtils';
 
 /**
  * API Client Configuration
@@ -200,7 +201,7 @@ export const apiService = {
   },
 
   /**
-   * 7. POST /giveaways/:id/claim
+   * 7. POST /giveaways/:id/claim (Requirement 69)
    * Submits physical or digital winner claim details for verification & fulfillment
    */
   async claimGiveawayPrize(giveawayId, claimPayload = {}) {
@@ -208,24 +209,27 @@ export const apiService = {
       method: 'POST',
       body: JSON.stringify(claimPayload)
     }, () => {
-      const isGift = claimPayload.isGiftCard ||
-                     claimPayload.prize?.toLowerCase().includes('gift card') ||
-                     claimPayload.prize?.toLowerCase().includes('amazon');
+      const config = getPrizeTypeConfig(claimPayload.prizeType || claimPayload.prize);
+      const isGift = config.type === PRIZE_TYPES.GIFT_CARD;
+      const isDigital = config.type === PRIZE_TYPES.DIGITAL_KEY;
 
       const randomCode = Math.floor(1000 + Math.random() * 9000);
       const tracking = isGift
         ? `AMZN-IN-${randomCode}-${Math.floor(100000 + Math.random() * 900000)}-GIFT`
+        : isDigital
+        ? `KEY-VEL-${randomCode}-${Math.floor(100000 + Math.random() * 900000)}-DIGITAL`
         : `FDX-VL-${randomCode}-${Math.floor(100000 + Math.random() * 900000)}`;
 
       return {
         success: true,
         status: 'submitted',
-        message: isGift
-          ? 'Digital Gift Card voucher dispatched successfully to email.'
-          : 'Claim registration confirmed and courier dispatch order scheduled.',
+        prizeType: config.type,
+        fulfillmentMethod: config.fulfillmentMethod,
+        message: config.dispatchDescription,
         claim: {
           ...claimPayload,
           giveawayId,
+          prizeType: config.type,
           trackingNumber: tracking,
           submittedAt: new Date().toISOString()
         }

@@ -1,20 +1,22 @@
+import { PRIZE_TYPES } from '../utils/prizeTypeUtils';
+
 /**
  * Standardized Giveaway Data Structures
  * Conforms to production REST API response specifications.
  *
- * Prize Configuration Schema (Requirement 37):
+ * Prize Configuration Schema (Requirement 37, 69):
  * - id: "PRIZE-001"
  * - name: "iPhone 15 Pro"
  * - position: 1 (or "1st Prize")
  * - image: "/assets/images/iphone_titanium.jpg"
  * - description: "Latest iPhone 15 Pro 128GB with Aerospace-grade Titanium chassis."
  * - winnerCount: 1
- * - type / prizeType: "physical" | "digital"
+ * - prizeType: PRIZE_TYPES.PHYSICAL | PRIZE_TYPES.GIFT_CARD | PRIZE_TYPES.DIGITAL_KEY
  * - claimType: "shipping_address" | "digital_email"
  */
 
 /**
- * Standard Prize Configurations (Requirement 37)
+ * Standard Prize Configurations (Requirement 37, 69)
  */
 export const mockPrizes = [
   {
@@ -29,7 +31,7 @@ export const mockPrizes = [
     winnerCount: 1,
     winnerLabel: "1 Winner",
     type: "physical",
-    prizeType: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
     claimType: "shipping_address",
     value: "₹1,34,900",
     valueUSD: 134900,
@@ -50,7 +52,7 @@ export const mockPrizes = [
     winnerCount: 3,
     winnerLabel: "3 Winners",
     type: "physical",
-    prizeType: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
     claimType: "shipping_address",
     value: "₹44,900",
     valueUSD: 44900,
@@ -71,7 +73,7 @@ export const mockPrizes = [
     winnerCount: 5,
     winnerLabel: "5 Winners",
     type: "physical",
-    prizeType: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
     claimType: "shipping_address",
     value: "₹24,900",
     valueUSD: 24900,
@@ -92,7 +94,7 @@ export const mockPrizes = [
     winnerCount: 10,
     winnerLabel: "10 Winners",
     type: "digital",
-    prizeType: "digital",
+    prizeType: PRIZE_TYPES.GIFT_CARD,
     claimType: "digital_email",
     value: "₹2,000",
     valueUSD: 2000,
@@ -171,7 +173,7 @@ export const mockActiveGiveaways = [
     description: "Latest iPhone 15 Pro 128GB with Aerospace-grade Titanium chassis.",
     subtitle: "Latest iPhone 15 Pro 128GB with Aerospace-grade Titanium chassis.",
     type: "physical",
-    prizeType: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
     claimType: "shipping_address",
     category: "Flagship Mobile",
     filterTag: "active",
@@ -203,7 +205,7 @@ export const mockActiveGiveaways = [
     description: "Latest Apple Watch Series 9 with Always-On Retina display & S9 SiP.",
     subtitle: "Latest Apple Watch Series 9 with Always-On Retina display & S9 SiP.",
     type: "physical",
-    prizeType: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
     claimType: "shipping_address",
     category: "Luxury Lifestyle",
     filterTag: "active",
@@ -216,15 +218,15 @@ export const mockActiveGiveaways = [
     endsAt: new Date(Date.now() + 9 * 86400000 + 6 * 3600000 + 30 * 60000).toISOString(),
     participants: 1840,
     totalParticipants: 1840,
-    totalTickets: 6240,
-    totalTicketsEntered: 6240,
+    totalTickets: 8120,
+    totalTicketsEntered: 8120,
     winnerCount: 3,
     winnerLabel: "3 Winners",
     badge: "2nd Prize",
     isInstantWin: false
   },
   {
-    id: "gw-ps5-pro",
+    id: "gw-audio-airpods",
     prizeId: "PRIZE-003",
     isHero: false,
     prizeTier: "3rd Prize",
@@ -235,7 +237,7 @@ export const mockActiveGiveaways = [
     description: "Active Noise Cancellation, Adaptive Audio and MagSafe Charging Case (USB-C).",
     subtitle: "Active Noise Cancellation, Adaptive Audio and MagSafe Charging Case (USB-C).",
     type: "physical",
-    prizeType: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
     claimType: "shipping_address",
     category: "Audio & Accessories",
     filterTag: "active",
@@ -267,7 +269,7 @@ export const mockActiveGiveaways = [
     description: "₹2,000 Amazon Gift Card redeemable instantly on Amazon India.",
     subtitle: "₹2,000 Amazon Gift Card redeemable instantly on Amazon India.",
     type: "digital",
-    prizeType: "digital",
+    prizeType: PRIZE_TYPES.GIFT_CARD,
     claimType: "digital_email",
     category: "Gift Cards & Cash",
     filterTag: "active",
@@ -342,47 +344,47 @@ export const mockSpotlightWinners = [
  */
 export const mockArchiveWinners = [
   {
-    id: "arch-00",
+    id: "arch-01",
     user: "VE****42",
-    prize: "Apple Watch Series 9",
-    giveawayName: "Summer Rewards",
-    date: "06 Aug 2026",
-    category: "Wearables & Lifestyle",
+    prize: "iPhone 15 Pro",
+    giveawayName: "August Flagship Tech Drop",
+    date: "August 10, 2026",
+    category: "Flagship Mobile",
     status: "Delivered & Verified",
-    val: "₹44,900",
+    val: "₹1,34,900",
     ticket: "#VEL-42190-IN",
     tracking: "FDX-9941-8821"
   },
   {
-    id: "arch-01",
-    user: "VE****82",
-    prize: "iPhone 15 Pro",
-    giveawayName: "August Reward Rush",
-    date: "05 Aug 2026",
-    category: "Flagship Mobile",
+    id: "arch-02",
+    user: "VE****91",
+    prize: "Apple Watch",
+    giveawayName: "Summer Loyalty Blast",
+    date: "August 10, 2026",
+    category: "Wearables & Lifestyle",
     status: "Delivered & Verified",
-    val: "₹1,34,900",
-    ticket: "#VEL-82194-IN",
+    val: "₹44,900",
+    ticket: "#VEL-91823-IN",
     tracking: "FDX-8829-9140"
   },
   {
-    id: "arch-02",
-    user: "VE****41",
-    prize: "Apple Watch Ultra 2",
-    giveawayName: "July Mega Tech Drop",
-    date: "28 Jul 2026",
-    category: "Wearables & Lifestyle",
+    id: "arch-03",
+    user: "VE****27",
+    prize: "AirPods Pro",
+    giveawayName: "August Audio Rush",
+    date: "August 10, 2026",
+    category: "Audio & Accessories",
     status: "Delivered & Verified",
-    val: "₹89,900",
-    ticket: "#VEL-59123-IN",
-    tracking: "DHL-4491-0021"
+    val: "₹24,900",
+    ticket: "#VEL-27041-IN",
+    tracking: "UPS-1Z992A0194"
   },
   {
-    id: "arch-03",
+    id: "arch-04",
     user: "VE****93",
     prize: "Sony PlayStation 5 Pro",
     giveawayName: "Monsoon Gaming Fest",
-    date: "20 Jul 2026",
+    date: "July 20, 2026",
     category: "Gaming & VR",
     status: "Delivered & Verified",
     val: "₹1,19,900",
@@ -390,23 +392,11 @@ export const mockArchiveWinners = [
     tracking: "INSTANT-CODE-994"
   },
   {
-    id: "arch-04",
-    user: "VE****17",
-    prize: "AirPods Pro 2",
-    giveawayName: "Summer Loyalty Blast",
-    date: "14 Jul 2026",
-    category: "Audio & Accessories",
-    status: "Delivered & Verified",
-    val: "₹24,900",
-    ticket: "#VEL-48921-IN",
-    tracking: "UPS-1Z992A0194"
-  },
-  {
     id: "arch-05",
     user: "VE****65",
     prize: "₹10,000 Amazon Gift Card",
     giveawayName: "Amazon Prime Festive Draw",
-    date: "08 Jul 2026",
+    date: "July 08, 2026",
     category: "Gift Cards & Cash",
     status: "Digital Dispatched",
     val: "₹10,000",

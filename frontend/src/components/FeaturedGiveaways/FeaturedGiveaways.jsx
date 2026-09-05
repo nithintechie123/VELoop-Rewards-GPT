@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, Sparkles, Flame, Zap, Shield, Gift } from 'lucide-react';
 import PrizeCard from '../PrizeCard/PrizeCard';
+import EmptyState from '../EmptyState/EmptyState';
 import styles from './FeaturedGiveaways.module.css';
 
 export default function FeaturedGiveaways({
@@ -136,14 +137,20 @@ export default function FeaturedGiveaways({
         </div>
 
         {filtered.length === 0 && (
-          <div className={styles.emptyState}>
-            <Gift size={40} className={styles.emptyIcon} />
-            <h4>No Giveaways Match Your Filter</h4>
-            <p>Try clearing your search term or switching to "All Giveaways".</p>
-            <button className="btn-outline-custom" onClick={() => { setSelectedFilter('all'); setSearchQuery(''); }}>
-              Reset Filters
-            </button>
-          </div>
+          <EmptyState
+            type="no_current_giveaway"
+            title={giveaways.length === 0 ? 'No Current Giveaway' : 'No Matching Giveaways'}
+            description={giveaways.length === 0 ? 'The next giveaway is being prepared.' : 'Try clearing your search term or switching to "All Giveaways".'}
+            actionText={giveaways.length === 0 ? 'Notify Me When Available 🔔' : 'Reset Filters'}
+            onAction={() => {
+              if (giveaways.length === 0) {
+                alert("🔔 We'll notify you the moment the next prize vault is published!");
+              } else {
+                setSelectedFilter('all');
+                setSearchQuery('');
+              }
+            }}
+          />
         )}
       </div>
     </section>

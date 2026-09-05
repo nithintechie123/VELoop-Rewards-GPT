@@ -158,7 +158,7 @@ export default function WinnersTabs({
               {activeGiveaways.map((item) => (
                 <div key={item.id} className={styles.activePrizeCard}>
                   <div className={styles.activePrizeTop}>
-                    <img src={item.image} alt={item.title} className={styles.activePrizeImg} />
+                    <img src={item.image} alt={item.title} className={styles.activePrizeImg} loading="lazy" decoding="async" />
                     <div className={styles.activePrizeInfo}>
                       <div className={styles.activePrizeBadgeRow}>
                         {item.prizeTier && (

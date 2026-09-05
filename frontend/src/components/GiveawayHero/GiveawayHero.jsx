@@ -18,6 +18,7 @@ import styles from './GiveawayHero.module.css';
 export default function GiveawayHero({
   giveaway,
   userEntryCount = 0,
+  isLoggedIn = true,
   onEnter,
   onOpenFairModal,
   onNavigateToWinners,
@@ -150,6 +151,12 @@ export default function GiveawayHero({
                 <Trophy size={13} /> {winnerLabel}
               </span>
 
+              {userEntryCount > 0 && (
+                <span className="badge-pill-custom badge-active-custom">
+                  <CheckCircle2 size={13} /> You're Participating ✓
+                </span>
+              )}
+
               <span className="badge-pill-custom badge-cyan-custom">
                 <ShieldCheck size={13} /> {giveaway.sponsor}
               </span>
@@ -179,7 +186,7 @@ export default function GiveawayHero({
               </div>
               <div className={styles.statDivider}></div>
               <div className={styles.statItem}>
-                <span className={styles.statLabel}>YOUR ACTIVE TICKETS</span>
+                <span className={styles.statLabel}>YOUR ENTRIES</span>
                 <motion.span
                   key={userEntryCount}
                   className={`${styles.statVal} ${styles.emeraldText}`}
@@ -187,7 +194,7 @@ export default function GiveawayHero({
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                 >
-                  {userEntryCount} Tickets
+                  {userEntryCount}
                 </motion.span>
               </div>
               <div className={styles.statDivider}></div>
@@ -235,13 +242,17 @@ export default function GiveawayHero({
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.35 }}
                   >
-                    <Sparkles size={24} className={styles.iconCyan} />
-                    <div>
-                      <h4 className={styles.upcomingTitle}>
-                        Next Giveaway Starts In: {giveaway.startsIn || '3 Days'}
-                      </h4>
+                    <div className={styles.upcomingIconCircle}>
+                      <Clock size={24} className={styles.iconCyan} />
+                    </div>
+                    <div className={styles.upcomingBannerText}>
+                      <div className={styles.upcomingHeaderRow}>
+                        <span className={styles.upcomingTag}>Next Giveaway</span>
+                        <span className={styles.upcomingStartsLabel}>Starts In</span>
+                        <strong className={styles.upcomingDaysVal}>{giveaway.startsIn || '3 Days'}</strong>
+                      </div>
                       <p className={styles.upcomingSubtitle}>
-                        Pre-registration is open. Activate launch notification to get instant 1st-day bonus entries.
+                        Get ready for another chance to win. Pre-register for early bird bonus tickets.
                       </p>
                     </div>
                   </motion.div>
@@ -314,21 +325,42 @@ export default function GiveawayHero({
                     )}
                   </div>
                 ) : isUpcoming ? (
-                  <motion.button
-                    key="btn-upcoming"
-                    className={styles.notifyBtn}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => {
-                      alert(`🔔 Launch Alert Registered! We'll notify you the moment the ${giveaway.title} begins.`);
-                    }}
-                  >
-                    <Sparkles size={18} />
-                    <span>Notify Me 🔔</span>
-                  </motion.button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <motion.button
+                      key="btn-upcoming-explore"
+                      className="btn-primary-glow"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => {
+                        soundFx.playClick();
+                        const el = document.getElementById('active-giveaways') || document.querySelector('#featured-giveaways');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      aria-label="Explore Rewards"
+                    >
+                      <Sparkles size={18} />
+                      <span>Explore Rewards</span>
+                    </motion.button>
+
+                    <motion.button
+                      key="btn-upcoming-notify"
+                      className="btn-outline-custom"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => {
+                        soundFx.playSuccess();
+                        alert(`🔔 Launch Alert Registered! We'll notify you the moment the ${giveaway.title} begins.`);
+                      }}
+                      aria-label={`Notify me for ${giveaway.title}`}
+                    >
+                      <span>Notify Me 🔔</span>
+                    </motion.button>
+                  </div>
                 ) : (
                   <motion.button
                     key="btn-active"
@@ -341,7 +373,13 @@ export default function GiveawayHero({
                     onClick={() => onEnter(giveaway.id)}
                   >
                     <Zap size={18} />
-                    <span>{userEntryCount > 0 ? `Enter More Tickets (${userEntryCount} Active) →` : 'Enter Giveaway Free →'}</span>
+                    <span>
+                      {!isLoggedIn
+                        ? 'Login / Signup to Participate →'
+                        : userEntryCount > 0
+                        ? 'Earn More Entries →'
+                        : 'Enter Giveaway Free →'}
+                    </span>
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -364,6 +402,8 @@ export default function GiveawayHero({
                 src={giveaway.image}
                 alt={giveaway.title}
                 className={styles.heroImg}
+                fetchPriority="high"
+                decoding="async"
                 whileHover={{ scale: 1.04 }}
                 transition={{ duration: 0.4 }}
               />

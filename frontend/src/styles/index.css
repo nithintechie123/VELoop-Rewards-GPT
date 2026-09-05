@@ -140,6 +140,23 @@ button {
   font-family: var(--font-display);
 }
 
+/* Accessibility: High Visibility Keyboard Focus States (Requirement 67) */
+:focus-visible {
+  outline: 2px solid var(--color-cyan) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.45) !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-cyan) !important;
+  outline-offset: 3px !important;
+}
+
 /* Glassmorphism utility */
 .glass-panel {
   background: var(--bg-glass-card);

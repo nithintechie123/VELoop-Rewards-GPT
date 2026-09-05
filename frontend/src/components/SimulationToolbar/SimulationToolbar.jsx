@@ -17,8 +17,13 @@ export default function SimulationToolbar({
   isLoggedIn,
   currentUserId = 'VE10025',
   currentStage = 1,
+  lifecycleStage = currentStage,
   claimState = 'not_submitted',
   activeUserStatePreset = 4,
+  isLoading = false,
+  hasError = false,
+  onToggleLoading,
+  onToggleError,
   onCycleLifecycleStage,
   onCycleUserIdentity,
   onCycleClaimState,
@@ -67,6 +72,25 @@ export default function SimulationToolbar({
                 <CheckCircle2 size={14} className={styles.emeraldIcon} />
                 <span style={{ fontWeight: 800, color: '#34d399' }}>
                   {userStateLabels[activeUserStatePreset] || 'User State'}
+                </span>
+              </button>
+            )}
+
+            {/* Requirement 61: Lifecycle Stage Transition */}
+            {onCycleLifecycleStage && (
+              <button
+                className={styles.simBtn}
+                onClick={onCycleLifecycleStage}
+                title="Requirement 61: Transition between Current Giveaway -> Giveaway Ends -> Winners Announced -> Move to Previous Winners -> New Giveaway Becomes Current"
+                style={{ background: 'rgba(56, 189, 248, 0.18)', borderColor: 'rgba(56, 189, 248, 0.5)' }}
+              >
+                <Radio size={14} className={styles.emeraldIcon} style={{ color: '#38bdf8' }} />
+                <span style={{ fontWeight: 800, color: '#38bdf8' }}>
+                  {lifecycleStage === 1 && 'Lifecycle: 1. Current (Live)'}
+                  {lifecycleStage === 2 && 'Lifecycle: 2. Giveaway Ends'}
+                  {lifecycleStage === 3 && 'Lifecycle: 3. Winners Announced'}
+                  {lifecycleStage === 4 && 'Lifecycle: 4. Move to Previous'}
+                  {lifecycleStage === 5 && 'Lifecycle: 5. New Cycle Active'}
                 </span>
               </button>
             )}
@@ -125,6 +149,31 @@ export default function SimulationToolbar({
               <PlusCircle size={14} className={styles.emeraldIcon} />
               +1k Coins
             </button>
+
+            {/* Requirement 65: Skeletons & Loading Simulation */}
+            {onToggleLoading && (
+              <button
+                className={styles.simBtn}
+                onClick={onToggleLoading}
+                title="Requirement 65: Toggle Skeleton Loading States across Hero, Cards, Winners, Archive, Stats, and Countdown"
+                style={isLoading ? { background: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgba(239, 68, 68, 0.5)' } : {}}
+              >
+                <Sparkles size={14} className={styles.goldIcon} />
+                <span>{isLoading ? '⏳ Loading: ON' : '⏳ Skeletons'}</span>
+              </button>
+            )}
+
+            {/* Requirement 66: Error State Simulation */}
+            {onToggleError && (
+              <button
+                className={styles.simBtn}
+                onClick={onToggleError}
+                title="Requirement 66: Simulate Error State (We couldn't load the giveaway information / Try Again)"
+                style={hasError ? { background: 'rgba(239, 68, 68, 0.3)', borderColor: '#ef4444' } : {}}
+              >
+                <span style={{ color: '#f87171', fontWeight: 800 }}>{hasError ? '⚠️ Error: ON' : '⚠️ Error State'}</span>
+              </button>
+            )}
 
             {/* Reset */}
             <button className={styles.simBtnGhost} onClick={onResetData} title="Reset demo state">

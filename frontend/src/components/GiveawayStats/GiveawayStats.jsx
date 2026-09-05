@@ -82,6 +82,9 @@ export default function GiveawayStats() {
             </div>
           ))}
         </div>
+        <div className={styles.benchmarkFootnote}>
+          <span>* Fictional demonstration benchmark figures for preview. Production backend sync ready.</span>
+        </div>
       </div>
     </section>
   );

@@ -101,6 +101,14 @@ export default function WinnerRevealModal({
     return () => clearInterval(interval);
   }, [stage]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!isOpen) return null;
 
   const handleReplay = () => {
@@ -296,7 +304,7 @@ export default function WinnerRevealModal({
 
                 {/* Premium Winner Card */}
                 <div className={styles.winnerCard}>
-                  <img src={prizeImage} alt={prizeTitle} className={styles.winnerPrizeImg} />
+                  <img src={prizeImage} alt={prizeTitle} className={styles.winnerPrizeImg} loading="lazy" decoding="async" />
 
                   <div className={styles.winnerCardInfo}>
                     <div className={styles.winnerPrizeTag}>

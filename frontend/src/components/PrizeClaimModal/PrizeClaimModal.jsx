@@ -19,46 +19,36 @@ import {
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
+import {
+  getPrizeTypeConfig,
+  isPhysicalPrize,
+  isGiftCardPrize,
+  isDigitalPrize,
+  PRIZE_TYPES
+} from '../../utils/prizeTypeUtils';
 import styles from './PrizeClaimModal.module.css';
 
 /**
- * Prize Types Supported (Requirement 38):
- * - PHYSICAL  : Physical shipped products (iPhone, Apple Watch, AirPods) -> Name, Phone, Address, City, State, PIN
- * - GIFT_CARD : Digital retail gift cards (Amazon, Apple Gift Cards) -> Email Address
- * - DIGITAL   : Software licenses, in-game assets, or subscription codes -> Email Address & Gamer Tag / Platform ID
+ * Prize Types Supported (Requirement 38, 69):
+ * Centralized business logic via getPrizeTypeConfig
  */
 export default function PrizeClaimModal({
   isOpen,
   onClose,
   defaultPrize = 'Apple Watch Series 9',
-  prizeType = null, // 'PHYSICAL' | 'GIFT_CARD' | 'DIGITAL'
+  prizeType = null, // 'PHYSICAL' | 'GIFT_CARD' | 'DIGITAL_KEY' | 'EXPERIENCE'
   giveawayName = 'Summer Rewards',
   defaultTicket = '#VEL-42190-IN',
   onSubmitClaim
 }) {
   if (!isOpen) return null;
 
-  // Determine normalized prize type
-  const normalizedType = (() => {
-    if (prizeType) {
-      const pType = prizeType.toUpperCase();
-      if (pType === 'GIFT_CARD' || pType === 'GIFT' || pType === 'CARD') return 'GIFT_CARD';
-      if (pType === 'DIGITAL' || pType === 'SOFTWARE' || pType === 'VOUCHER') return 'DIGITAL';
-      return 'PHYSICAL';
-    }
-    const lower = defaultPrize.toLowerCase();
-    if (lower.includes('gift card') || lower.includes('amazon') || lower.includes('voucher') || lower.includes('wallet')) {
-      return 'GIFT_CARD';
-    }
-    if (lower.includes('game pass') || lower.includes('steam') || lower.includes('license') || lower.includes('subscription')) {
-      return 'DIGITAL';
-    }
-    return 'PHYSICAL';
-  })();
-
-  const isGiftCard = normalizedType === 'GIFT_CARD';
-  const isDigital = normalizedType === 'DIGITAL';
-  const isPhysical = normalizedType === 'PHYSICAL';
+  // Retrieve unified structured config
+  const prizeConfig = getPrizeTypeConfig(prizeType || defaultPrize);
+  const normalizedType = prizeConfig.type;
+  const isGiftCard = normalizedType === PRIZE_TYPES.GIFT_CARD;
+  const isDigital = normalizedType === PRIZE_TYPES.DIGITAL_KEY || isDigitalPrize(prizeConfig);
+  const isPhysical = normalizedType === PRIZE_TYPES.PHYSICAL;
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [fullName, setFullName] = useState('Alex Thorne');
@@ -133,6 +123,14 @@ export default function PrizeClaimModal({
     }, 500);
   };
 
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const handleDownloadReceipt = () => {
     soundFx.playClick();
     alert(`📄 Official Claim Certificate saved. Reference Code: ${generatedTracking}`);
@@ -145,6 +143,9 @@ export default function PrizeClaimModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="prize-claim-modal-title"
     >
       <motion.div
         className={styles.modal}
@@ -161,7 +162,7 @@ export default function PrizeClaimModal({
               <Gift size={20} className={styles.iconGold} />
             </div>
             <div>
-              <h3 className={styles.title}>
+              <h3 className={styles.title} id="prize-claim-modal-title">
                 {isGiftCard
                   ? '🎁 Claim Gift Card'
                   : isDigital
@@ -231,11 +232,12 @@ export default function PrizeClaimModal({
                 {isGiftCard && (
                   <div className={styles.fieldSection}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                      <label htmlFor="claim-gift-email" className={styles.label}>
                         <Mail size={14} className={styles.fieldIcon} />
                         Email Address <span className={styles.requiredAsterisk}>*</span>
                       </label>
                       <input
+                        id="claim-gift-email"
                         type="email"
                         value={digitalEmail}
                         onChange={(e) => setDigitalEmail(e.target.value)}
@@ -255,11 +257,12 @@ export default function PrizeClaimModal({
                 {isDigital && (
                   <div className={styles.fieldSection}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                      <label htmlFor="claim-digital-email" className={styles.label}>
                         <Mail size={14} className={styles.fieldIcon} />
                         Delivery Email Address <span className={styles.requiredAsterisk}>*</span>
                       </label>
                       <input
+                        id="claim-digital-email"
                         type="email"
                         value={digitalEmail}
                         onChange={(e) => setDigitalEmail(e.target.value)}
@@ -271,11 +274,12 @@ export default function PrizeClaimModal({
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                      <label htmlFor="claim-gamertag" className={styles.label}>
                         <Gamepad2 size={14} className={styles.fieldIcon} />
                         Platform GamerTag / Account ID (Optional)
                       </label>
                       <input
+                        id="claim-gamertag"
                         type="text"
                         value={gamerTag}
                         onChange={(e) => setGamerTag(e.target.value)}
@@ -294,10 +298,11 @@ export default function PrizeClaimModal({
                   <div className={styles.fieldSection}>
                     {/* Full Name */}
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                      <label htmlFor="claim-fullname" className={styles.label}>
                         Full Name <span className={styles.requiredAsterisk}>*</span>
                       </label>
                       <input
+                        id="claim-fullname"
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
@@ -309,11 +314,12 @@ export default function PrizeClaimModal({
 
                     {/* Phone Number */}
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                      <label htmlFor="claim-phone" className={styles.label}>
                         <Phone size={14} className={styles.fieldIcon} />
                         Phone Number <span className={styles.requiredAsterisk}>*</span>
                       </label>
                       <input
+                        id="claim-phone"
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
@@ -325,11 +331,12 @@ export default function PrizeClaimModal({
 
                     {/* Address */}
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                      <label htmlFor="claim-address" className={styles.label}>
                         <MapPin size={14} className={styles.fieldIcon} />
                         Address <span className={styles.requiredAsterisk}>*</span>
                       </label>
                       <input
+                        id="claim-address"
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
@@ -342,10 +349,11 @@ export default function PrizeClaimModal({
                     {/* 3-Column Grid: City, State, PIN */}
                     <div className={styles.threeColRow}>
                       <div className={styles.formGroup}>
-                        <label className={styles.label}>
+                        <label htmlFor="claim-city" className={styles.label}>
                           City <span className={styles.requiredAsterisk}>*</span>
                         </label>
                         <input
+                          id="claim-city"
                           type="text"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
@@ -356,10 +364,11 @@ export default function PrizeClaimModal({
                       </div>
 
                       <div className={styles.formGroup}>
-                        <label className={styles.label}>
+                        <label htmlFor="claim-state" className={styles.label}>
                           State <span className={styles.requiredAsterisk}>*</span>
                         </label>
                         <input
+                          id="claim-state"
                           type="text"
                           value={state}
                           onChange={(e) => setState(e.target.value)}
@@ -370,10 +379,11 @@ export default function PrizeClaimModal({
                       </div>
 
                       <div className={styles.formGroup}>
-                        <label className={styles.label}>
+                        <label htmlFor="claim-pin" className={styles.label}>
                           PIN <span className={styles.requiredAsterisk}>*</span>
                         </label>
                         <input
+                          id="claim-pin"
                           type="text"
                           value={pin}
                           onChange={(e) => setPin(e.target.value)}

@@ -98,6 +98,15 @@
 .unit_green { color: #34d399; }
 .unit_orange { color: #fb923c; }
 
+.benchmarkFootnote {
+  text-align: center;
+  margin-top: 0.85rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+  font-style: italic;
+}
+
 /* Responsive Breakpoints (Requirement 40: 2-column or stacked on mobile) */
 @media (max-width: 1024px) {
   .statsGrid {

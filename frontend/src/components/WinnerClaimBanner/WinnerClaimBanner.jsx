@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
+import { getPrizeTypeConfig } from '../../utils/prizeTypeUtils';
 import styles from './WinnerClaimBanner.module.css';
 
 export default function WinnerClaimBanner({
@@ -23,7 +24,8 @@ export default function WinnerClaimBanner({
   winningRecord, // matched winner object or null
   claimState = 'not_submitted', // 'not_submitted' | 'submitted' | 'processing' | 'completed' | 'expired'
   onClaimPrize,
-  onExploreNextGiveaway
+  onViewWinners,
+  onExploreGiveaways
 }) {
   if (!isLoggedIn) return null;
 
@@ -38,6 +40,16 @@ export default function WinnerClaimBanner({
     }
   };
 
+  const handleViewWinnersClick = () => {
+    soundFx.playClick();
+    if (onViewWinners) {
+      onViewWinners();
+    } else {
+      const el = document.getElementById('winners-section') || document.querySelector('#featured-giveaways');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleExploreClick = () => {
     soundFx.playClick();
     if (onExploreNextGiveaway) {
@@ -49,12 +61,16 @@ export default function WinnerClaimBanner({
   };
 
   /* =========================================================================
-     NON-WINNER EXPERIENCE (Requirement 33)
-     Users who did not win should not see the winner claim form.
+     NON-WINNER EXPERIENCE (Requirements 33 & 58)
+     Show:
+     Thanks for participating!
+     Winners have been announced.
+     [View Winners]
+     Better luck next time!
      ========================================================================= */
   if (!isWinner) {
     return (
-      <section className={styles.claimSection} aria-label="Participant Status & Next Giveaway CTA">
+      <section className={styles.claimSection} aria-label="Participant Status & Non-Winner Notice">
         <div className="container-custom">
           <motion.div
             className={styles.nonWinnerCard}
@@ -69,20 +85,35 @@ export default function WinnerClaimBanner({
                   <Compass size={13} className={styles.iconCyan} />
                   <span>MEMBER ID: {currentUserId} • PARTICIPATING</span>
                 </div>
-                <h3 className={styles.nonWinnerTitle}>Didn't win this time?</h3>
+                <h3 className={styles.nonWinnerTitle}>Thanks for participating!</h3>
                 <p className={styles.nonWinnerSub}>
-                  Keep participating for the next giveaway. Every entry earns bonus points and unlocks exclusive VIP rewards.
+                  Winners have been announced. Better luck next time!
+                </p>
+                <p className={styles.nonWinnerNote}>
+                  Keep participating in active & upcoming giveaways to earn bonus loyalty tickets and reward multipliers.
                 </p>
               </div>
 
               <div className={styles.nonWinnerRight}>
                 <motion.button
-                  className={`${styles.exploreBtn} btn-primary-glow`}
+                  className={`${styles.viewWinnersActionBtn} btn-primary-glow`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={handleExploreClick}
+                  onClick={handleViewWinnersClick}
+                  aria-label="View announced winners"
                 >
-                  <span>Explore Next Giveaway →</span>
+                  <Trophy size={16} />
+                  <span>View Winners</span>
+                </motion.button>
+
+                <motion.button
+                  className={styles.exploreSecondaryBtn}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleExploreClick}
+                  aria-label="Explore upcoming giveaways"
+                >
+                  <span>Explore Giveaways →</span>
                 </motion.button>
               </div>
             </div>
@@ -93,13 +124,13 @@ export default function WinnerClaimBanner({
   }
 
   /* =========================================================================
-     WINNER-SPECIFIC CLAIM AREA (Requirements 26, 32, 34)
+     WINNER-SPECIFIC CLAIM AREA (Requirements 26, 32, 34, 69)
      currentUserId === winner.userId matched!
      ========================================================================= */
-  const prizeTitle = winningRecord.prize || 'Apple Watch Series 9';
+  const prizeConfig = getPrizeTypeConfig(winningRecord);
+  const prizeTitle = winningRecord.prize || winningRecord.title || 'Apple Watch Series 9';
   const prizeVal = winningRecord.value || '₹44,900';
   const ticketCode = winningRecord.ticket || '#VEL-10025-IN';
-  const isGiftCard = winningRecord.isGiftCard || prizeTitle.toLowerCase().includes('gift card') || prizeTitle.toLowerCase().includes('amazon');
 
   return (
     <section className={styles.claimSection} aria-label="Winner Celebration and Claim Area">
@@ -132,28 +163,33 @@ export default function WinnerClaimBanner({
                 )}
                 {claimState === 'processing' && (
                   <span className={styles.stateTagWarning}>
-                    <Hourglass size={12} /> Verification In Progress
+                    <Hourglass size={12} /> Processing Verification
                   </span>
                 )}
                 {claimState === 'completed' && (
-                  <span className={styles.stateTagDelivered}>
+                  <span className={styles.stateTagCompleted}>
                     <PackageCheck size={12} /> Prize Delivered ✓
                   </span>
                 )}
                 {claimState === 'expired' && (
                   <span className={styles.stateTagExpired}>
-                    <AlertTriangle size={12} /> Claim Expired
+                    <AlertTriangle size={12} /> Expired
                   </span>
                 )}
               </div>
 
-              <h2 className={styles.congratsTitle}>
-                🎉 Congratulations!
+              {/* Dynamic Heading based on Claim State */}
+              <h2 className={styles.heading}>
+                {claimState === 'not_submitted' && '🎉 Congratulations! You won:'}
+                {claimState === 'submitted' && 'Claim Submitted Successfully!'}
+                {claimState === 'processing' && 'Fulfillment in Progress'}
+                {claimState === 'completed' && 'Prize Delivered!'}
+                {claimState === 'expired' && 'Claim Window Expired'}
               </h2>
 
-              <p className={styles.wonText}>
-                You won <span className={styles.highlightPrize}>{prizeTitle}</span>!
-              </p>
+              <div className={styles.prizeTitle}>
+                {prizeTitle} <span className={styles.prizeValueHighlight}>({prizeVal})</span>
+              </div>
 
               {/* Requirement 32: Distinct Claim State Text Messages */}
               {claimState === 'not_submitted' && (
@@ -206,7 +242,7 @@ export default function WinnerClaimBanner({
               {claimState === 'not_submitted' && (
                 <div className={styles.deadlineRow}>
                   <Clock size={14} className={styles.clockIcon} />
-                  <span>Claim within: <strong>7 days</strong> • {isGiftCard ? 'Instant Email Delivery' : 'Free Insured Air Express'}</span>
+                  <span>Claim within: <strong>7 days</strong> • {prizeConfig.deliveryEstimate} ({prizeConfig.badgeText})</span>
                 </div>
               )}
             </div>
