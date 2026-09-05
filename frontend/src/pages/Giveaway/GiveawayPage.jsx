@@ -25,6 +25,7 @@ const WinnerRevealModal = lazy(() => import('../../components/WinnerReveal/Winne
 const PrizeDetailDrawer = lazy(() => import('../../components/PrizeDetailDrawer/PrizeDetailDrawer'));
 const EntryFeeConfirmationModal = lazy(() => import('../../components/EntryFeeConfirmationModal/EntryFeeConfirmationModal'));
 const LoginRequiredModal = lazy(() => import('../../components/LoginRequiredModal/LoginRequiredModal'));
+const AuthModal = lazy(() => import('../../components/AuthModal/AuthModal'));
 import ErrorState from '../../components/ErrorState/ErrorState';
 import {
   HeroSkeleton,
@@ -45,9 +46,12 @@ import {
 } from '../../data/giveawayData';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
+import { useAuth } from '../../context/AuthContext';
 import styles from './GiveawayPage.module.css';
 
 export default function GiveawayPage() {
+  const { user, isLoggedIn, updateUser, authModalConfig, closeAuthModal } = useAuth();
+
   // Application Data States
   const [giveaways, setGiveaways] = useState(mockActiveGiveaways);
   const [heroGiveaway, setHeroGiveaway] = useState(mockHeroGiveaway);
@@ -55,26 +59,50 @@ export default function GiveawayPage() {
   const [archiveWinners, setArchiveWinners] = useState(mockArchiveWinners);
 
   // User & Identity State (Requirements 32, 33, 34)
-  const [currentUserId, setCurrentUserId] = useState('VE10025');
+  const [currentUserId, setCurrentUserId] = useState(user?.userId || 'VE10025');
   const [claimState, setClaimState] = useState('not_submitted'); // 'not_submitted' | 'submitted' | 'processing' | 'completed' | 'expired'
 
   const [userState, setUserState] = useState({
-    name: 'Alex Thorne',
-    userId: 'VE10025',
-    isLoggedIn: true,
-    coins: 1450,
-    veloopCoins: 850,
-    sveCoins: 1200,
-    tokens: 5000,
-    activeTickets: 12,
+    name: user?.fullName || 'Alex Thorne',
+    userId: user?.userId || 'VE10025',
+    isLoggedIn: isLoggedIn,
+    coins: user?.coins || 1450,
+    veloopCoins: user?.veloopCoins || 850,
+    sveCoins: user?.sveCoins || 1200,
+    tokens: user?.tokens || 5000,
+    activeTickets: user?.activeTickets || 12,
     soundEnabled: true,
-    userEntries: {
+    userEntries: user?.userEntries || {
       'gw-apple-studio': { tickets: 5 },
       'gw-ps5-pro': { tickets: 3 },
       'gw-iphone-titanium': { tickets: 4 }
     },
     quests: mockQuestTasks
   });
+
+  // Keep userState in sync with centralized AuthContext
+  useEffect(() => {
+    if (user) {
+      setUserState(prev => ({
+        ...prev,
+        name: user.fullName || user.name || 'Member',
+        userId: user.userId || 'VE10025',
+        isLoggedIn: true,
+        coins: user.coins ?? prev.coins,
+        veloopCoins: user.veloopCoins ?? prev.veloopCoins,
+        sveCoins: user.sveCoins ?? prev.sveCoins,
+        tokens: user.tokens ?? prev.tokens,
+        activeTickets: user.activeTickets ?? prev.activeTickets,
+        userEntries: user.userEntries ?? prev.userEntries
+      }));
+      setCurrentUserId(user.userId || 'VE10025');
+    } else {
+      setUserState(prev => ({
+        ...prev,
+        isLoggedIn: false
+      }));
+    }
+  }, [user, isLoggedIn]);
 
   // Current Winner Matching (Requirement 34)
   const winningRecord = mockWinnerLookup.find(w => w.userId === currentUserId) || null;
@@ -977,6 +1005,15 @@ export default function GiveawayPage() {
             isOpen={isLoginRequiredOpen}
             onClose={() => setIsLoginRequiredOpen(false)}
             giveawayTitle={activeModalGiveaway?.title}
+          />
+        )}
+
+        {/* 9. Interactive Auth Modal */}
+        {authModalConfig?.isOpen && (
+          <AuthModal
+            isOpen={authModalConfig.isOpen}
+            initialMode={authModalConfig.mode}
+            onClose={closeAuthModal}
           />
         )}
       </Suspense>

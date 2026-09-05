@@ -49,6 +49,7 @@ import {
   mockHeroGiveaway,
   mockQuestTasks
 } from '../../data/giveawayData';
+import { useAuth } from '../../context/AuthContext';
 import styles from './GiveawayDetailsPage.module.css';
 
 const ParticipationModal = lazy(() => import('../../components/ParticipationModal/ParticipationModal'));
@@ -56,21 +57,25 @@ const ProvablyFairModal = lazy(() => import('../../components/ProvablyFairModal/
 const GiveawayRules = lazy(() => import('../../components/GiveawayRules/GiveawayRules'));
 const EntryFeeConfirmationModal = lazy(() => import('../../components/EntryFeeConfirmationModal/EntryFeeConfirmationModal'));
 const LoginRequiredModal = lazy(() => import('../../components/LoginRequiredModal/LoginRequiredModal'));
+const AuthModal = lazy(() => import('../../components/AuthModal/AuthModal'));
 
 export default function GiveawayDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user, isLoggedIn, updateUser, authModalConfig, closeAuthModal } = useAuth();
 
   const [giveaway, setGiveaway] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('veloop_theme') || 'dark');
   const [userState, setUserState] = useState({
-    name: 'Alex Thorne',
-    userId: 'VE10025',
-    isLoggedIn: true,
-    veloopCoins: 850,
-    sveCoins: 1200,
-    tokens: 5000,
-    userEntries: {
+    name: user?.fullName || 'Alex Thorne',
+    userId: user?.userId || 'VE10025',
+    isLoggedIn: isLoggedIn,
+    coins: user?.coins || 1450,
+    veloopCoins: user?.veloopCoins || 850,
+    sveCoins: user?.sveCoins || 1200,
+    tokens: user?.tokens || 5000,
+    activeTickets: user?.activeTickets || 8,
+    userEntries: user?.userEntries || {
       'GW-2026-08': { tickets: 8, oddsMultiplier: 1.5 },
       'gw-iphone-titanium': { tickets: 6, oddsMultiplier: 2.0 },
       'gw-smartwatch-titanium': { tickets: 3, oddsMultiplier: 1.0 },
@@ -81,6 +86,29 @@ export default function GiveawayDetailsPage() {
       'gw-ps5-pro': { tickets: 4, oddsMultiplier: 1.0 }
     }
   });
+
+  // Keep userState in sync with centralized AuthContext
+  useEffect(() => {
+    if (user) {
+      setUserState(prev => ({
+        ...prev,
+        name: user.fullName || user.name || 'Member',
+        userId: user.userId || 'VE10025',
+        isLoggedIn: true,
+        coins: user.coins ?? prev.coins,
+        veloopCoins: user.veloopCoins ?? prev.veloopCoins,
+        sveCoins: user.sveCoins ?? prev.sveCoins,
+        tokens: user.tokens ?? prev.tokens,
+        activeTickets: user.activeTickets ?? prev.activeTickets,
+        userEntries: user.userEntries ?? prev.userEntries
+      }));
+    } else {
+      setUserState(prev => ({
+        ...prev,
+        isLoggedIn: false
+      }));
+    }
+  }, [user, isLoggedIn]);
 
   const [isParticipationOpen, setIsParticipationOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -1640,6 +1668,14 @@ export default function GiveawayDetailsPage() {
             isOpen={isLoginRequiredOpen}
             onClose={() => setIsLoginRequiredOpen(false)}
             giveawayTitle={giveaway.title}
+          />
+        )}
+
+        {authModalConfig?.isOpen && (
+          <AuthModal
+            isOpen={authModalConfig.isOpen}
+            initialMode={authModalConfig.mode}
+            onClose={closeAuthModal}
           />
         )}
       </Suspense>
