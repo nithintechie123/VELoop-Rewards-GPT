@@ -21,6 +21,7 @@ import { PRIZE_TYPES } from '../utils/prizeTypeUtils';
 export const mockPrizes = [
   {
     id: "PRIZE-001",
+    slug: "iphone-15-pro",
     name: "iPhone 15 Pro",
     title: "iPhone 15 Pro",
     position: 1,
@@ -42,6 +43,7 @@ export const mockPrizes = [
   },
   {
     id: "PRIZE-002",
+    slug: "apple-watch",
     name: "Apple Watch Series 9",
     title: "Apple Watch Series 9",
     position: 2,
@@ -63,6 +65,7 @@ export const mockPrizes = [
   },
   {
     id: "PRIZE-003",
+    slug: "airpods",
     name: "AirPods Pro 2",
     title: "AirPods Pro 2",
     position: 3,
@@ -84,8 +87,9 @@ export const mockPrizes = [
   },
   {
     id: "PRIZE-004",
+    slug: "amazon-2000",
     name: "₹2,000 Amazon Gift Card",
-    title: "Amazon Gift Card",
+    title: "Amazon Gift Card (₹2,000)",
     position: 4,
     tier: "Lucky Draw",
     image: "/assets/images/rewards_gift_card.jpg",
@@ -100,6 +104,50 @@ export const mockPrizes = [
     valueUSD: 2000,
     accentTheme: "orange",
     badge: "Lucky Draw",
+    isGiftCard: true,
+    isInstantWin: true
+  },
+  {
+    id: "PRIZE-005",
+    slug: "amazon-500",
+    name: "₹500 Amazon Gift Card",
+    title: "Amazon Gift Card (₹500)",
+    position: 5,
+    tier: "Community Draw",
+    image: "/assets/images/rewards_gift_card.jpg",
+    description: "₹500 Amazon Gift Card redeemable instantly on Amazon India.",
+    model: "Instant Digital Redemption",
+    winnerCount: 25,
+    winnerLabel: "25 Winners",
+    type: "digital",
+    prizeType: PRIZE_TYPES.GIFT_CARD,
+    claimType: "digital_email",
+    value: "₹500",
+    valueUSD: 500,
+    accentTheme: "orange",
+    badge: "Community Draw",
+    isGiftCard: true,
+    isInstantWin: true
+  },
+  {
+    id: "PRIZE-006",
+    slug: "amazon-20",
+    name: "₹20 Amazon Gift Card Voucher",
+    title: "Amazon Gift Card (₹20 Flash)",
+    position: 6,
+    tier: "Flash Draw",
+    image: "/assets/images/rewards_gift_card.jpg",
+    description: "₹20 Amazon Gift Card flash drop for daily active quest streak completers.",
+    model: "Instant Digital Drop",
+    winnerCount: 100,
+    winnerLabel: "100 Winners",
+    type: "digital",
+    prizeType: PRIZE_TYPES.GIFT_CARD,
+    claimType: "digital_email",
+    value: "₹20",
+    valueUSD: 20,
+    accentTheme: "gold",
+    badge: "Flash Drop",
     isGiftCard: true,
     isInstantWin: true
   }
@@ -163,6 +211,7 @@ export const mockHeroGiveaway = {
 export const mockActiveGiveaways = [
   {
     id: "gw-iphone-titanium",
+    slug: "iphone-15-pro",
     prizeId: "PRIZE-001",
     isHero: false,
     prizeTier: "1st Prize",
@@ -170,7 +219,7 @@ export const mockActiveGiveaways = [
     accentTheme: "purple",
     title: "iPhone 15 Pro",
     name: "iPhone 15 Pro",
-    description: "Latest iPhone 15 Pro 128GB with Aerospace-grade Titanium chassis.",
+    description: "Latest iPhone 15 Pro 128GB with Aerospace-grade Titanium chassis and A17 Pro chip.",
     subtitle: "Latest iPhone 15 Pro 128GB with Aerospace-grade Titanium chassis.",
     type: "physical",
     prizeType: PRIZE_TYPES.PHYSICAL,
@@ -188,6 +237,7 @@ export const mockActiveGiveaways = [
     totalParticipants: 2350,
     totalTickets: 14210,
     totalTicketsEntered: 14210,
+    poolCap: 25000,
     winnerCount: 1,
     winnerLabel: "1 Winner",
     badge: "1st Prize",
@@ -195,6 +245,7 @@ export const mockActiveGiveaways = [
   },
   {
     id: "gw-smartwatch-titanium",
+    slug: "apple-watch",
     prizeId: "PRIZE-002",
     isHero: false,
     prizeTier: "2nd Prize",
@@ -202,7 +253,7 @@ export const mockActiveGiveaways = [
     accentTheme: "blue",
     title: "Apple Watch Series 9",
     name: "Apple Watch Series 9",
-    description: "Latest Apple Watch Series 9 with Always-On Retina display & S9 SiP.",
+    description: "Latest Apple Watch Series 9 with Always-On Retina display & S9 SiP precision tracking.",
     subtitle: "Latest Apple Watch Series 9 with Always-On Retina display & S9 SiP.",
     type: "physical",
     prizeType: PRIZE_TYPES.PHYSICAL,
@@ -220,6 +271,7 @@ export const mockActiveGiveaways = [
     totalParticipants: 1840,
     totalTickets: 8120,
     totalTicketsEntered: 8120,
+    poolCap: 20000,
     winnerCount: 3,
     winnerLabel: "3 Winners",
     badge: "2nd Prize",
@@ -227,6 +279,7 @@ export const mockActiveGiveaways = [
   },
   {
     id: "gw-audio-airpods",
+    slug: "airpods",
     prizeId: "PRIZE-003",
     isHero: false,
     prizeTier: "3rd Prize",
@@ -252,21 +305,23 @@ export const mockActiveGiveaways = [
     totalParticipants: 3120,
     totalTickets: 9420,
     totalTicketsEntered: 9420,
+    poolCap: 25000,
     winnerCount: 5,
     winnerLabel: "5 Winners",
     badge: "3rd Prize",
     isInstantWin: false
   },
   {
-    id: "gw-gift-card-1000",
+    id: "gw-gift-card-2000",
+    slug: "amazon-2000",
     prizeId: "PRIZE-004",
     isHero: false,
     prizeTier: "Lucky Draw",
     position: 4,
     accentTheme: "orange",
-    title: "Amazon Gift Card",
+    title: "Amazon Gift Card (₹2,000)",
     name: "₹2,000 Amazon Gift Card",
-    description: "₹2,000 Amazon Gift Card redeemable instantly on Amazon India.",
+    description: "₹2,000 Amazon Gift Card redeemable instantly on Amazon India with email voucher dispatch.",
     subtitle: "₹2,000 Amazon Gift Card redeemable instantly on Amazon India.",
     type: "digital",
     prizeType: PRIZE_TYPES.GIFT_CARD,
@@ -284,10 +339,113 @@ export const mockActiveGiveaways = [
     totalParticipants: 1350,
     totalTickets: 28900,
     totalTicketsEntered: 28900,
+    poolCap: 50000,
     winnerCount: 10,
     winnerLabel: "10 Winners",
     badge: "Lucky Draw",
     isInstantWin: true
+  },
+  {
+    id: "gw-gift-card-500",
+    slug: "amazon-500",
+    prizeId: "PRIZE-005",
+    isHero: false,
+    prizeTier: "Community Draw",
+    position: 5,
+    accentTheme: "orange",
+    title: "Amazon Gift Card (₹500)",
+    name: "₹500 Amazon Gift Card",
+    description: "₹500 Amazon Gift Card digital code for everyday shopping and digital content on Amazon India.",
+    subtitle: "₹500 Amazon Gift Card redeemable instantly on Amazon India.",
+    type: "digital",
+    prizeType: PRIZE_TYPES.GIFT_CARD,
+    claimType: "digital_email",
+    category: "Gift Cards & Cash",
+    filterTag: "active",
+    image: "/assets/images/rewards_gift_card.jpg",
+    valueUSD: 500,
+    status: "active",
+    statusLabel: "Community Draw",
+    startDate: "2026-08-01T00:00:00.000Z",
+    endDate: new Date(Date.now() + 6 * 86400000 + 8 * 3600000).toISOString(),
+    endsAt: new Date(Date.now() + 6 * 86400000 + 8 * 3600000).toISOString(),
+    participants: 2890,
+    totalParticipants: 2890,
+    totalTickets: 19400,
+    totalTicketsEntered: 19400,
+    poolCap: 30000,
+    winnerCount: 25,
+    winnerLabel: "25 Winners",
+    badge: "Community Draw",
+    isInstantWin: true
+  },
+  {
+    id: "gw-gift-card-20",
+    slug: "amazon-20",
+    prizeId: "PRIZE-006",
+    isHero: false,
+    prizeTier: "Flash Draw",
+    position: 6,
+    accentTheme: "gold",
+    title: "Amazon Gift Card (₹20 Flash)",
+    name: "₹20 Amazon Gift Card Voucher",
+    description: "₹20 Amazon Gift Card flash voucher drop with guaranteed high winner count.",
+    subtitle: "₹20 Amazon Gift Card flash drop for daily active quest streak completers.",
+    type: "digital",
+    prizeType: PRIZE_TYPES.GIFT_CARD,
+    claimType: "digital_email",
+    category: "Gift Cards & Cash",
+    filterTag: "active",
+    image: "/assets/images/rewards_gift_card.jpg",
+    valueUSD: 20,
+    status: "active",
+    statusLabel: "Flash Drop",
+    startDate: "2026-08-01T00:00:00.000Z",
+    endDate: new Date(Date.now() + 2 * 86400000 + 18 * 3600000).toISOString(),
+    endsAt: new Date(Date.now() + 2 * 86400000 + 18 * 3600000).toISOString(),
+    participants: 4500,
+    totalParticipants: 4500,
+    totalTickets: 45000,
+    totalTicketsEntered: 45000,
+    poolCap: 60000,
+    winnerCount: 100,
+    winnerLabel: "100 Winners",
+    badge: "Flash Drop",
+    isInstantWin: true
+  },
+  {
+    id: "gw-ps5-pro",
+    slug: "ps5-pro",
+    prizeId: "PRIZE-007",
+    isHero: false,
+    prizeTier: "Grand Prize",
+    position: 7,
+    accentTheme: "blue",
+    title: "Sony PlayStation 5 Pro",
+    name: "PlayStation 5 Pro Gaming Rig",
+    description: "Sony PS5 Pro Console with 2TB SSD, DualSense Edge Wireless Controller, and Pulse 3D Wireless Headset.",
+    subtitle: "Next-gen 4K 120FPS gaming bundle with DualSense Edge controller.",
+    type: "physical",
+    prizeType: PRIZE_TYPES.PHYSICAL,
+    claimType: "shipping_address",
+    category: "Gaming & VR",
+    filterTag: "active",
+    image: "/assets/images/ps5_gaming_bundle.jpg",
+    valueUSD: 119900,
+    status: "active",
+    statusLabel: "Giveaway Live",
+    startDate: "2026-08-01T00:00:00.000Z",
+    endDate: new Date(Date.now() + 8 * 86400000 + 10 * 3600000).toISOString(),
+    endsAt: new Date(Date.now() + 8 * 86400000 + 10 * 3600000).toISOString(),
+    participants: 3900,
+    totalParticipants: 3900,
+    totalTickets: 21200,
+    totalTicketsEntered: 21200,
+    poolCap: 35000,
+    winnerCount: 1,
+    winnerLabel: "1 Winner",
+    badge: "Grand Prize",
+    isInstantWin: false
   }
 ];
 
@@ -494,4 +652,74 @@ export const mockWinnerLookup = [
     isGiftCard: false
   }
 ];
+
+/**
+ * Requirement 79: Slug Normalization & Individual Giveaway Resolver
+ */
+export function getGiveawaySlug(item) {
+  if (!item) return '';
+  if (item.slug) return item.slug;
+  const title = item.title || item.name || '';
+  return title
+    .toLowerCase()
+    .replace(/[₹,()]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+export function getAllGiveaways() {
+  const all = [...mockActiveGiveaways];
+  // Ensure hero is accessible
+  if (!all.some(g => g.id === mockHeroGiveaway.id)) {
+    all.unshift({
+      ...mockHeroGiveaway,
+      slug: mockHeroGiveaway.slug || 'creator-bundle'
+    });
+  }
+  return all;
+}
+
+export function getGiveawayBySlug(slug) {
+  if (!slug) return null;
+  const normalized = slug.toLowerCase().replace(/^\/giveaway\//, '').trim();
+
+  // Direct slug match in active giveaways
+  const activeMatch = mockActiveGiveaways.find(g => g.slug === normalized || g.id === normalized);
+  if (activeMatch) return activeMatch;
+
+  // Prize match
+  const prizeMatch = mockPrizes.find(p => p.slug === normalized || p.id === normalized);
+  if (prizeMatch) {
+    const parentActive = mockActiveGiveaways.find(g => g.prizeId === prizeMatch.id || g.slug === prizeMatch.slug);
+    if (parentActive) return parentActive;
+    return {
+      ...prizeMatch,
+      status: "active",
+      statusLabel: "Giveaway Live",
+      endDate: new Date(Date.now() + 5 * 86400000).toISOString(),
+      participants: 1200,
+      totalTickets: 8500,
+      poolCap: 20000
+    };
+  }
+
+  // Hero match
+  if (
+    normalized === 'creator-bundle' ||
+    normalized === 'macbook-pro' ||
+    normalized === 'flagship' ||
+    normalized === mockHeroGiveaway.id.toLowerCase()
+  ) {
+    return {
+      ...mockHeroGiveaway,
+      slug: 'creator-bundle'
+    };
+  }
+
+  // Fallback match by substring
+  return mockActiveGiveaways.find(g => {
+    const s = getGiveawaySlug(g);
+    return s.includes(normalized) || normalized.includes(s);
+  }) || mockActiveGiveaways[0];
+}
 

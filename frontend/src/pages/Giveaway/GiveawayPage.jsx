@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Gift } from 'lucide-react';
 
 import Header from '../../components/Header/Header';
@@ -153,6 +154,15 @@ export default function GiveawayPage() {
     }));
     setCurrentUserId('VE10025');
     showToast('👤 Logged In as Member', 'Welcome back, Alex Thorne (VE10025)! Free daily entries unlocked.', 'success');
+  };
+
+  const navigate = useNavigate();
+
+  const handleNavigateToDetails = (giveawayIdOrSlug) => {
+    soundFx.playClick();
+    const found = giveaways.find(g => g.id === giveawayIdOrSlug || g.slug === giveawayIdOrSlug);
+    const slug = found?.slug || giveawayIdOrSlug;
+    navigate(`/giveaway/${slug}`);
   };
 
   // Participation Handlers
@@ -715,7 +725,7 @@ export default function GiveawayPage() {
                   giveaways={giveaways}
                   userEntries={userState.userEntries}
                   isLoggedIn={userState.isLoggedIn !== false}
-                  onEnterGiveaway={handleOpenParticipation}
+                  onEnterGiveaway={handleNavigateToDetails}
                   onViewDetails={(prize) => {
                     soundFx.playClick();
                     setSelectedDrawerPrize(prize);
@@ -747,7 +757,7 @@ export default function GiveawayPage() {
             currentTab={activeWinnersTab}
             onInspectProof={handleInspectProof}
             onOpenFairModal={() => { setInspectingWinner(null); setIsFairOpen(true); }}
-            onEnterGiveaway={handleOpenParticipation}
+            onEnterGiveaway={handleNavigateToDetails}
           />
         )}
 

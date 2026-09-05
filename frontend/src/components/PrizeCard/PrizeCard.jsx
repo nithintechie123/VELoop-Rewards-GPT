@@ -39,7 +39,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
   const handleJoinClick = (e) => {
     e.stopPropagation();
     soundFx.playClick();
-    if (onEnter) onEnter(giveaway.id);
+    if (onEnter) onEnter(giveaway.slug || giveaway.id, giveaway);
   };
 
   const handleDetailsClick = (e) => {
@@ -259,7 +259,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               aria-label={`Join giveaway ${giveaway.title}`}
             >
               <Zap size={16} />
-              <span>Join Giveaway →</span>
+              <span>Join Now →</span>
             </motion.button>
           )}
 
