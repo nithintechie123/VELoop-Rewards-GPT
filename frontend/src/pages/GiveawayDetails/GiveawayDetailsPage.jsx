@@ -233,6 +233,24 @@ export default function GiveawayDetailsPage() {
             <h1 className={styles.heading}>{giveaway.title}</h1>
             <p className={styles.description}>{giveaway.description || giveaway.subtitle}</p>
 
+            {/* Requirement 80: High-Visibility Cost & Currency Callout Banner */}
+            <div className={styles.costCalloutBanner}>
+              <div className={styles.costItem}>
+                <span className={styles.costLabel}>JOINING COST</span>
+                <strong className={styles.costHighlightFree}>₹0.00 (100% FREE)</strong>
+              </div>
+              <div className={styles.costDivider}></div>
+              <div className={styles.costItem}>
+                <span className={styles.costLabel}>CURRENCY REQUIRED</span>
+                <strong className={styles.costVal}>0 Real Money / 0 Cash</strong>
+              </div>
+              <div className={styles.costDivider}></div>
+              <div className={styles.costItem}>
+                <span className={styles.costLabel}>FREE DAILY ENTRY</span>
+                <strong className={styles.costVal}>1 Ticket Guaranteed</strong>
+              </div>
+            </div>
+
             {/* Countdown Box */}
             <div className={styles.countdownWrapper}>
               <span className={styles.countdownLabel}>
@@ -310,6 +328,12 @@ export default function GiveawayDetailsPage() {
               <Layers size={16} /> Reward Details & Specs
             </button>
             <button
+              className={`${styles.tabBtn} ${activeTab === 'howitworks' ? styles.tabBtnActive : ''}`}
+              onClick={() => { soundFx.playClick(); setActiveTab('howitworks'); }}
+            >
+              <CheckCircle2 size={16} /> How It Works & Transparency
+            </button>
+            <button
               className={`${styles.tabBtn} ${activeTab === 'odds' ? styles.tabBtnActive : ''}`}
               onClick={() => { soundFx.playClick(); setActiveTab('odds'); }}
             >
@@ -325,7 +349,7 @@ export default function GiveawayDetailsPage() {
               className={`${styles.tabBtn} ${activeTab === 'rules' ? styles.tabBtnActive : ''}`}
               onClick={() => { soundFx.playClick(); setActiveTab('rules'); }}
             >
-              <Award size={16} /> Terms & Fair Eligibility
+              <Award size={16} /> Terms & Eligibility
             </button>
           </div>
 
@@ -353,12 +377,69 @@ export default function GiveawayDetailsPage() {
                 </div>
 
                 <div className={styles.packageInclusions}>
-                  <h4>Official Box Contents:</h4>
+                  <h4>Official Box Contents & Warranty:</h4>
                   <ul>
                     <li>Brand New Factory-Sealed Unit with 1-Year Comprehensive Manufacturer Warranty</li>
-                    <li>Official retail box with all standard accessories and charging cables</li>
+                    <li>Official retail packaging with all standard charging cables and user manuals</li>
                     <li>Certificate of Provenance & Cryptographic Draw Receipt</li>
                   </ul>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'howitworks' && (
+              <div className={styles.tabPanel}>
+                <h3>🔍 Everything You Need to Know Before Joining</h3>
+                <p>We believe in 100% transparency. Here is the complete breakdown of how this giveaway operates:</p>
+
+                <div className={styles.transparencyGrid}>
+                  <div className={styles.transparencyCard}>
+                    <div className={styles.transparencyHeader}>
+                      <span className={styles.transparencyIcon}>💰</span>
+                      <strong>How Much Does It Cost?</strong>
+                    </div>
+                    <p><strong>₹0.00 (Zero).</strong> No purchase or payment of any kind is required. Every verified member is entitled to a free baseline ticket.</p>
+                  </div>
+
+                  <div className={styles.transparencyCard}>
+                    <div className={styles.transparencyHeader}>
+                      <span className={styles.transparencyIcon}>🪙</span>
+                      <strong>What Currency is Required?</strong>
+                    </div>
+                    <p><strong>Zero Real Cash / 0 INR.</strong> In-platform loyalty VELoop coins can be optionally earned through non-monetary daily quests to boost multiplier tiers.</p>
+                  </div>
+
+                  <div className={styles.transparencyCard}>
+                    <div className={styles.transparencyHeader}>
+                      <span className={styles.transparencyIcon}>⏳</span>
+                      <strong>Giveaway Duration & Draw Time</strong>
+                    </div>
+                    <p>Pool locks at <strong>23:59 IST on {new Date(giveaway.endDate || giveaway.endsAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>. The countdown timer on this page is synchronized across all users.</p>
+                  </div>
+
+                  <div className={styles.transparencyCard}>
+                    <div className={styles.transparencyHeader}>
+                      <span className={styles.transparencyIcon}>🛡️</span>
+                      <strong>Eligibility & Important Restrictions</strong>
+                    </div>
+                    <p>Open to users aged 18+. Strictly <strong>1 account per human</strong>. Automated scripts/bots will result in immediate disqualification and permanent ban.</p>
+                  </div>
+
+                  <div className={styles.transparencyCard}>
+                    <div className={styles.transparencyHeader}>
+                      <span className={styles.transparencyIcon}>🎲</span>
+                      <strong>How the Winner is Selected</strong>
+                    </div>
+                    <p>Winners are chosen via our <strong>SHA-256 Provably Fair algorithm</strong> combining locked server seeds, client entropy, and blockchain hashes for un-riggable transparency.</p>
+                  </div>
+
+                  <div className={styles.transparencyCard}>
+                    <div className={styles.transparencyHeader}>
+                      <span className={styles.transparencyIcon}>📦</span>
+                      <strong>What Happens After Joining?</strong>
+                    </div>
+                    <p>Your unique ticket ID is recorded. If your ticket wins, the prize claim portal activates with <strong>7 calendar days</strong> to confirm courier shipping or email voucher dispatch.</p>
+                  </div>
                 </div>
               </div>
             )}
@@ -427,12 +508,14 @@ export default function GiveawayDetailsPage() {
 
             {activeTab === 'rules' && (
               <div className={styles.tabPanel}>
-                <h3>🛡️ Official Giveaway Terms</h3>
+                <h3>🛡️ Official Giveaway Terms & Conditions</h3>
                 <ul className={styles.rulesList}>
-                  <li><strong>No Purchase Necessary:</strong> Free entries are provided to all authenticated users.</li>
-                  <li><strong>Eligibility:</strong> Open to verified account holders aged 18+.</li>
+                  <li><strong>No Purchase Necessary:</strong> Free entries are provided to all authenticated users. No payment required to enter or win.</li>
+                  <li><strong>Eligibility:</strong> Open to verified account holders aged 18+ worldwide.</li>
+                  <li><strong>Entry Limits:</strong> Strictly capped at 50 tickets per user to maintain fair odds across the entire community.</li>
                   <li><strong>Claim Deadline:</strong> Declared winners have 7 calendar days to submit recipient details.</li>
-                  <li><strong>Audit Logs:</strong> Complete seed hashes are publicly verifiable upon draw conclusion.</li>
+                  <li><strong>Shipping & Taxes:</strong> All shipping, handling, and insurance fees are 100% covered by VELoop Rewards and authorized sponsors.</li>
+                  <li><strong>Audit Logs:</strong> Complete seed hashes are publicly verifiable upon draw conclusion via the SHA-256 audit modal.</li>
                 </ul>
               </div>
             )}
