@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Gift, Ticket, Sparkles, ArrowRight } from 'lucide-react';
+import { Trophy, Gift, Ticket, ArrowRight } from 'lucide-react';
 import styles from './EmptyState.module.css';
 
 /**

@@ -6,7 +6,6 @@ import {
   Ticket,
   Volume2,
   VolumeX,
-  Sparkles,
   Award,
   Sun,
   Moon,
@@ -41,7 +40,7 @@ export default function Header({
   onOpenRules,
   onLoginClick
 }) {
-  const { user, isLoggedIn, logout, switchDemoUser, demoProfiles, claimDailyBonus, openAuthModal } = useAuth();
+  const { user, isLoggedIn, logout, claimDailyBonus, openAuthModal } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -56,9 +55,8 @@ export default function Header({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Effective user values
-  const effectiveUser = user || (userState?.isLoggedIn !== false ? userState : null);
-  const isVisitor = !isLoggedIn && userState?.isLoggedIn === false;
+  const effectiveUser = user;
+  const isVisitor = !isLoggedIn;
 
   const totalCoins = effectiveUser?.coins || effectiveUser?.veloopCoins || 0;
   const activeTicketsCount = effectiveUser?.activeTickets || 0;
@@ -120,26 +118,20 @@ export default function Header({
             {/* If Visitor (Logged-Out) */}
             {isVisitor ? (
               <div className={styles.authBtnGroup}>
-                <button
+                <Link
+                  to="/login"
                   className={styles.loginPillBtn}
-                  onClick={() => {
-                    soundFx.playClick();
-                    if (onLoginClick) onLoginClick();
-                    else openAuthModal('login');
-                  }}
+                  onClick={() => soundFx.playClick()}
                 >
                   <LogIn size={15} /> Login
-                </button>
-                <button
+                </Link>
+                <Link
+                  to="/login?mode=signup"
                   className={styles.registerPillBtn}
-                  onClick={() => {
-                    soundFx.playClick();
-                    if (onLoginClick) onLoginClick();
-                    else openAuthModal('signup');
-                  }}
+                  onClick={() => soundFx.playClick()}
                 >
                   <UserPlus size={15} /> Register Free
-                </button>
+                </Link>
               </div>
             ) : (
               <>
@@ -245,25 +237,8 @@ export default function Header({
                           <Zap size={15} /> Claim +200 VEs Daily Bonus
                         </button>
 
-                        {/* Quick Demo Profile Switchers */}
+                        {/* Account Actions */}
                         <div className={styles.dropdownActions}>
-                          <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700, padding: '0 0.5rem' }}>
-                            Switch Demo Profile:
-                          </span>
-                          {demoProfiles.map((p) => (
-                            <button
-                              key={p.id}
-                              className={styles.dropdownItem}
-                              onClick={() => {
-                                switchDemoUser(p);
-                                setIsProfileOpen(false);
-                              }}
-                            >
-                              <Users size={14} />
-                              <span>{p.fullName} ({p.tier.split(' ')[0]})</span>
-                            </button>
-                          ))}
-
                           <button
                             className={`${styles.dropdownItem} ${styles.logoutItem}`}
                             onClick={() => {

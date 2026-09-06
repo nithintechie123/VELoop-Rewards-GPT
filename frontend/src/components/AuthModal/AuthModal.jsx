@@ -24,12 +24,12 @@ export default function AuthModal({
   onClose,
   onSuccess
 }) {
-  const { login, register, demoProfiles } = useAuth();
+  const { login, register } = useAuth();
 
   const [mode, setMode] = useState(initialMode);
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('alex.thorne@veloop.io');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -89,18 +89,6 @@ export default function AuthModal({
     }
   };
 
-  const handleQuickDemoFill = () => {
-    soundFx.playClick();
-    const demo = demoProfiles[0];
-    if (demo) {
-      setEmail(demo.email);
-      setPassword(demo.password);
-      setFullName(demo.fullName);
-      setMode('login');
-      setErrorMessage('');
-    }
-  };
-
   return (
     <AnimatePresence>
       <motion.div
@@ -138,7 +126,7 @@ export default function AuthModal({
             <p className={styles.brandSubtitle}>
               {mode === 'login'
                 ? 'Sign in to access your sweepstakes entries & prize vault'
-                : 'Create your free account for instant daily entries & bonuses'}
+                : 'Create your account stored securely in our database'}
             </p>
 
             {mode === 'signup' && (
@@ -170,7 +158,7 @@ export default function AuthModal({
                 setErrorMessage('');
               }}
             >
-              <UserPlus size={14} /> Register
+              <UserPlus size={14} /> Register Free
             </button>
           </div>
 
@@ -195,14 +183,14 @@ export default function AuthModal({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className={styles.textInput}
-                    placeholder="Alex Thorne"
+                    placeholder="Enter full name"
                   />
                 </div>
               </div>
             )}
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Email</label>
+              <label className={styles.inputLabel}>Email Address</label>
               <div className={styles.inputWrap}>
                 <Mail size={15} className={styles.inputIcon} />
                 <input
@@ -246,7 +234,7 @@ export default function AuthModal({
               className={styles.submitBtn}
             >
               {isLoading ? (
-                <span>Authenticating...</span>
+                <span>Connecting to Server...</span>
               ) : mode === 'login' ? (
                 <>
                   <LogIn size={16} />
@@ -260,18 +248,6 @@ export default function AuthModal({
               )}
             </button>
           </form>
-
-          {/* Quick Demo Helper */}
-          <div className={styles.quickDemoRow}>
-            <span>Demo: <code>alex.thorne@veloop.io</code></span>
-            <button
-              type="button"
-              className={styles.demoFillBtn}
-              onClick={handleQuickDemoFill}
-            >
-              Auto-fill
-            </button>
-          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>

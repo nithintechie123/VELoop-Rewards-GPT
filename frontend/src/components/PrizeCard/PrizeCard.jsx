@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Users, Ticket, Info, Sparkles, Trophy, ArrowRight } from 'lucide-react';
+import { Zap, Users, Ticket, Info, Sparkles, Trophy } from 'lucide-react';
 import Countdown from '../Countdown/Countdown';
 import { soundFx } from '../../utils/soundFx';
 import styles from './PrizeCard.module.css';

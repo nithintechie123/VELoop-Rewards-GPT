@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Trophy, Sparkles } from 'lucide-react';
+import { Clock, Trophy } from 'lucide-react';
 import styles from './Countdown.module.css';
 
 export default function Countdown({ targetDate, compact = false, onExpire, label = 'Ends In' }) {

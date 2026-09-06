@@ -132,6 +132,18 @@ class SoundFX {
       });
     });
   }
+
+  playCelebration() {
+    this.playFanfare();
+  }
+
+  playWin() {
+    this.playFanfare();
+  }
+
+  playError() {
+    this.playClick();
+  }
 }
 
 export const soundFx = new SoundFX();

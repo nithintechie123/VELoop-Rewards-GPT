@@ -14,15 +14,12 @@ import {
   Loader2,
   Award,
   Key,
-  Gamepad2,
-  Truck
+  Gamepad2
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
 import {
   getPrizeTypeConfig,
-  isPhysicalPrize,
-  isGiftCardPrize,
   isDigitalPrize,
   PRIZE_TYPES
 } from '../../utils/prizeTypeUtils';

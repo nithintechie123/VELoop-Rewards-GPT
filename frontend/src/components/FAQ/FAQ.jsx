@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, HelpCircle, Sparkles, MessageCircleQuestion } from 'lucide-react';
+import { ChevronDown, HelpCircle, MessageCircleQuestion } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import styles from './FAQ.module.css';
 

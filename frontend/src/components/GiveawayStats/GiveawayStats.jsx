@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Gift, Users, Trophy, Clock, Sparkles } from 'lucide-react';
+import { Gift, Users, Trophy, Clock } from 'lucide-react';
 import styles from './GiveawayStats.module.css';
 
 /**

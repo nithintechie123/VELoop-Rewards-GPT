@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Gift, ShieldCheck, Sparkles, ArrowRight, Trophy, Zap } from 'lucide-react';
+import { Gift, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
 import styles from './PreFooterCTA.module.css';

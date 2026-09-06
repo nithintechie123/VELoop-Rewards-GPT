@@ -651,12 +651,6 @@ export const mockCoinPacks = [
   { coins: 2500, tickets: 35, label: "VIP Vault Pack", badge: "Best Value" }
 ];
 
-export const PrizeTypes = {
-  PHYSICAL: 'PHYSICAL',
-  GIFT_CARD: 'GIFT_CARD',
-  DIGITAL: 'DIGITAL'
-};
-
 export const mockWinnerLookup = [
   {
     userId: "VE10025",

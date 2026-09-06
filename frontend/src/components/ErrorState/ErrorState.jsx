@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, RefreshCw, ShieldAlert, ArrowRight } from 'lucide-react';
+import { AlertCircle, RefreshCw, ShieldAlert } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import styles from './ErrorState.module.css';
 

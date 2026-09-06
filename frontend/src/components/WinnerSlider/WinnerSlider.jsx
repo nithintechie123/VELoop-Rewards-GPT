@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import styles from './WinnerSlider.module.css';
 
 export default function WinnerSlider({ isLiveBackend = false }) {

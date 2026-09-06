@@ -17,20 +17,16 @@ import {
   Layers,
   ChevronRight,
   TrendingUp,
-  Percent,
   Calendar,
-  Gift,
   AlertCircle,
   AlertTriangle,
   Package,
   Coins,
-  Star,
   Eye,
   UserCheck,
   PackageCheck,
   ArrowDown,
   ChevronDown,
-  ChevronUp,
   Info,
   ShieldAlert,
   FileText,
@@ -45,9 +41,7 @@ import { ConfettiManager } from '../../utils/confetti';
 import { getPrizeTypeConfig, validateUserCurrencyBalance } from '../../utils/prizeTypeUtils';
 import {
   getGiveawayBySlug,
-  mockActiveGiveaways,
-  mockHeroGiveaway,
-  mockQuestTasks
+  mockActiveGiveaways
 } from '../../data/giveawayData';
 import { useAuth } from '../../context/AuthContext';
 import styles from './GiveawayDetailsPage.module.css';
@@ -67,24 +61,15 @@ export default function GiveawayDetailsPage() {
   const [giveaway, setGiveaway] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('veloop_theme') || 'dark');
   const [userState, setUserState] = useState({
-    name: user?.fullName || 'Alex Thorne',
-    userId: user?.userId || 'VE10025',
+    name: user?.fullName || 'Guest',
+    userId: user?.userId || null,
     isLoggedIn: isLoggedIn,
-    coins: user?.coins || 1450,
-    veloopCoins: user?.veloopCoins || 850,
-    sveCoins: user?.sveCoins || 1200,
-    tokens: user?.tokens || 5000,
-    activeTickets: user?.activeTickets || 8,
-    userEntries: user?.userEntries || {
-      'GW-2026-08': { tickets: 8, oddsMultiplier: 1.5 },
-      'gw-iphone-titanium': { tickets: 6, oddsMultiplier: 2.0 },
-      'gw-smartwatch-titanium': { tickets: 3, oddsMultiplier: 1.0 },
-      'gw-audio-airpods': { tickets: 2, oddsMultiplier: 1.0 },
-      'gw-gift-card-2000': { tickets: 10, oddsMultiplier: 3.0 },
-      'gw-gift-card-500': { tickets: 5, oddsMultiplier: 1.5 },
-      'gw-gift-card-20': { tickets: 1, oddsMultiplier: 1.0 },
-      'gw-ps5-pro': { tickets: 4, oddsMultiplier: 1.0 }
-    }
+    coins: user?.coins || user?.veloopCoins || 0,
+    veloopCoins: user?.veloopCoins || 0,
+    sveCoins: user?.sveCoins || 0,
+    tokens: user?.tokens || 0,
+    activeTickets: user?.activeTickets || 0,
+    userEntries: user?.userEntries || {}
   });
 
   // Keep userState in sync with centralized AuthContext
@@ -93,19 +78,27 @@ export default function GiveawayDetailsPage() {
       setUserState(prev => ({
         ...prev,
         name: user.fullName || user.name || 'Member',
-        userId: user.userId || 'VE10025',
+        userId: user.userId || user.id,
         isLoggedIn: true,
-        coins: user.coins ?? prev.coins,
-        veloopCoins: user.veloopCoins ?? prev.veloopCoins,
-        sveCoins: user.sveCoins ?? prev.sveCoins,
-        tokens: user.tokens ?? prev.tokens,
-        activeTickets: user.activeTickets ?? prev.activeTickets,
-        userEntries: user.userEntries ?? prev.userEntries
+        coins: user.coins ?? user.veloopCoins ?? 0,
+        veloopCoins: user.veloopCoins ?? 0,
+        sveCoins: user.sveCoins ?? 0,
+        tokens: user.tokens ?? 0,
+        activeTickets: user.activeTickets ?? 0,
+        userEntries: user.userEntries ?? {}
       }));
     } else {
       setUserState(prev => ({
         ...prev,
-        isLoggedIn: false
+        name: 'Guest',
+        userId: null,
+        isLoggedIn: false,
+        coins: 0,
+        veloopCoins: 0,
+        sveCoins: 0,
+        tokens: 0,
+        activeTickets: 0,
+        userEntries: {}
       }));
     }
   }, [user, isLoggedIn]);

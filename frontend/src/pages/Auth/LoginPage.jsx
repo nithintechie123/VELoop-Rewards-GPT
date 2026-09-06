@@ -14,8 +14,7 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  Gift,
-  CheckCircle2
+  Gift
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { soundFx } from '../../utils/soundFx';
@@ -24,15 +23,15 @@ import styles from './LoginPage.module.css';
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login, register, demoProfiles, switchDemoUser } = useAuth();
+  const { login, register } = useAuth();
 
   const redirectUrl = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
   const initialMode = searchParams.get('mode') === 'signup' || searchParams.get('mode') === 'register' ? 'signup' : 'login';
 
   const [mode, setMode] = useState(initialMode);
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('alex.thorne@veloop.io');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [agreeTerms, setAgreeTerms] = useState(true);
@@ -56,9 +55,12 @@ export default function LoginPage() {
 
   const strength = calculateStrength(password);
 
+  const [infoNotice, setInfoNotice] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setInfoNotice('');
 
     if (mode === 'signup') {
       if (!fullName.trim()) {
@@ -83,7 +85,15 @@ export default function LoginPage() {
       if (res.success) {
         navigate(redirectUrl);
       } else {
-        setErrorMessage(res.error);
+        // If user is not found in database, redirect to register mode
+        if (res.notFound || res.status === 404 || res.error?.toLowerCase().includes('no account')) {
+          soundFx.playClick();
+          setMode('signup');
+          setInfoNotice(`No account found for "${email}". We've redirected you to create your account — enter your full name below to get your +500 VEs signup bonus!`);
+          navigate(`/login?mode=signup&redirect=${encodeURIComponent(redirectUrl)}`, { replace: true });
+        } else {
+          setErrorMessage(res.error);
+        }
       }
     } else {
       const res = await register({ fullName, email, password, rememberMe });
@@ -96,15 +106,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleSelectDemoUser = (demoUser) => {
-    soundFx.playClick();
-    setEmail(demoUser.email);
-    setPassword(demoUser.password);
-    setFullName(demoUser.fullName);
-    setErrorMessage('');
-    if (mode === 'signup') setMode('login');
-  };
-
   return (
     <div className={styles.loginPageWrap}>
       <div className={styles.ambientBackdrop}></div>
@@ -115,7 +116,7 @@ export default function LoginPage() {
           <ArrowLeft size={16} /> Return to Giveaway
         </Link>
         <span className={styles.securityTag}>
-          <ShieldCheck size={14} className={styles.iconEmerald} /> 256-Bit SSL Secured
+          <ShieldCheck size={14} className={styles.iconEmerald} /> 256-Bit SSL Secured & MongoDB Cloud Verified
         </span>
       </div>
 
@@ -134,8 +135,8 @@ export default function LoginPage() {
             <h1 className={styles.brandTitle}>VELOOP Rewards</h1>
             <p className={styles.brandSubtitle}>
               {mode === 'login'
-                ? 'Sign in to access your sweepstakes entries, coins & prize vault'
-                : 'Create your free account to unlock instant daily entries & bonuses'}
+                ? 'Sign in to access your real giveaway entries, coins & prize vault'
+                : 'Create your verified account stored securely in our database'}
             </p>
 
             {mode === 'signup' && (
@@ -144,7 +145,7 @@ export default function LoginPage() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
               >
-                <Gift size={14} /> +500 VEs & 2,000 Tokens Welcome Bonus!
+                <Gift size={14} /> +500 VEs Welcome Signup Bonus!
               </motion.div>
             )}
           </div>
@@ -171,9 +172,36 @@ export default function LoginPage() {
                 setErrorMessage('');
               }}
             >
-              <UserPlus size={15} /> Register
+              <UserPlus size={15} /> Register Free
             </button>
           </div>
+
+          {/* Info Notice (Redirected from Login) */}
+          <AnimatePresence>
+            {infoNotice && (
+              <motion.div
+                className={styles.infoNoticeAlert}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  color: '#7dd3fc',
+                  padding: '0.85rem 1rem',
+                  borderRadius: '12px',
+                  fontSize: '0.85rem',
+                  lineHeight: '1.4',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.6rem'
+                }}
+              >
+                <Sparkles size={18} style={{ color: '#38bdf8', flexShrink: 0, marginTop: '2px' }} />
+                <span>{infoNotice}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Error Alert */}
           <AnimatePresence>
@@ -203,7 +231,7 @@ export default function LoginPage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className={styles.textInput}
-                    placeholder="e.g. Alex Thorne"
+                    placeholder="Enter your full name"
                   />
                 </div>
               </div>
@@ -232,7 +260,7 @@ export default function LoginPage() {
                     className={styles.forgotLink}
                     onClick={() => {
                       soundFx.playClick();
-                      alert('Password reset link sent to ' + (email || 'your email'));
+                      alert('Please contact support or register a new account.');
                     }}
                   >
                     Forgot password?
@@ -296,7 +324,7 @@ export default function LoginPage() {
                     onChange={(e) => setAgreeTerms(e.target.checked)}
                     className={styles.checkboxInput}
                   />
-                  <span>I agree to Official Sweepstakes Rules & Terms</span>
+                  <span>I agree to Sweepstakes Rules & Privacy Policy</span>
                 </label>
               )}
             </div>
@@ -308,7 +336,7 @@ export default function LoginPage() {
               className={styles.submitBtn}
             >
               {isLoading ? (
-                <span>Authenticating...</span>
+                <span>Connecting to Server...</span>
               ) : mode === 'login' ? (
                 <>
                   <LogIn size={18} />
@@ -322,31 +350,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          {/* Demo Profiles Quick Auto-fill */}
-          <div className={styles.demoSwitcherSection}>
-            <div className={styles.demoSwitcherHead}>
-              <span>⚡ Quick Demo Profiles:</span>
-              <span style={{ color: '#94a3b8', fontSize: '0.72rem' }}>1-Click Auto Fill</span>
-            </div>
-            <div className={styles.demoProfilesGrid}>
-              {demoProfiles.map((dp) => (
-                <button
-                  key={dp.id}
-                  type="button"
-                  className={styles.demoProfileBtn}
-                  onClick={() => handleSelectDemoUser(dp)}
-                  title={`Auto-fill ${dp.fullName}`}
-                >
-                  <img src={dp.avatar} alt={dp.fullName} className={styles.demoAvatar} />
-                  <div className={styles.demoProfileInfo}>
-                    <span className={styles.demoProfileName}>{dp.fullName}</span>
-                    <span className={styles.demoProfileTier}>{dp.tier}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>

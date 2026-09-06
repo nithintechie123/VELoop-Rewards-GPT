@@ -10,33 +10,55 @@ import { getPrizeTypeConfig, PRIZE_TYPES } from '../utils/prizeTypeUtils';
 
 /**
  * API Client Configuration
- * Allows dynamic configuration via Vite environment variables (e.g., VITE_API_BASE_URL)
- * Supports seamless fallback to mock data when backend is not actively connected.
+ * Communicates directly with the secure VELOOP Rewards Express Backend (Port 5000)
+ * Includes seamless offline fallback to mock data when server is unavailable.
  */
 const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 /**
  * Generic HTTP Request Helper
- * Automatically handles JSON parsing, error boundaries, and mock fallback
+ * Automatically handles auth token headers, JSON parsing, error boundaries, and mock fallback
  */
 async function request(endpoint, options = {}, mockFallbackFn) {
   try {
+    const token = localStorage.getItem('veloop_auth_token');
+    const storedUser = localStorage.getItem('veloop_auth_current_user');
+    let userId = null;
+    if (storedUser) {
+      try {
+        userId = JSON.parse(storedUser)?.userId;
+      } catch (e) {}
+    }
+
+    const authHeaders = {};
+    if (token) {
+      authHeaders['Authorization'] = `Bearer ${token}`;
+    }
+    if (userId) {
+      authHeaders['x-user-id'] = userId;
+    }
+
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...(options.headers || {})
       },
       ...options
     });
 
     if (!res.ok) {
-      throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
+      const errorData = await res.json().catch(() => ({}));
+      const customError = new Error(errorData.message || `HTTP Error ${res.status}: ${res.statusText}`);
+      customError.status = res.status;
+      customError.data = errorData;
+      throw customError;
     }
 
     return await res.json();
   } catch (error) {
-    // In dev / mock mode, invoke fallback provider
-    if (mockFallbackFn) {
+    // If backend is down or unreachable (network error), trigger fallback
+    if (mockFallbackFn && (!error.status || error.status >= 500)) {
       return mockFallbackFn();
     }
     throw error;
@@ -44,20 +66,12 @@ async function request(endpoint, options = {}, mockFallbackFn) {
 }
 
 /**
- * Standard Giveaway API Service Layer
- * Fully decoupled architecture designed to consume:
- * - GET  /giveaways/current
- * - GET  /giveaways/:id
- * - GET  /giveaways/:id/winners
- * - GET  /giveaways/previous
- * - GET  /giveaways/my-status
- * - POST /giveaways/:id/join
- * - POST /giveaways/:id/claim
+ * Authoritative Giveaway API Service Layer
  */
 export const apiService = {
   /**
    * 1. GET /giveaways/current
-   * Retrieves the current flagship and active giveaways with real-time pools & countdowns
+   * Retrieves active giveaways & flagship hero pool from backend
    */
   async getCurrentGiveaways() {
     return request('/giveaways/current', { method: 'GET' }, () => {
@@ -69,42 +83,34 @@ export const apiService = {
     });
   },
 
-  /**
-   * Helper alias for hero giveaway
-   */
   async getHeroGiveaway() {
     const data = await this.getCurrentGiveaways();
     return data?.hero || mockHeroGiveaway;
   },
 
-  /**
-   * Helper alias for active giveaways list
-   */
   async getGiveaways() {
     const data = await this.getCurrentGiveaways();
     return data?.active || mockActiveGiveaways;
   },
 
   /**
-   * 2. GET /giveaways/:id
-   * Retrieves a single giveaway by its unique identifier
+   * 2. GET /giveaways/:idOrSlug
    */
-  async getGiveawayById(id) {
-    return request(`/giveaways/${id}`, { method: 'GET' }, () => {
-      if (mockHeroGiveaway.id === id) return mockHeroGiveaway;
-      return mockActiveGiveaways.find(g => g.id === id) || mockHeroGiveaway;
-    });
+  async getGiveawayById(idOrSlug) {
+    return request(`/giveaways/${encodeURIComponent(idOrSlug)}`, { method: 'GET' }, () => {
+      if (mockHeroGiveaway.id === idOrSlug || mockHeroGiveaway.slug === idOrSlug) return mockHeroGiveaway;
+      return mockActiveGiveaways.find(g => g.id === idOrSlug || g.slug === idOrSlug) || mockHeroGiveaway;
+    }).then(res => res.giveaway || res);
   },
 
   /**
-   * 3. GET /giveaways/:id/winners
-   * Retrieves spotlight and verified winners for a specific giveaway or recent draws
+   * 3. GET /winners
    */
-  async getGiveawayWinners(giveawayId = 'current') {
-    return request(`/giveaways/${giveawayId}/winners`, { method: 'GET' }, () => {
+  async getGiveawayWinners() {
+    return request('/winners', { method: 'GET' }, () => {
       return {
-        spotlight: mockSpotlightWinners,
-        totalWinnersAnnounced: mockSpotlightWinners.length + mockArchiveWinners.length,
+        spotlightWinners: mockSpotlightWinners,
+        archiveWinners: mockArchiveWinners,
         isFairVerified: true
       };
     });
@@ -112,41 +118,28 @@ export const apiService = {
 
   async getSpotlightWinners() {
     const data = await this.getGiveawayWinners();
-    return data?.spotlight || mockSpotlightWinners;
+    return data?.spotlightWinners || data?.spotlight || mockSpotlightWinners;
   },
 
   /**
-   * 4. GET /giveaways/previous
-   * Retrieves historical completed giveaways and archived winner records
+   * 4. GET /giveaways/previous or /winners
    */
   async getPreviousGiveaways(search = '', filterCategory = 'all') {
-    return request(`/giveaways/previous?search=${encodeURIComponent(search)}&category=${encodeURIComponent(filterCategory)}`, { method: 'GET' }, () => {
-      let results = [...mockArchiveWinners];
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        results = results.filter(item =>
-          item.user.toLowerCase().includes(q) ||
-          item.prize.toLowerCase().includes(q) ||
-          item.ticket.toLowerCase().includes(q) ||
-          item.giveawayName.toLowerCase().includes(q)
-        );
-      }
-      if (filterCategory && filterCategory !== 'all') {
-        results = results.filter(item =>
-          item.category?.toLowerCase() === filterCategory.toLowerCase()
-        );
-      }
-      return results;
+    return request(`/winners`, { method: 'GET' }, () => {
+      return { archiveWinners: mockArchiveWinners };
+    }).then(res => {
+      const list = Array.isArray(res) ? res : (res.archiveWinners || res.winners || res.giveaways || mockArchiveWinners);
+      return Array.isArray(list) ? list : [];
     });
   },
 
   async getArchiveWinners(search = '', filterCategory = 'all') {
-    return this.getPreviousGiveaways(search, filterCategory);
+    const data = await this.getGiveawayWinners();
+    return data?.archiveWinners || data?.archive || mockArchiveWinners;
   },
 
   /**
    * 5. GET /giveaways/my-status
-   * Retrieves the current user's authenticated tickets, coin balance, and winning eligibility
    */
   async getMyStatus(userId = 'VE10025') {
     return request(`/giveaways/my-status?userId=${encodeURIComponent(userId)}`, { method: 'GET' }, () => {
@@ -155,6 +148,9 @@ export const apiService = {
         userId,
         isLoggedIn: true,
         coins: 1450,
+        veloopCoins: 850,
+        sveCoins: 1200,
+        tokens: 4500,
         activeTickets: 12,
         winningRecord,
         isWinner: !!winningRecord,
@@ -170,14 +166,13 @@ export const apiService = {
   },
 
   /**
-   * 6. POST /giveaways/:id/join
-   * Submits a free ticket entry, coin booster entry, or promo code entry
+   * 6. POST /giveaways/:id/join (Zero-Trust Verified Join)
    */
   async joinGiveaway(giveawayId, payload = {}) {
-    const { ticketCount = 1, entryType = 'free', promoCode = null } = payload;
-    return request(`/giveaways/${giveawayId}/join`, {
+    const { ticketCount = 1, entryType = 'free', promoCode = null, idempotencyKey = null } = payload;
+    return request(`/giveaways/${encodeURIComponent(giveawayId)}/join`, {
       method: 'POST',
-      body: JSON.stringify({ giveawayId, ticketCount, entryType, promoCode })
+      body: JSON.stringify({ giveawayId, ticketCount, entryType, promoCode, idempotencyKey })
     }, () => {
       const randomHex = Math.floor(10000 + Math.random() * 90000);
       const ticketId = `#VEL-${randomHex}-US`;
@@ -195,17 +190,15 @@ export const apiService = {
     });
   },
 
-  // Alias helper for UI components
   async enterGiveaway(giveawayId, ticketCount, entryType) {
     return this.joinGiveaway(giveawayId, { ticketCount, entryType });
   },
 
   /**
-   * 7. POST /giveaways/:id/claim (Requirement 69)
-   * Submits physical or digital winner claim details for verification & fulfillment
+   * 7. POST /giveaways/:id/claim (Zero-Trust Prize Claim)
    */
   async claimGiveawayPrize(giveawayId, claimPayload = {}) {
-    return request(`/giveaways/${giveawayId}/claim`, {
+    return request(`/giveaways/${encodeURIComponent(giveawayId)}/claim`, {
       method: 'POST',
       body: JSON.stringify(claimPayload)
     }, () => {
@@ -237,8 +230,28 @@ export const apiService = {
     });
   },
 
-  // Alias helper for UI components
   async submitClaim(claimPayload) {
     return this.claimGiveawayPrize(claimPayload.giveawayId || 'current-draw', claimPayload);
+  },
+
+  /**
+   * 8. POST /winners/verify-proof (Provably Fair Verifier)
+   */
+  async verifyProof(payload) {
+    return request('/winners/verify-proof', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  /**
+   * 9. Security Audit & Fraud Logs
+   */
+  async getAuditLogs() {
+    return request('/audit/logs', { method: 'GET' });
+  },
+
+  async getFraudIncidents() {
+    return request('/audit/fraud-incidents', { method: 'GET' });
   }
 };

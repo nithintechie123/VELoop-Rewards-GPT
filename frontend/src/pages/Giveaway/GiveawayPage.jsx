@@ -31,8 +31,7 @@ import {
   HeroSkeleton,
   StatsSkeleton,
   PrizeCardSkeleton,
-  WinnerCardSkeleton,
-  PreviousWinnerSkeleton
+  WinnerCardSkeleton
 } from '../../components/Skeletons/Skeletons';
 
 import { apiService } from '../../services/api';
@@ -58,25 +57,21 @@ export default function GiveawayPage() {
   const [spotlightWinners, setSpotlightWinners] = useState(mockSpotlightWinners);
   const [archiveWinners, setArchiveWinners] = useState(mockArchiveWinners);
 
-  // User & Identity State (Requirements 32, 33, 34)
-  const [currentUserId, setCurrentUserId] = useState(user?.userId || 'VE10025');
+  // User & Identity State
+  const [currentUserId, setCurrentUserId] = useState(user?.userId || null);
   const [claimState, setClaimState] = useState('not_submitted'); // 'not_submitted' | 'submitted' | 'processing' | 'completed' | 'expired'
 
   const [userState, setUserState] = useState({
-    name: user?.fullName || 'Alex Thorne',
-    userId: user?.userId || 'VE10025',
+    name: user?.fullName || 'Guest',
+    userId: user?.userId || null,
     isLoggedIn: isLoggedIn,
-    coins: user?.coins || 1450,
-    veloopCoins: user?.veloopCoins || 850,
-    sveCoins: user?.sveCoins || 1200,
-    tokens: user?.tokens || 5000,
-    activeTickets: user?.activeTickets || 12,
+    coins: user?.coins || user?.veloopCoins || 0,
+    veloopCoins: user?.veloopCoins || 0,
+    sveCoins: user?.sveCoins || 0,
+    tokens: user?.tokens || 0,
+    activeTickets: user?.activeTickets || 0,
     soundEnabled: true,
-    userEntries: user?.userEntries || {
-      'gw-apple-studio': { tickets: 5 },
-      'gw-ps5-pro': { tickets: 3 },
-      'gw-iphone-titanium': { tickets: 4 }
-    },
+    userEntries: user?.userEntries || {},
     quests: mockQuestTasks
   });
 
@@ -86,21 +81,30 @@ export default function GiveawayPage() {
       setUserState(prev => ({
         ...prev,
         name: user.fullName || user.name || 'Member',
-        userId: user.userId || 'VE10025',
+        userId: user.userId || user.id,
         isLoggedIn: true,
-        coins: user.coins ?? prev.coins,
-        veloopCoins: user.veloopCoins ?? prev.veloopCoins,
-        sveCoins: user.sveCoins ?? prev.sveCoins,
-        tokens: user.tokens ?? prev.tokens,
-        activeTickets: user.activeTickets ?? prev.activeTickets,
-        userEntries: user.userEntries ?? prev.userEntries
+        coins: user.coins ?? user.veloopCoins ?? 0,
+        veloopCoins: user.veloopCoins ?? 0,
+        sveCoins: user.sveCoins ?? 0,
+        tokens: user.tokens ?? 0,
+        activeTickets: user.activeTickets ?? 0,
+        userEntries: user.userEntries ?? {}
       }));
-      setCurrentUserId(user.userId || 'VE10025');
+      setCurrentUserId(user.userId || user.id);
     } else {
       setUserState(prev => ({
         ...prev,
-        isLoggedIn: false
+        name: 'Guest',
+        userId: null,
+        isLoggedIn: false,
+        coins: 0,
+        veloopCoins: 0,
+        sveCoins: 0,
+        tokens: 0,
+        activeTickets: 0,
+        userEntries: {}
       }));
+      setCurrentUserId(null);
     }
   }, [user, isLoggedIn]);
 

@@ -5,7 +5,6 @@ import {
   Sparkles,
   Coins,
   ShieldCheck,
-  CheckCircle2,
   AlertTriangle,
   ArrowRight,
   Zap,

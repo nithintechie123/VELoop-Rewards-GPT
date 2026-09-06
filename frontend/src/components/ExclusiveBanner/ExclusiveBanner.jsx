@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ShieldCheck, Zap, Gift, ArrowRight, X, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Zap, Gift, ArrowRight, X, CheckCircle2 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
 import styles from './ExclusiveBanner.module.css';

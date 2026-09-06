@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   Cpu,
   CheckCircle2,
-  ExternalLink,
   ArrowRight,
   RotateCcw,
   Clock,

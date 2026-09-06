@@ -7,33 +7,49 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser());
-  const [isVisitorMode, setIsVisitorMode] = useState(false); // Can be toggled to simulate logged-out visitor
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
   const [authModalConfig, setAuthModalConfig] = useState({ isOpen: false, mode: 'login', redirectUrl: '/' });
 
-  // Synced user state object
-  const user = isVisitorMode ? null : currentUser;
-  const isLoggedIn = !!user;
+  const isLoggedIn = !!currentUser;
+  const user = currentUser;
 
-  // Login handler
+  // Verify JWT token and hydrate live user session directly from MongoDB Atlas on mount
+  useEffect(() => {
+    async function syncBackendSession() {
+      try {
+        const liveUser = await authService.fetchMe();
+        if (liveUser) {
+          setCurrentUser(liveUser);
+        } else {
+          setCurrentUser(null);
+        }
+      } catch (e) {
+        console.warn('Session hydration error:', e);
+      } finally {
+        setIsLoadingSession(false);
+      }
+    }
+    syncBackendSession();
+  }, []);
+
+  // Real Login handler with MongoDB Atlas verification
   const login = useCallback(async (email, password, rememberMe = true) => {
     try {
-      const loggedUser = authService.login(email, password, rememberMe);
+      const loggedUser = await authService.login(email, password, rememberMe);
       setCurrentUser(loggedUser);
-      setIsVisitorMode(false);
       soundFx.playSuccess();
       return { success: true, user: loggedUser };
     } catch (err) {
       soundFx.playError?.() || soundFx.playClick();
-      return { success: false, error: err.message };
+      return { success: false, error: err.message, notFound: !!err.notFound, status: err.status };
     }
   }, []);
 
-  // Register handler
+  // Real Registration handler with MongoDB Atlas creation & welcome bonus
   const register = useCallback(async ({ fullName, email, password, rememberMe = true }) => {
     try {
-      const newUser = authService.register({ fullName, email, password, rememberMe });
+      const newUser = await authService.register({ fullName, email, password, rememberMe });
       setCurrentUser(newUser);
-      setIsVisitorMode(false);
       soundFx.playWin();
       ConfettiManager.burst(window.innerWidth / 2, window.innerHeight / 2, 80);
       return { success: true, user: newUser };
@@ -43,60 +59,33 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Logout handler
-  const logout = useCallback(() => {
-    authService.logout();
+  // Real Logout handler
+  const logout = useCallback(async () => {
+    await authService.logout();
     setCurrentUser(null);
-    setIsVisitorMode(true);
     soundFx.playClick();
   }, []);
 
-  // Switch to specific demo user
-  const switchDemoUser = useCallback((demoUser) => {
-    if (!demoUser) {
-      // Toggle visitor mode
-      setIsVisitorMode(true);
-      setCurrentUser(null);
-    } else {
-      setIsVisitorMode(false);
-      authService.setCurrentUser(demoUser);
-      setCurrentUser(demoUser);
-    }
-    soundFx.playClick();
-  }, []);
-
-  // Toggle visitor simulation mode
-  const toggleVisitorMode = useCallback(() => {
-    setIsVisitorMode(prev => {
-      const next = !prev;
-      if (!next && !currentUser) {
-        const defaultUser = authService.getDemoProfiles()[0];
-        authService.setCurrentUser(defaultUser);
-        setCurrentUser(defaultUser);
-      }
-      return next;
-    });
-    soundFx.playClick();
-  }, [currentUser]);
-
-  // Update user balances or entries
-  const updateUser = useCallback((updatedFields) => {
+  // Update live user fields (e.g. shipping address, local balance cache)
+  const updateUser = useCallback(async (updatedFields) => {
     if (!currentUser) return null;
-    const updated = authService.updateCurrentUser(updatedFields);
+    const updated = await authService.updateCurrentUser(updatedFields);
     setCurrentUser(updated);
     return updated;
   }, [currentUser]);
 
-  // Quick Daily / Top-up Bonus claim
+  // Daily bonus claim
   const claimDailyBonus = useCallback(() => {
     if (!currentUser) return;
     const bonusVEs = 200;
     const bonusTokens = 500;
-    const updated = authService.updateCurrentUser({
+    const updated = {
+      ...currentUser,
       veloopCoins: (currentUser.veloopCoins || 0) + bonusVEs,
       tokens: (currentUser.tokens || 0) + bonusTokens,
       coins: (currentUser.coins || 0) + bonusVEs
-    });
+    };
+    authService.updateCurrentUser(updated);
     setCurrentUser(updated);
     soundFx.playWin();
     ConfettiManager.burst(window.innerWidth / 2, window.innerHeight / 3, 50);
@@ -116,19 +105,18 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
+    currentUser,
     isLoggedIn,
-    isVisitorMode,
-    demoProfiles: authService.getDemoProfiles(),
+    isLoadingSession,
     authModalConfig,
     login,
     register,
     logout,
-    switchDemoUser,
-    toggleVisitorMode,
     updateUser,
     claimDailyBonus,
     openAuthModal,
-    closeAuthModal
+    closeAuthModal,
+    demoProfiles: []
   };
 
   return (

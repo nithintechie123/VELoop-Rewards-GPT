@@ -2,13 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Gift,
-  HelpCircle,
-  FileText,
   ShieldCheck,
   Lock,
   Mail,
-  ExternalLink,
-  ChevronRight,
   Headphones
 } from 'lucide-react';
 import styles from './IndividualPageFooter.module.css';

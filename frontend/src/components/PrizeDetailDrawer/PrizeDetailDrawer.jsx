@@ -6,20 +6,16 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
-  Ticket,
   Clock,
   CheckCircle2,
   TrendingUp,
   Percent,
   Calendar,
   Layers,
-  ChevronRight,
-  ExternalLink,
-  Package,
-  Award
+  Package
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
-import { getPrizeTypeConfig, validateUserCurrencyBalance } from '../../utils/prizeTypeUtils';
+import { getPrizeTypeConfig } from '../../utils/prizeTypeUtils';
 import styles from './PrizeDetailDrawer.module.css';
 
 /**

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, History, Search, ShieldCheck, Sparkles, Radio, Clock, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Trophy, History, Search, ShieldCheck, Sparkles, Radio, Clock, ArrowRight } from 'lucide-react';
 import WinnerCard from '../WinnerCard/WinnerCard';
 import PreviousWinnerCard from '../PreviousWinnerCard/PreviousWinnerCard';
 import Countdown from '../Countdown/Countdown';
@@ -44,13 +44,20 @@ export default function WinnersTabs({
     ...giveaways
   ].filter(g => g.status === 'active' || !g.status);
 
-  const filteredArchive = archiveWinners.filter(item => {
+  const archiveList = Array.isArray(archiveWinners) 
+    ? archiveWinners 
+    : (archiveWinners?.archiveWinners || archiveWinners?.winners || archiveWinners?.giveaways || []);
+
+  const filteredArchive = archiveList.filter(item => {
     if (!archiveSearch.trim()) return true;
     const q = archiveSearch.toLowerCase();
+    const userStr = String(item?.userName || item?.user || '');
+    const prizeStr = String(item?.prizeTitle || item?.prize || '');
+    const ticketStr = String(item?.ticketNumber || item?.ticket || '');
     return (
-      item.user.toLowerCase().includes(q) ||
-      item.prize.toLowerCase().includes(q) ||
-      item.ticket.toLowerCase().includes(q)
+      userStr.toLowerCase().includes(q) ||
+      prizeStr.toLowerCase().includes(q) ||
+      ticketStr.toLowerCase().includes(q)
     );
   });
 

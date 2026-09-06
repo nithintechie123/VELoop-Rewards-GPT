@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlusCircle, Trophy, RefreshCw, Radio, UserCheck, LogOut, Layers, Sparkles, CheckCircle2, ChevronDown } from 'lucide-react';
+import { PlusCircle, Trophy, RefreshCw, Radio, UserCheck, LogOut, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 import styles from './SimulationToolbar.module.css';
 
 /**
