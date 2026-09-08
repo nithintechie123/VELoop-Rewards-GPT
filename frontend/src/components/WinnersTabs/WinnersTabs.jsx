@@ -141,20 +141,22 @@ export default function WinnersTabs({
                 </div>
                 {isEnded ? (
                   <button
-                    className="btn-primary-custom"
+                    className={styles.enterLiveBtn}
                     onClick={() => setActiveTab('spotlight')}
                   >
-                    View Declared Winners 🏆
+                    <span>View Declared Winners</span>
+                    <Trophy size={16} />
                   </button>
                 ) : (
                   <button
-                    className="btn-primary-custom"
+                    className={styles.enterLiveBtn}
                     onClick={() => {
                       const el = document.getElementById('active-giveaways');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
                   >
-                    Enter Active Giveaway <ArrowRight size={15} />
+                    <span>Enter Active Giveaway</span>
+                    <ArrowRight size={16} />
                   </button>
                 )}
               </div>
