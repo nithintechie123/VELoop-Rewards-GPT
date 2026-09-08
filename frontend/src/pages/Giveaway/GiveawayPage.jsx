@@ -785,34 +785,30 @@ export default function GiveawayPage() {
           <GiveawayStats />
         )}
 
-        {/* 7. Dual Split Hub: Featured Giveaways & How To Participate */}
-        <div className="container-custom" id="active-giveaways">
-          <div className={styles.splitGiveawayHub}>
-            <div className={styles.giveawaysCol}>
-              {isLoading ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
-                  <PrizeCardSkeleton />
-                  <PrizeCardSkeleton />
-                  <PrizeCardSkeleton />
-                </div>
-              ) : (
-                <FeaturedGiveaways
-                  giveaways={giveaways}
-                  userEntries={userState.userEntries}
-                  isLoggedIn={userState.isLoggedIn !== false}
-                  onEnterGiveaway={handleNavigateToDetails}
-                  onViewDetails={(prize) => {
-                    soundFx.playClick();
-                    setSelectedDrawerPrize(prize);
-                  }}
-                />
-              )}
-            </div>
-            <div className={styles.howToCol}>
-              <HowToParticipate onOpenRules={() => setIsRulesOpen(true)} />
+        {/* 7. Featured Giveaways Horizontal Kinetic Carousel Section */}
+        {isLoading ? (
+          <div className="container-custom" style={{ margin: '3rem auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+              <PrizeCardSkeleton />
+              <PrizeCardSkeleton />
+              <PrizeCardSkeleton />
             </div>
           </div>
-        </div>
+        ) : (
+          <FeaturedGiveaways
+            giveaways={giveaways}
+            userEntries={userState.userEntries}
+            isLoggedIn={userState.isLoggedIn !== false}
+            onEnterGiveaway={handleNavigateToDetails}
+            onViewDetails={(prize) => {
+              soundFx.playClick();
+              setSelectedDrawerPrize(prize);
+            }}
+          />
+        )}
+
+        {/* 8. 4-Step Participation Protocol Section */}
+        <HowToParticipate onOpenRules={() => setIsRulesOpen(true)} />
 
         {/* 8. Verified Winners & Historical Archive */}
         {isLoading ? (
