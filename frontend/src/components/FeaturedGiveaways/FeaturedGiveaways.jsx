@@ -1,8 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Sparkles, Flame, Zap, Shield, Gift } from 'lucide-react';
+import {
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Flame,
+  Zap,
+  Shield,
+  Gift,
+  ChevronLeft,
+  ChevronRight,
+  Trophy,
+  Layers
+} from 'lucide-react';
 import PrizeCard from '../PrizeCard/PrizeCard';
 import EmptyState from '../EmptyState/EmptyState';
+import { soundFx } from '../../utils/soundFx';
 import styles from './FeaturedGiveaways.module.css';
 
 export default function FeaturedGiveaways({
@@ -15,24 +28,32 @@ export default function FeaturedGiveaways({
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const scrollRef = useRef(null);
 
   const filterTabs = [
-    { id: 'all', label: 'All Giveaways', icon: <Gift size={14} /> },
-    { id: 'active', label: '● Live Active', icon: <Flame size={14} /> },
-    { id: 'ended', label: '🏆 Concluded / Ended', icon: <Sparkles size={14} /> },
-    { id: 'upcoming', label: '⏳ Upcoming Starts In', icon: <Zap size={14} /> },
-    { id: 'high-value', label: 'High Value (₹1L+)', icon: <Shield size={14} /> }
+    { id: 'all', label: 'All Rewards', icon: <Gift size={14} /> },
+    { id: 'Flagship Mobile', label: 'Flagship Mobile', icon: <Flame size={14} /> },
+    { id: 'Luxury Lifestyle', label: 'Luxury Wearables', icon: <Shield size={14} /> },
+    { id: 'Audio & Accessories', label: 'Audio & Studio', icon: <Zap size={14} /> },
+    { id: 'Gift Cards & Cash', label: 'VIP Mystery Vault', icon: <Sparkles size={14} /> }
   ];
 
   // Filtering & Sorting
-  let filtered = giveaways.filter(item => {
-    // Exclude hero if it's already shown in hero banner
+  let filtered = (giveaways || []).filter(item => {
     if (item.isHero) return false;
 
-    if (selectedFilter === 'high-value') {
-      if (item.valueUSD < 100000) return false;
-    } else if (selectedFilter !== 'all' && item.status !== selectedFilter && item.filterTag !== selectedFilter) {
-      return false;
+    if (selectedFilter !== 'all') {
+      if (
+        item.category !== selectedFilter &&
+        item.status !== selectedFilter &&
+        item.filterTag !== selectedFilter
+      ) {
+        return false;
+      }
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -48,63 +69,136 @@ export default function FeaturedGiveaways({
   if (sortBy === 'value') {
     filtered.sort((a, b) => b.valueUSD - a.valueUSD);
   } else if (sortBy === 'ending') {
-    filtered.sort((a, b) => new Date(a.endsAt) - new Date(b.endsAt));
+    filtered.sort((a, b) => new Date(a.endsAt || a.endAt) - new Date(b.endsAt || b.endAt));
   } else {
-    filtered.sort((a, b) => b.totalTicketsEntered - a.totalTicketsEntered);
+    filtered.sort((a, b) => (b.totalTicketsEntered || b.totalTickets || 0) - (a.totalTicketsEntered || a.totalTickets || 0));
   }
+
+  // Update Scroll State
+  const updateScrollState = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll > 0) {
+      setScrollProgress((scrollLeft / maxScroll) * 100);
+    } else {
+      setScrollProgress(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', updateScrollState, { passive: true });
+      updateScrollState();
+      window.addEventListener('resize', updateScrollState);
+      return () => {
+        el.removeEventListener('scroll', updateScrollState);
+        window.removeEventListener('resize', updateScrollState);
+      };
+    }
+  }, [updateScrollState, filtered.length]);
+
+  const handleScroll = (direction) => {
+    soundFx.playClick();
+    if (!scrollRef.current) return;
+    const { clientWidth } = scrollRef.current;
+    const scrollAmount = direction === 'left' ? -clientWidth * 0.75 : clientWidth * 0.75;
+    scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  };
 
   return (
     <section className={styles.section} id="active-giveaways">
+      <div className={styles.ambientGlowTop}></div>
+      <div className={styles.ambientGlowBottom}></div>
+
       <div className="container-custom">
-        {/* Section Header */}
+        {/* Section Header & Interactive Navigation Controls */}
         <div className={styles.sectionHeader}>
           <div className={styles.titleWrap}>
-            <span className={styles.sectionTag}>
-              <Sparkles size={14} /> ACTIVE PRIZE VAULT
-            </span>
-            <h2 className={styles.sectionTitle}>Featured Live Giveaways</h2>
+            <div className={styles.badgeRow}>
+              <span className={styles.sectionTag}>
+                <Sparkles size={14} className={styles.sparkleGold} /> OFFICIAL PRIZE VAULT
+              </span>
+              <span className={styles.verifiedTag}>
+                <Trophy size={13} /> 100% Provably Fair SHA-256
+              </span>
+            </div>
+            <h2 className={styles.sectionTitle}>
+              Featured <span className={styles.titleGradient}>Giveaway Pools</span>
+            </h2>
             <p className={styles.sectionSubtitle}>
-              100% free participation tier available for every draw. Verified by cryptographic hash.
+              Explore certified flagship hardware, luxury wearables, and high-tier mystery drops. Join free daily or stake VEs.
             </p>
+          </div>
+
+          {/* Desktop/Tablet Horizontal Slider Navigation Controls */}
+          <div className={styles.sliderNavControls}>
+            <button
+              className={`${styles.navArrowBtn} ${!canScrollLeft ? styles.navArrowDisabled : ''}`}
+              onClick={() => handleScroll('left')}
+              disabled={!canScrollLeft}
+              aria-label="Scroll giveaways left"
+              title="Previous giveaways"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              className={`${styles.navArrowBtn} ${!canScrollRight ? styles.navArrowDisabled : ''}`}
+              onClick={() => handleScroll('right')}
+              disabled={!canScrollRight}
+              aria-label="Scroll giveaways right"
+              title="Next giveaways"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
         </div>
 
-        {/* Filter & Search Toolbar */}
+        {/* Filter Toolbar & Search Bar */}
         <div className={styles.toolbar}>
-          {/* Tabs */}
+          {/* Category Filter Pills */}
           <div className={styles.tabsList}>
             {filterTabs.map(tab => (
               <button
                 key={tab.id}
                 className={`${styles.tabBtn} ${selectedFilter === tab.id ? styles.tabActive : ''}`}
-                onClick={() => setSelectedFilter(tab.id)}
+                onClick={() => {
+                  soundFx.playClick();
+                  setSelectedFilter(tab.id);
+                  if (scrollRef.current) scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+                }}
               >
                 {tab.icon}
-                {tab.label}
+                <span>{tab.label}</span>
               </button>
             ))}
           </div>
 
           {/* Controls (Search & Sort) */}
           <div className={styles.controlsRow}>
-            {/* Search */}
             <div className={styles.searchWrap}>
               <Search size={15} className={styles.searchIcon} />
               <input
                 type="text"
-                placeholder="Search prizes or tech..."
+                placeholder="Search prize, phone, watch..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
               />
             </div>
 
-            {/* Sort Selector */}
             <div className={styles.sortWrap}>
               <SlidersHorizontal size={14} className={styles.sortIcon} />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => {
+                  soundFx.playClick();
+                  setSortBy(e.target.value);
+                }}
                 className={styles.sortSelect}
               >
                 <option value="popular">Most Popular</option>
@@ -115,40 +209,61 @@ export default function FeaturedGiveaways({
           </div>
         </div>
 
-        {/* Mobile Swipe Carousel Hint */}
-        <div className={styles.swipeHint}>
-          <Sparkles size={12} />
-          <span>← Swipe prizes horizontally →</span>
+        {/* Mobile Swipe Guidance Banner */}
+        <div className={styles.mobileSwipeIndicator}>
+          <span>← Swipe horizontally to explore prize pools →</span>
         </div>
 
-        {/* Giveaways Grid / Mobile Snap Carousel */}
-        <div className={styles.grid}>
-          <AnimatePresence>
-            {filtered.map(gw => (
-              <PrizeCard
-                key={gw.id}
-                giveaway={{ ...gw, isLoggedIn }}
-                userEntryCount={userEntries[gw.id]?.tickets || 0}
-                onEnter={onEnterGiveaway}
-                onViewDetails={onViewDetails}
+        {/* Horizontal Kinetic Scroll Carousel Track */}
+        <div className={styles.carouselContainer}>
+          <div
+            className={styles.horizontalTrack}
+            ref={scrollRef}
+          >
+            <AnimatePresence mode="popLayout">
+              {filtered.map((gw, idx) => (
+                <div key={gw.id || idx} className={styles.cardWrapper}>
+                  <PrizeCard
+                    giveaway={{ ...gw, isLoggedIn }}
+                    userEntryCount={userEntries[gw.id]?.tickets || 0}
+                    onEnter={onEnterGiveaway}
+                    onViewDetails={onViewDetails}
+                  />
+                </div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Scroll Progress Bar & Item Count Footer */}
+        {filtered.length > 0 && (
+          <div className={styles.trackFooter}>
+            <div className={styles.progressBarTrack}>
+              <div
+                className={styles.progressBarFill}
+                style={{ width: `${Math.max(15, scrollProgress)}%` }}
               />
-            ))}
-          </AnimatePresence>
-        </div>
+            </div>
+            <span className={styles.trackCounter}>
+              Showing <strong>{filtered.length}</strong> active verified draws
+            </span>
+          </div>
+        )}
 
+        {/* Empty State when no items match */}
         {filtered.length === 0 && (
           <EmptyState
             type="no_current_giveaway"
-            title={giveaways.length === 0 ? 'No Current Giveaway' : 'No Matching Giveaways'}
-            description={giveaways.length === 0 ? 'The next giveaway is being prepared.' : 'Try clearing your search term or switching to "All Giveaways".'}
-            actionText={giveaways.length === 0 ? 'Notify Me When Available 🔔' : 'Reset Filters'}
+            title={giveaways?.length === 0 ? 'No Current Giveaways' : 'No Matching Prize Pools'}
+            description={
+              giveaways?.length === 0
+                ? 'The next high-tier prize pools are currently being prepared.'
+                : 'Try adjusting your search keyword or switching to "All Rewards".'
+            }
+            actionText={giveaways?.length === 0 ? 'Notify Me When Available 🔔' : 'Reset Filters'}
             onAction={() => {
-              if (giveaways.length === 0) {
-                alert("🔔 We'll notify you the moment the next prize vault is published!");
-              } else {
-                setSelectedFilter('all');
-                setSearchQuery('');
-              }
+              setSelectedFilter('all');
+              setSearchQuery('');
             }}
           />
         )}

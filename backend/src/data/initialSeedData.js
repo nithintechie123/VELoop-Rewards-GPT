@@ -245,7 +245,7 @@ export const initialSeedData = {
           type: "PHYSICAL",
           value: "₹1,34,900",
           valueUSD: 134900,
-          image: "/assets/images/iphone_titanium.jpg",
+          image: "/assets/images/iphone_deep_purple.jpg",
           quantity: 1,
           claimInstructions: "Requires shipping address verification."
         }
@@ -268,7 +268,7 @@ export const initialSeedData = {
       category: "Flagship Mobile",
       filterTag: "active",
       badge: "1st Prize",
-      image: "/assets/images/iphone_titanium.jpg",
+      image: "/assets/images/iphone_deep_purple.jpg",
       value: "₹1,34,900",
       valueUSD: 134900,
       winnerCount: 1,
@@ -325,7 +325,7 @@ export const initialSeedData = {
           type: "PHYSICAL",
           value: "₹44,900",
           valueUSD: 44900,
-          image: "/assets/images/luxury_smartwatch.jpg",
+          image: "/assets/images/apple_watch_purple.png",
           quantity: 1,
           claimInstructions: "Winner must provide courier shipping details."
         }
@@ -348,7 +348,7 @@ export const initialSeedData = {
       category: "Luxury Wearables",
       filterTag: "active",
       badge: "2nd Prize",
-      image: "/assets/images/luxury_smartwatch.jpg",
+      image: "/assets/images/apple_watch_purple.png",
       value: "₹44,900",
       valueUSD: 44900,
       winnerCount: 1,
@@ -404,7 +404,7 @@ export const initialSeedData = {
           type: "PHYSICAL",
           value: "₹24,900",
           valueUSD: 24900,
-          image: "/assets/images/airpods_pro_2.jpg",
+          image: "/assets/images/airpods_pro_purple.png",
           quantity: 2,
           claimInstructions: "Requires courier delivery address verification."
         }
@@ -427,7 +427,7 @@ export const initialSeedData = {
       category: "Audio Essentials",
       filterTag: "active",
       badge: "3rd Prize",
-      image: "/assets/images/airpods_pro_2.jpg",
+      image: "/assets/images/airpods_pro_purple.png",
       value: "₹24,900",
       valueUSD: 24900,
       winnerCount: 2,
@@ -483,7 +483,7 @@ export const initialSeedData = {
           type: "GIFT_CARD",
           value: "₹500",
           valueUSD: 500,
-          image: "/assets/images/amazon_gift_card.jpg",
+          image: "/assets/images/gift_box_purple_gold.jpg",
           quantity: 10,
           claimInstructions: "Instant digital code issued to dashboard."
         }
@@ -506,7 +506,7 @@ export const initialSeedData = {
       category: "Digital Vouchers",
       filterTag: "active",
       badge: "Community Prize",
-      image: "/assets/images/amazon_gift_card.jpg",
+      image: "/assets/images/gift_box_purple_gold.jpg",
       value: "₹500",
       valueUSD: 500,
       winnerCount: 10,
