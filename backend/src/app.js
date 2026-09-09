@@ -8,6 +8,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import { config } from './config/index.js';
 import { standardRateLimiter } from './middleware/rateLimitMiddleware.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
+import { sanitizeInputs } from './middleware/validationMiddleware.js';
 
 // Route Imports
 import authRoutes from './routes/authRoutes.js';
@@ -20,23 +21,68 @@ import auditRoutes from './routes/auditRoutes.js';
 
 const app = express();
 
-// Security and utility middleware
+// 1. Security Headers (Helmet)
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' }
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"]
+    }
+  },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  xContentTypeOptions: true,
+  xFrameOptions: { action: 'deny' },
+  hidePoweredBy: true
 }));
 
-app.use(cors({
-  origin: (origin, callback) => callback(null, true), // Dynamic origin for seamless local + preview dev
-  credentials: true
-}));
+// 2. CORS Configuration (Never use wildcard '*' with credentials or in production)
+const allowedOrigins = [
+  config.corsOrigin,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000'
+].filter(Boolean);
 
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (like mobile apps, curl, or server-to-server)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in whitelist
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // In development mode, allow localhost/127.0.0.1 ports
+    if (process.env.NODE_ENV !== 'production' && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error(`Origin '${origin}' not allowed by CORS policy`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+};
+
+app.use(cors(corsOptions));
+
+// 3. Payload Limits (Strict 100kb to mitigate payload DoS / memory exhaustion)
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 app.use(useragent.express());
-app.use(mongoSanitize());
 
-// General rate limiter on API
+// 4. Input Sanitization (NoSQL injection & Prototype pollution prevention)
+app.use(mongoSanitize());
+app.use(sanitizeInputs);
+
+// 5. Rate Limiting (General API rate limiter)
 app.use('/api', standardRateLimiter);
 
 // Healthchecks
@@ -50,7 +96,9 @@ app.use('/api/participations', participationRoutes);
 app.use('/api/participation', participationRoutes);
 app.use('/api/winners', winnerRoutes);
 app.use('/api/claims', claimRoutes);
+app.use('/api/claim', claimRoutes);
 app.use('/api/admin/giveaways', adminGiveawayRoutes);
+app.use('/api/admin', adminGiveawayRoutes);
 app.use('/api/audit', auditRoutes);
 
 // Fallback 404 for unknown endpoints

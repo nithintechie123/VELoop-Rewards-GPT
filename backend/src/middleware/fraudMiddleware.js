@@ -18,8 +18,11 @@ export const fraudInspectionMiddleware = async (req, res, next) => {
     });
 
     return res.status(429).json({
-      error: 'RAPID_REQUEST_BURST_BLOCKED',
-      message: 'Anti-bot velocity threshold exceeded. Please pause before sending more requests.',
+      error: 'RATE_LIMITED',
+      code: 'RATE_LIMITED',
+      title: 'Please Slow Down',
+      message: 'You are making requests too quickly. Please pause before sending more requests.',
+      action: 'Try Again',
       retryAfterSeconds: 5
     });
   }

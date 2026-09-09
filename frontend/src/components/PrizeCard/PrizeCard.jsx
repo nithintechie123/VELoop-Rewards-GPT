@@ -54,6 +54,11 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
   const entryRequirement = giveaway.joiningRequirement || (giveaway.entryFee ? `${giveaway.entryFee} ${giveaway.entryFeeUnit || 'VEs'}` : '250 VEs');
   const isFreeDaily = giveaway.allowsFreeDaily || giveaway.entryFee === 0 || !userEntryCount;
 
+  const statusUpper = (giveaway.status || 'ACTIVE').toUpperCase();
+  const isEnded = statusUpper === 'ENDED' || statusUpper === 'ARCHIVED';
+  const isUpcoming = statusUpper === 'UPCOMING';
+  const isActive = statusUpper === 'ACTIVE';
+
   // Calculate ticket progress percentage
   const totalEntered = giveaway.totalTicketsEntered || giveaway.totalTickets || 14200;
   const poolCap = giveaway.poolCap || 25000;
@@ -147,11 +152,11 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
             <span className={styles.enteredStatusPill}>
               <CheckCircle2 size={12} /> Participating ({userEntryCount} Tickets)
             </span>
-          ) : giveaway.status === 'ended' ? (
+          ) : isEnded ? (
             <span className={styles.endedStatusPill}>
               <Trophy size={11} /> Draw Concluded
             </span>
-          ) : giveaway.status === 'upcoming' ? (
+          ) : isUpcoming ? (
             <span className={styles.upcomingStatusPill}>
               <Clock size={11} /> Starts in {giveaway.startsIn || '3 Days'}
             </span>
@@ -202,9 +207,9 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
             <span className={styles.statLabel}>
               <Clock size={11} /> TIME LEFT
             </span>
-            {giveaway.status === 'ended' ? (
+            {isEnded ? (
               <span className={styles.statEndedText}>Ended</span>
-            ) : giveaway.status === 'upcoming' ? (
+            ) : isUpcoming ? (
               <span className={styles.statUpcomingText}>{giveaway.startsIn || '3 Days'}</span>
             ) : (
               <div className={styles.timerWrap}>
@@ -226,7 +231,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
 
         {/* Primary Action Button Row */}
         <div className={styles.actionsRow}>
-          {giveaway.status === 'ended' ? (
+          {isEnded ? (
             <motion.button
               className={`${styles.primaryBtn} ${styles.btnEnded}`}
               whileHover={{ scale: 1.02 }}
@@ -236,7 +241,7 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
               <Trophy size={16} />
               <span>View Winners & Proof</span>
             </motion.button>
-          ) : giveaway.status === 'upcoming' ? (
+          ) : isUpcoming ? (
             <motion.button
               className={`${styles.primaryBtn} ${styles.btnUpcoming}`}
               whileHover={{ scale: 1.02 }}

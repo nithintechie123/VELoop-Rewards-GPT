@@ -10,7 +10,8 @@ import {
   Zap,
   Ticket,
   Flame,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
@@ -35,11 +36,15 @@ export default function EntryFeeConfirmationModal({
 }) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [ticketCode, setTicketCode] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!isOpen) {
       setIsSuccess(false);
       setTicketCode(null);
+      setIsLoading(false);
+      setError(null);
     }
   }, [isOpen]);
 
@@ -65,29 +70,35 @@ export default function EntryFeeConfirmationModal({
   const currencyBadgeBg = isSVEs ? 'rgba(16, 185, 129, 0.15)' : isTokens ? 'rgba(56, 189, 248, 0.15)' : 'rgba(245, 158, 11, 0.15)';
   const currencyBorder = isSVEs ? 'rgba(16, 185, 129, 0.35)' : isTokens ? 'rgba(56, 189, 248, 0.35)' : 'rgba(245, 158, 11, 0.35)';
 
-  const handleConfirm = () => {
-    if (!hasEnoughBalance) {
-      soundFx.playClick();
-      return;
+  const handleConfirm = async () => {
+    if (!hasEnoughBalance || isLoading) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await onConfirmJoin({
+        giveawayId: giveaway.id,
+        feeAmount,
+        feeUnit,
+        newBalance: balanceAfter
+      });
+
+      const generatedCode = result?.ticketCode || `#VEL-${Math.floor(10000 + Math.random() * 90000)}-US`;
+      setTicketCode(generatedCode);
+      setIsSuccess(true);
+
+      soundFx.playCoin();
+      setTimeout(() => {
+        soundFx.playCelebration();
+        ConfettiManager.burst(window.innerWidth / 2, window.innerHeight / 2, 90);
+      }, 120);
+    } catch (err) {
+      console.error("Failed to join giveaway:", err);
+      setError("Unable to process your entry at this time. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    const generatedCode = `#VEL-${Math.floor(10000 + Math.random() * 90000)}-US`;
-    setTicketCode(generatedCode);
-    setIsSuccess(true);
-
-    soundFx.playCoin();
-    setTimeout(() => {
-      soundFx.playCelebration();
-      ConfettiManager.burst(window.innerWidth / 2, window.innerHeight / 2, 90);
-    }, 120);
-
-    onConfirmJoin({
-      giveawayId: giveaway.id,
-      feeAmount,
-      feeUnit,
-      newBalance: balanceAfter,
-      ticketCode: generatedCode
-    });
   };
 
   const prizeDisplayName = giveaway.title.replace(/^Win an?\s+/i, '');
@@ -288,13 +299,13 @@ export default function EntryFeeConfirmationModal({
                 </div>
               </div>
 
-              {/* Warning notice if insufficient balance */}
-              {!hasEnoughBalance && (
+              {/* Warning/Error display */}
+              {(!hasEnoughBalance || error) && (
                 <div className={styles.warningBox}>
                   <AlertTriangle size={18} className={styles.iconWarning} />
                   <div>
-                    <strong>Insufficient {feeUnit}</strong>
-                    <p>You need {difference.toLocaleString()} more {feeUnit} to participate.</p>
+                    <strong>{error ? "Processing Error" : `Insufficient ${feeUnit}`}</strong>
+                    <p>{error || `You need ${difference.toLocaleString()} more ${feeUnit} to participate.`}</p>
                   </div>
                 </div>
               )}
@@ -315,17 +326,27 @@ export default function EntryFeeConfirmationModal({
                     soundFx.playClick();
                     onClose();
                   }}
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
 
                 <button
-                  className={`${styles.confirmBtn} ${!hasEnoughBalance ? styles.disabledBtn : ''}`}
+                  className={`${styles.confirmBtn} ${!hasEnoughBalance || isLoading ? styles.disabledBtn : ''}`}
                   onClick={handleConfirm}
-                  disabled={!hasEnoughBalance}
+                  disabled={!hasEnoughBalance || isLoading}
                 >
-                  <Zap size={16} />
-                  <span>Confirm & Join</span>
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={16} className={styles.spinIcon} />
+                      <span>Joining Giveaway...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={16} />
+                      <span>Confirm & Join</span>
+                    </>
+                  )}
                 </button>
               </div>
             </>
@@ -335,4 +356,3 @@ export default function EntryFeeConfirmationModal({
     </AnimatePresence>
   );
 }
-

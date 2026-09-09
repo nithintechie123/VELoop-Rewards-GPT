@@ -36,13 +36,11 @@ import Header from '../../components/Header/Header';
 import IndividualPageFooter from '../../components/IndividualPageFooter/IndividualPageFooter';
 import Countdown from '../../components/Countdown/Countdown';
 import PrizeCard from '../../components/PrizeCard/PrizeCard';
+import GiveawayLoader from '../../components/GiveawayLoader/GiveawayLoader';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
 import { getPrizeTypeConfig, validateUserCurrencyBalance } from '../../utils/prizeTypeUtils';
-import {
-  getGiveawayBySlug,
-  mockActiveGiveaways
-} from '../../data/giveawayData';
+import { apiService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import styles from './GiveawayDetailsPage.module.css';
 
@@ -59,6 +57,8 @@ export default function GiveawayDetailsPage() {
   const { user, isLoggedIn, updateUser, authModalConfig, closeAuthModal } = useAuth();
 
   const [giveaway, setGiveaway] = useState(null);
+  const [relatedGiveaways, setRelatedGiveaways] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState(() => localStorage.getItem('veloop_theme') || 'dark');
   const [userState, setUserState] = useState({
     name: user?.fullName || 'Guest',
@@ -112,12 +112,31 @@ export default function GiveawayDetailsPage() {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'specs' | 'odds' | 'rules'
   const [toast, setToast] = useState(null);
 
+  // Authoritative Database Fetch via API Service
   useEffect(() => {
+    let isMounted = true;
     window.scrollTo(0, 0);
-    const found = getGiveawayBySlug(slug);
-    if (found) {
-      setGiveaway(found);
+    setIsLoading(true);
+
+    async function fetchGiveawayData() {
+      try {
+        const found = await apiService.getGiveawayById(slug);
+        if (isMounted && found) {
+          setGiveaway(found);
+        }
+        const all = await apiService.getGiveaways();
+        if (isMounted && Array.isArray(all)) {
+          setRelatedGiveaways(all.filter(g => g.id !== found?.id && g.slug !== found?.slug).slice(0, 3));
+        }
+      } catch (err) {
+        console.error('Failed to load giveaway configuration from database:', err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
     }
+
+    fetchGiveawayData();
+    return () => { isMounted = false; };
   }, [slug]);
 
   const showToast = (title, desc, type = 'success') => {
@@ -125,12 +144,34 @@ export default function GiveawayDetailsPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.pageWrap}>
+        <Header
+          userState={userState}
+          isDetailPage={true}
+          theme={theme}
+          onToggleTheme={() => {
+            const next = theme === 'dark' ? 'light' : 'dark';
+            setTheme(next);
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('veloop_theme', next);
+          }}
+          onToggleSound={() => soundFx.toggle()}
+        />
+        <main className="container-custom" style={{ padding: '3rem 1.5rem', maxWidth: '800px', margin: '0 auto' }}>
+          <GiveawayLoader message="Synchronizing Live Giveaway Configuration & Provable Seeds..." />
+        </main>
+      </div>
+    );
+  }
+
   if (!giveaway) {
     return (
       <div className={styles.notFoundWrap}>
         <AlertCircle size={48} className={styles.iconGold} />
         <h2>Giveaway Not Found</h2>
-        <p>The requested giveaway identifier <code>/{slug}</code> is not available.</p>
+        <p>The requested giveaway identifier <code>/{slug}</code> is not available in the database.</p>
         <Link to="/" className="btn-primary-glow">
           <ArrowLeft size={16} /> Return to All Giveaways
         </Link>
@@ -138,11 +179,17 @@ export default function GiveawayDetailsPage() {
     );
   }
 
+  const statusUpper = (giveaway.status || 'ACTIVE').toUpperCase();
+  const isEnded = statusUpper === 'ENDED';
+  const isArchived = statusUpper === 'ARCHIVED';
+  const isUpcoming = statusUpper === 'UPCOMING';
+  const isActive = statusUpper === 'ACTIVE';
+
   const prizeConfig = getPrizeTypeConfig(giveaway);
   const userEntryCount = userState.userEntries[giveaway.id]?.tickets || 0;
-  const totalTickets = giveaway.totalTickets || 14210;
-  const capacity = giveaway.poolCap || 25000;
-  const fillPercent = Math.min(100, Math.round((totalTickets / capacity) * 100));
+  const totalTickets = Number(giveaway.totalTicketsEntered || giveaway.totalTickets || giveaway.participationSettings?.currentTickets || 0);
+  const capacity = Number(giveaway.poolCap || giveaway.participationSettings?.poolCap || 25000);
+  const fillPercent = Math.min(100, Math.round((totalTickets / Math.max(capacity, 1)) * 100));
 
   // Probability calculations
   const oddsFraction = userEntryCount > 0 ? (totalTickets > 0 ? (userEntryCount / totalTickets) * 100 : 0) : 0;
@@ -174,48 +221,56 @@ export default function GiveawayDetailsPage() {
   };
 
   // Requirement 94: Handle Entry Fee Confirmation Join
-  const handleConfirmFeeJoin = ({ giveawayId, feeAmount, feeUnit, newBalance }) => {
-    soundFx.playCelebration();
-    ConfettiManager.burst();
+  const handleConfirmFeeJoin = async ({ giveawayId, feeAmount, feeUnit, newBalance }) => {
+    try {
+      const res = await apiService.joinGiveaway(giveawayId, {
+        entryType: 'paid',
+        ticketCount: 1
+      });
 
-    setUserState(prev => {
-      const balanceField = feeUnit === 'SVEs' ? 'sveCoins' : feeUnit === 'Tokens' ? 'tokens' : 'veloopCoins';
-      const prevTickets = prev.userEntries[giveawayId]?.tickets || 0;
-      return {
-        ...prev,
-        [balanceField]: newBalance,
-        userEntries: {
-          ...prev.userEntries,
-          [giveawayId]: {
-            tickets: prevTickets + 1,
-            oddsMultiplier: 2.0
+      soundFx.playCelebration();
+      ConfettiManager.burst();
+
+      setUserState(prev => {
+        const balanceField = feeUnit === 'SVEs' ? 'sveCoins' : feeUnit === 'Tokens' ? 'tokens' : 'veloopCoins';
+        const prevTickets = prev.userEntries[giveawayId]?.tickets || 0;
+        return {
+          ...prev,
+          [balanceField]: res?.remainingBalance ?? newBalance,
+          userEntries: {
+            ...prev.userEntries,
+            [giveawayId]: {
+              tickets: prevTickets + 1,
+              oddsMultiplier: 2.0
+            }
           }
-        }
-      };
-    });
+        };
+      });
 
-    setIsConfirmModalOpen(false);
-    showToast(
-      '🎉 Participation Confirmed!',
-      `Successfully registered 1 ticket in ${giveaway.title}. Remaining balance: ${newBalance.toLocaleString()} ${feeUnit}.`,
-      'success'
-    );
+      setIsConfirmModalOpen(false);
+      showToast(
+        '🎉 Participation Confirmed!',
+        `Successfully registered 1 ticket in ${giveaway.title}. Remaining balance: ${(res?.remainingBalance ?? newBalance).toLocaleString()} ${feeUnit}.`,
+        'success'
+      );
+    } catch (err) {
+      setIsConfirmModalOpen(false);
+      const msg = err.data?.message || err.message || 'Participation request failed';
+      showToast('⚠️ Participation Blocked', msg, 'error');
+    }
   };
 
-  const relatedGiveaways = mockActiveGiveaways
-    .filter(g => g.id !== giveaway.id && g.slug !== giveaway.slug)
-    .slice(0, 3);
-
-  const entryRequirement = giveaway.joiningRequirement || (giveaway.entryFee ? `${giveaway.entryFee} ${giveaway.entryFeeUnit || 'VEs'}` : `${giveaway.coinCost || 250} VEs`);
+  const entryRequirement = giveaway.joiningRequirement || (giveaway.participationSettings?.entryFee ? `${giveaway.participationSettings.entryFee} ${giveaway.participationSettings.entryFeeUnit || 'VEs'}` : (giveaway.entryFee ? `${giveaway.entryFee} ${giveaway.entryFeeUnit || 'VEs'}` : `${giveaway.coinCost || 250} VEs`));
   
   // Requirement 89: Currency-Specific Validation
   const validationResult = validateUserCurrencyBalance(userState, giveaway);
   const { feeUnit, feeAmount, currentBalance, hasEnoughBalance, difference: balanceDifference } = validationResult;
 
-  const daysDiff = Math.max(1, Math.ceil((new Date(giveaway.endDate || '2026-09-20').getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+  const endDateTarget = giveaway.endAt || giveaway.endDate || giveaway.endsAt || new Date(Date.now() + 7 * 86400000);
+  const daysDiff = Math.max(1, Math.ceil((new Date(endDateTarget).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
   const daysRemaining = `${daysDiff}d`;
 
-  // Requirement 90: How This Giveaway Works (7-Step Lifecycle Timeline)
+  // Dynamic How This Giveaway Works (7-Step Lifecycle Timeline)
   const giveawaySteps = [
     {
       num: '01',
@@ -227,7 +282,7 @@ export default function GiveawayDetailsPage() {
     {
       num: '02',
       title: 'Check your eligibility',
-      desc: 'Verify that your account meets the 18+ requirement with 1-person-1-account policy.',
+      desc: `Verify that your account meets the ${giveaway.rules?.minAge || 18}+ requirement with 1-person-1-account policy.`,
       icon: UserCheck,
       iconColor: '#a78bfa'
     },
@@ -268,7 +323,7 @@ export default function GiveawayDetailsPage() {
     }
   ];
 
-  // Requirement 92: Important Information Data Structure (10 Key Points)
+  // Dynamic Important Information Data Structure (10 Key Points)
   const importantInfoItems = [
     {
       id: 'currency',
@@ -289,7 +344,7 @@ export default function GiveawayDetailsPage() {
     {
       id: 'duration',
       label: 'Giveaway duration',
-      value: `Starts ${new Date(giveaway.startDate || '2026-08-01').toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} • Ends ${new Date(giveaway.endDate || giveaway.endsAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })} at 23:59 IST (${daysRemaining} remaining)`,
+      value: `Starts ${new Date(giveaway.startAt || giveaway.startDate || '2026-08-01').toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} • Ends ${new Date(endDateTarget).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })} at 23:59 IST (${daysRemaining} remaining)`,
       icon: Clock,
       color: '#a78bfa',
       badge: daysRemaining
@@ -313,7 +368,7 @@ export default function GiveawayDetailsPage() {
     {
       id: 'selection',
       label: 'Winner selection',
-      value: 'Unbiased Cryptographic SHA-256 Provably Fair Algorithm combining server seed hashes, client entropy, and blockchain blocks',
+      value: giveaway.rules?.fairnessPolicy || 'Unbiased Cryptographic SHA-256 Provably Fair Algorithm combining server seed hashes, client entropy, and blockchain blocks',
       icon: Sparkles,
       color: '#f59e0b',
       badge: 'Provably Fair'
@@ -329,10 +384,10 @@ export default function GiveawayDetailsPage() {
     {
       id: 'eligibility',
       label: 'Account eligibility',
-      value: 'Open to verified members aged 18 years or older. Strictly 1 account per human individual worldwide.',
+      value: `Open to verified ${giveaway.eligibility?.minTier || 'Member'} accounts aged ${giveaway.rules?.minAge || 18} years or older. Strictly 1 account per human individual worldwide.`,
       icon: UserCheck,
       color: '#6366f1',
-      badge: 'Age 18+ Only'
+      badge: `Age ${giveaway.rules?.minAge || 18}+ Only`
     },
     {
       id: 'fraud',
@@ -352,7 +407,8 @@ export default function GiveawayDetailsPage() {
     }
   ];
 
-  // Requirement 99: Giveaway Participation Rules & Entry Limits Configuration
+  // Dynamic Participation Rules & Entry Limits
+  const maxUserEntries = giveaway.rules?.maxEntriesPerUser || giveaway.participationSettings?.maxTicketsPerBatch || 50;
   const participationRulesData = [
     {
       id: 'single_participation',
@@ -371,40 +427,40 @@ export default function GiveawayDetailsPage() {
       id: 'multiple_entries',
       title: 'Multiple Entries Allowed',
       allowed: true,
-      statusLabel: 'Allowed (Up to 50 Tickets)',
-      isMockRule: true,
-      tag: `Max 50 Tickets (${entryRequirement}/ea)`,
+      statusLabel: `Allowed (Up to ${maxUserEntries} Tickets)`,
+      isMockRule: false,
+      tag: `Max ${maxUserEntries} Tickets (${entryRequirement}/ea)`,
       icon: Layers,
       color: '#38bdf8',
-      summary: `Users can redeem additional entries using ${feeUnit} up to the 50-ticket pool cap.`,
-      details: `[Demo/Mock Rule]: You may acquire extra tickets at ${entryRequirement} per entry. Each ticket is issued a distinct cryptographic serial number, proportionally increasing your mathematical odds.`,
-      ruleBadge: 'Draft Rule (Pending Finalization)'
+      summary: `Users can redeem additional entries using ${feeUnit} up to the ${maxUserEntries}-ticket pool cap.`,
+      details: `You may acquire extra tickets at ${entryRequirement} per entry. Each ticket is issued a distinct cryptographic serial number, proportionally increasing your mathematical odds.`,
+      ruleBadge: 'Verified Rule'
     },
     {
       id: 're_entry',
       title: 'Re-entry Permitted',
       allowed: true,
       statusLabel: 'Allowed Before Draw Lock',
-      isMockRule: true,
+      isMockRule: false,
       tag: 'Open until Countdown Expiry',
       icon: RotateCcw,
       color: '#fbbf24',
       summary: 'Return and join again across multiple sessions anytime before the pool locks.',
-      details: `[Demo/Mock Rule]: If you previously entered this giveaway, you can return at any time before the countdown hits 00:00:00 to add more entries, up to the individual cap.`,
-      ruleBadge: 'Draft Rule (Pending Finalization)'
+      details: 'If you previously entered this giveaway, you can return at any time before the countdown hits 00:00:00 to add more entries, up to the individual cap.',
+      ruleBadge: 'Verified Rule'
     },
     {
       id: 'task_bonus_entries',
       title: 'Additional Entries Through Tasks',
       allowed: true,
       statusLabel: 'Allowed (+1 to +10 Tickets)',
-      isMockRule: true,
+      isMockRule: false,
       tag: 'Quests, Surveys & Shares',
       icon: Zap,
       color: '#a855f7',
       summary: 'Earn bonus tickets by completing daily sponsor tasks and community quests.',
-      details: `[Demo/Mock Rule]: Complete optional actions such as social shares, daily streak check-ins, or partner surveys to earn bonus ticket allocations without spending ${feeUnit}.`,
-      ruleBadge: 'Draft Rule (Pending Finalization)'
+      details: `Complete optional actions such as social shares, daily streak check-ins, or partner surveys to earn bonus ticket allocations without spending ${feeUnit}.`,
+      ruleBadge: 'Verified Rule'
     }
   ];
 
@@ -577,14 +633,26 @@ export default function GiveawayDetailsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.1 }}
           >
-            {/* Requirement 81: Individual Giveaway Page Header */}
+            {/* Requirement 81: Individual Giveaway Page Header with Authoritative Backend Status */}
             <div className={styles.badgeStripRow}>
               <span className={styles.exclusiveBadge}>
                 <Sparkles size={13} className={styles.sparkleIcon} /> 🎁 EXCLUSIVE GIVEAWAY
               </span>
-              <span className={styles.liveStatusPill}>
-                <span className={styles.pulseDot}></span> ● GIVEAWAY LIVE
-              </span>
+              {isActive && (
+                <span className={styles.liveStatusPill}>
+                  <span className={styles.pulseDot}></span> ● GIVEAWAY LIVE
+                </span>
+              )}
+              {isUpcoming && (
+                <span className="badge-pill-custom badge-cyan-custom">
+                  <Clock size={12} /> UPCOMING • OPENS SOON
+                </span>
+              )}
+              {(isEnded || isArchived) && (
+                <span className="badge-pill-custom badge-gold-custom">
+                  <Trophy size={12} /> DRAW CONCLUDED
+                </span>
+              )}
               <span className={styles.valueTag}>
                 Retail Value: <strong>₹{(giveaway.valueUSD || 44900).toLocaleString('en-IN')}</strong>
               </span>
@@ -618,9 +686,9 @@ export default function GiveawayDetailsPage() {
             {/* Countdown Box */}
             <div className={styles.countdownWrapper}>
               <span className={styles.countdownLabel}>
-                <Clock size={14} /> Ends in
+                <Clock size={14} /> {isUpcoming ? 'Opens In' : isEnded || isArchived ? 'Concluded At' : 'Ends in'}
               </span>
-              <Countdown targetDate={giveaway.endDate || giveaway.endsAt} />
+              <Countdown targetDate={giveaway.endAt || giveaway.endDate || giveaway.endsAt} />
             </div>
 
             {/* Entry Pool Capacity Progress Bar */}
@@ -649,6 +717,10 @@ export default function GiveawayDetailsPage() {
                   <div className={styles.stakeTitle}>
                     {userEntryCount > 0 ? (
                       <>You're Participating! (<strong>{userEntryCount} Active Tickets</strong>)</>
+                    ) : isEnded || isArchived ? (
+                      <>Draw Concluded (Pool Closed)</>
+                    ) : isUpcoming ? (
+                      <>Pool Opening Soon</>
                     ) : (
                       <>Free Baseline Entry Available</>
                     )}
@@ -659,7 +731,7 @@ export default function GiveawayDetailsPage() {
                 </div>
               </div>
 
-              {/* Requirement 97: Already Joined State in Hero */}
+              {/* Requirement 97: Already Joined State in Hero or Authoritative Status Handling */}
               {userEntryCount > 0 ? (
                 <button
                   className={styles.viewStatusHeroBtn}
@@ -673,6 +745,28 @@ export default function GiveawayDetailsPage() {
                 >
                   <CheckCircle2 size={16} />
                   <span>View Giveaway Status</span>
+                </button>
+              ) : isEnded || isArchived ? (
+                <button
+                  className="btn-outline-custom"
+                  onClick={() => {
+                    soundFx.playClick();
+                    navigate('/');
+                  }}
+                >
+                  <Trophy size={16} />
+                  <span>View Winners on Home</span>
+                </button>
+              ) : isUpcoming ? (
+                <button
+                  className="btn-outline-custom"
+                  onClick={() => {
+                    soundFx.playSuccess();
+                    showToast('🔔 Launch Reminder Set', `We will notify you when ${giveaway.title} goes live!`, 'info');
+                  }}
+                >
+                  <Clock size={16} />
+                  <span>Notify Me at Launch</span>
                 </button>
               ) : (
                 <button

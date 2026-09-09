@@ -27,6 +27,7 @@ const EntryFeeConfirmationModal = lazy(() => import('../../components/EntryFeeCo
 const LoginRequiredModal = lazy(() => import('../../components/LoginRequiredModal/LoginRequiredModal'));
 const AuthModal = lazy(() => import('../../components/AuthModal/AuthModal'));
 import ErrorState from '../../components/ErrorState/ErrorState';
+import GiveawayLoader from '../../components/GiveawayLoader/GiveawayLoader';
 import {
   HeroSkeleton,
   StatsSkeleton,
@@ -56,6 +57,12 @@ export default function GiveawayPage() {
   const [heroGiveaway, setHeroGiveaway] = useState(mockHeroGiveaway);
   const [spotlightWinners, setSpotlightWinners] = useState(mockSpotlightWinners);
   const [archiveWinners, setArchiveWinners] = useState(mockArchiveWinners);
+
+  // Requirement 59: Backend-Driven Loader — loading/success/error/empty states
+  const [apiLoaded, setApiLoaded] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // starts true: initial API fetch
+  const [hasError, setHasError] = useState(false);
 
   // User & Identity State
   const [currentUserId, setCurrentUserId] = useState(user?.userId || null);
@@ -150,20 +157,59 @@ export default function GiveawayPage() {
     );
   };
 
-  // Fetch initial data from Express API
+  // Requirement 59 & 60: Backend-Driven Loading with proper loading/success/error/empty states.
+  // On API failure: do NOT silently show fake data — set apiError and show "Unable to load giveaway".
   useEffect(() => {
-    async function loadData() {
-      const gws = await apiService.getGiveaways();
-      const hero = await apiService.getHeroGiveaway();
-      const winners = await apiService.getSpotlightWinners();
-      const archive = await apiService.getArchiveWinners();
+    let isMounted = true;
+    setIsLoading(true);
+    setApiError(null);
 
-      if (gws) setGiveaways(gws);
-      if (hero) setHeroGiveaway(hero);
-      if (winners) setSpotlightWinners(winners);
-      if (archive) setArchiveWinners(archive);
+    async function loadData() {
+      try {
+        const [gws, hero, winners, archive] = await Promise.allSettled([
+          apiService.getGiveaways(),
+          apiService.getHeroGiveaway(),
+          apiService.getSpotlightWinners(),
+          apiService.getArchiveWinners()
+        ]);
+
+        if (!isMounted) return;
+
+        let loadedAny = false;
+
+        // Requirement 60: Only update state if API returned real data — no fake fallback
+        if (gws.status === 'fulfilled' && Array.isArray(gws.value) && gws.value.length > 0) {
+          setGiveaways(gws.value);
+          loadedAny = true;
+        }
+        if (hero.status === 'fulfilled' && hero.value) {
+          setHeroGiveaway(hero.value);
+          loadedAny = true;
+        }
+        if (winners.status === 'fulfilled' && Array.isArray(winners.value)) {
+          setSpotlightWinners(winners.value);
+        }
+        if (archive.status === 'fulfilled' && Array.isArray(archive.value)) {
+          setArchiveWinners(archive.value);
+        }
+
+        setApiLoaded(true);
+        if (!loadedAny) {
+          // Requirement 60: API returned but no active giveaway data — show proper empty state
+          setApiError('no_active_giveaway');
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        // Requirement 60: Hard failure — show "Unable to load giveaway" instead of fake data
+        console.error('[GiveawayPage] Failed to load backend giveaway data:', err);
+        setApiError('fetch_failed');
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
     }
+
     loadData();
+    return () => { isMounted = false; };
   }, []);
 
   const showToast = (title, desc, type = 'success') => {
@@ -655,8 +701,6 @@ export default function GiveawayPage() {
     showToast('🔄 State Reset', 'Demo data reset to initial values', 'info');
   };
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
 
   const handleToggleLoading = () => {
     soundFx.playClick();
@@ -676,14 +720,39 @@ export default function GiveawayPage() {
     });
   };
 
+  // Requirement 59: Retry — refetch from backend on user request
   const handleRetry = () => {
     soundFx.playSuccess();
     setHasError(false);
+    setApiError(null);
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      showToast('✨ Connected', 'Giveaway data retrieved successfully!', 'success');
-    }, 600);
+
+    const retryFetch = async () => {
+      try {
+        const [gws, hero] = await Promise.allSettled([
+          apiService.getGiveaways(),
+          apiService.getHeroGiveaway()
+        ]);
+        let loadedAny = false;
+        if (gws.status === 'fulfilled' && Array.isArray(gws.value) && gws.value.length > 0) {
+          setGiveaways(gws.value);
+          loadedAny = true;
+        }
+        if (hero.status === 'fulfilled' && hero.value) {
+          setHeroGiveaway(hero.value);
+          loadedAny = true;
+        }
+        setApiLoaded(true);
+        if (!loadedAny) setApiError('no_active_giveaway');
+        showToast('✨ Connected', 'Giveaway data retrieved successfully!', 'success');
+      } catch {
+        setApiError('fetch_failed');
+        showToast('⚠️ Still Unreachable', 'Could not connect to the giveaway server.', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    retryFetch();
   };
 
   return (
@@ -725,10 +794,15 @@ export default function GiveawayPage() {
 
       {/* Main Content Sections */}
       <main className={styles.mainContainer}>
-        {/* Requirement 66: Error State View */}
-        {hasError ? (
+        {/* Requirement 59: Initial page load — full-page themed GiveawayLoader (Requirement 51) */}
+        {isLoading && !apiLoaded && (
+          <GiveawayLoader fullScreen={false} message="Loading active giveaways..." />
+        )}
+
+        {/* Requirement 59 & 60: Error State — show "Unable to load giveaway" instead of fake data */}
+        {(hasError || apiError === 'fetch_failed') ? (
           <ErrorState
-            title="We couldn't load the giveaway information."
+            title="Unable to load giveaway"
             subtitle="Something went wrong while connecting to the prize vault. Please check your network or try again."
             onRetry={handleRetry}
             onReset={handleResetData}

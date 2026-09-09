@@ -8,6 +8,7 @@ const router = express.Router();
 router.get('/my', optionalAuthMiddleware, getUserParticipations);
 router.get('/user', optionalAuthMiddleware, getUserParticipations);
 router.get('/giveaway/:id', getGiveawayParticipants);
+router.post('/join', optionalAuthMiddleware, fraudInspectionMiddleware, joinGiveaway);
 router.post('/join/:id', optionalAuthMiddleware, fraudInspectionMiddleware, joinGiveaway);
 
 export default router;

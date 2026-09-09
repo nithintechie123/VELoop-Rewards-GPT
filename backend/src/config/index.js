@@ -11,11 +11,14 @@ dotenv.config(); // fallback
 
 export const config = {
   port: process.env.PORT || 5000,
+  nodeEnv: process.env.NODE_ENV || 'development',
   jwtSecret: process.env.JWT_SECRET || 'veloop_rewards_super_secure_jwt_secret_2026',
-  jwtAccessExpiresIn: '15m',
-  jwtRefreshExpiresIn: '7d',
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-  mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/veloop_rewards',
+  refreshSecret: process.env.REFRESH_SECRET || process.env.JWT_SECRET || 'veloop_rewards_super_secure_refresh_secret_2026',
+  jwtAccessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
+  jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+  clientUrl: process.env.CLIENT_URL || process.env.CORS_ORIGIN || 'http://localhost:5173',
+  corsOrigin: process.env.CLIENT_URL || process.env.CORS_ORIGIN || 'http://localhost:5173',
+  mongoUri: process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/veloop_rewards',
   fraud: {
     maxBurstRequests: 10,       // Max requests in 5 seconds
     burstWindowMs: 5000,        // 5 seconds

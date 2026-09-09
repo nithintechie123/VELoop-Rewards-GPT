@@ -4,7 +4,7 @@
       "id": "usr_alex_01",
       "userId": "VE10025",
       "email": "alex.thorne@veloop.io",
-      "passwordHash": "$2a$10$x5AjLo5U3sXSlBJ.Kwlh7uulHBz6UOg.Gy.d064Azlinnmcj3JX1O",
+      "passwordHash": "$2a$10$xqyzGOUopf6KfTsHbXQOaey50Gxefg3W.WnkzN4qVUETAlIEKXLQy",
       "fullName": "Alex Thorne",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
       "tier": "Diamond VIP",
@@ -40,14 +40,14 @@
       },
       "refreshTokens": [],
       "joinedDate": "2026-01-15",
-      "lastLoginAt": "2026-09-06T20:07:08.798Z",
+      "lastLoginAt": "2026-09-09T14:35:07.469Z",
       "lastActiveIp": "::1"
     },
     {
       "id": "usr_sarah_02",
       "userId": "VE10042",
       "email": "sarah.lin@veloop.io",
-      "passwordHash": "$2a$10$x5AjLo5U3sXSlBJ.Kwlh7uulHBz6UOg.Gy.d064Azlinnmcj3JX1O",
+      "passwordHash": "$2a$10$xqyzGOUopf6KfTsHbXQOaey50Gxefg3W.WnkzN4qVUETAlIEKXLQy",
       "fullName": "Sarah Lin",
       "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
       "tier": "Gold Member",
@@ -84,7 +84,7 @@
       "id": "usr_rohan_03",
       "userId": "VE20088",
       "email": "rohan.verma@veloop.io",
-      "passwordHash": "$2a$10$x5AjLo5U3sXSlBJ.Kwlh7uulHBz6UOg.Gy.d064Azlinnmcj3JX1O",
+      "passwordHash": "$2a$10$xqyzGOUopf6KfTsHbXQOaey50Gxefg3W.WnkzN4qVUETAlIEKXLQy",
       "fullName": "Rohan Verma",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
       "tier": "Platinum Member",
@@ -112,7 +112,7 @@
       "id": "usr_maya_04",
       "userId": "VE30077",
       "email": "maya.patel@veloop.io",
-      "passwordHash": "$2a$10$x5AjLo5U3sXSlBJ.Kwlh7uulHBz6UOg.Gy.d064Azlinnmcj3JX1O",
+      "passwordHash": "$2a$10$xqyzGOUopf6KfTsHbXQOaey50Gxefg3W.WnkzN4qVUETAlIEKXLQy",
       "fullName": "Maya Patel",
       "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
       "tier": "Diamond VIP",
@@ -147,10 +147,10 @@
     "status": "active",
     "statusLabel": "Giveaway Live",
     "startAt": "2026-08-01T00:00:00.000Z",
-    "endAt": "2026-09-10T10:07:08.587Z",
+    "endAt": "2026-09-13T04:35:07.263Z",
     "startDate": "2026-08-01T00:00:00.000Z",
-    "endDate": "2026-09-10T10:07:08.587Z",
-    "endsAt": "2026-09-10T10:07:08.587Z",
+    "endDate": "2026-09-13T04:35:07.265Z",
+    "endsAt": "2026-09-13T04:35:07.265Z",
     "rules": {
       "terms": [
         "Open to all verified VELOOP Rewards members aged 18 and older.",
@@ -231,10 +231,10 @@
       "status": "active",
       "statusLabel": "Giveaway Live",
       "startAt": "2026-08-01T00:00:00.000Z",
-      "endAt": "2026-09-11T08:07:08.587Z",
+      "endAt": "2026-09-14T02:35:07.265Z",
       "startDate": "2026-08-01T00:00:00.000Z",
-      "endDate": "2026-09-11T08:07:08.587Z",
-      "endsAt": "2026-09-11T08:07:08.587Z",
+      "endDate": "2026-09-14T02:35:07.265Z",
+      "endsAt": "2026-09-14T02:35:07.265Z",
       "rules": {
         "terms": [
           "Open to all verified VELOOP Rewards members.",
@@ -266,9 +266,9 @@
           "type": "PHYSICAL",
           "value": "₹1,34,900",
           "valueUSD": 134900,
-          "image": "/assets/images/iphone_titanium.jpg",
+          "image": "/assets/images/iphone_deep_purple.jpg",
           "quantity": 1,
-          "claimInstructions": "Requires shipping address verification."
+          "claimInstructions": "Requires shipping address verification within 7 days."
         }
       ],
       "participationSettings": {
@@ -276,8 +276,8 @@
         "entryFeeUnit": "VEs",
         "allowsFreeDaily": true,
         "maxTicketsPerBatch": 50,
-        "poolCap": 20000,
-        "currentTickets": 14200
+        "poolCap": 25000,
+        "currentTickets": 14210
       },
       "isHero": false,
       "prizeTier": "1st Prize",
@@ -289,14 +289,14 @@
       "category": "Flagship Mobile",
       "filterTag": "active",
       "badge": "1st Prize",
-      "image": "/assets/images/iphone_titanium.jpg",
+      "image": "/assets/images/iphone_deep_purple.jpg",
       "value": "₹1,34,900",
       "valueUSD": 134900,
       "winnerCount": 1,
       "winnerLabel": "1 Winner",
-      "totalTicketsEntered": 14204,
-      "totalTickets": 14204,
-      "poolCap": 20000,
+      "totalTicketsEntered": 14214,
+      "totalTickets": 14214,
+      "poolCap": 25000,
       "entryFee": 250,
       "entryFeeUnit": "VEs",
       "joiningRequirement": "250 VEs",
@@ -316,14 +316,14 @@
       "status": "active",
       "statusLabel": "Giveaway Live",
       "startAt": "2026-08-01T00:00:00.000Z",
-      "endAt": "2026-09-09T04:07:08.587Z",
+      "endAt": "2026-09-18T20:35:07.265Z",
       "startDate": "2026-08-01T00:00:00.000Z",
-      "endDate": "2026-09-09T04:07:08.587Z",
-      "endsAt": "2026-09-09T04:07:08.587Z",
+      "endDate": "2026-09-18T20:35:07.265Z",
+      "endsAt": "2026-09-18T20:35:07.265Z",
       "rules": {
         "terms": [
           "Open to all active VELOOP accounts.",
-          "1 free entry allowed per user.",
+          "1 free entry allowed per user daily.",
           "Cryptographically audited draw process."
         ],
         "minAge": 18,
@@ -351,40 +351,40 @@
           "type": "PHYSICAL",
           "value": "₹44,900",
           "valueUSD": 44900,
-          "image": "/assets/images/luxury_smartwatch.jpg",
-          "quantity": 1,
+          "image": "/assets/images/apple_watch_purple.png",
+          "quantity": 3,
           "claimInstructions": "Winner must provide courier shipping details."
         }
       ],
       "participationSettings": {
-        "entryFee": 150,
+        "entryFee": 200,
         "entryFeeUnit": "VEs",
         "allowsFreeDaily": true,
         "maxTicketsPerBatch": 50,
-        "poolCap": 15000,
-        "currentTickets": 8900
+        "poolCap": 20000,
+        "currentTickets": 8120
       },
       "isHero": false,
       "prizeTier": "2nd Prize",
       "position": 2,
-      "accentTheme": "emerald",
+      "accentTheme": "blue",
       "type": "physical",
       "prizeType": "PHYSICAL",
       "claimType": "shipping_address",
-      "category": "Luxury Wearables",
+      "category": "Luxury Lifestyle",
       "filterTag": "active",
       "badge": "2nd Prize",
-      "image": "/assets/images/luxury_smartwatch.jpg",
+      "image": "/assets/images/apple_watch_purple.png",
       "value": "₹44,900",
       "valueUSD": 44900,
-      "winnerCount": 1,
-      "winnerLabel": "1 Winner",
-      "totalTicketsEntered": 8901,
-      "totalTickets": 8901,
-      "poolCap": 15000,
-      "entryFee": 150,
+      "winnerCount": 3,
+      "winnerLabel": "3 Winners",
+      "totalTicketsEntered": 8121,
+      "totalTickets": 8121,
+      "poolCap": 20000,
+      "entryFee": 200,
       "entryFeeUnit": "VEs",
-      "joiningRequirement": "150 VEs",
+      "joiningRequirement": "200 VEs",
       "serverSeed": "b2c3d4e5f6a10718293a4b5c6d7e8f90123456789abcdef0123456789abcdef1",
       "serverSeedHash": "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b",
       "clientSeed": "BLOCK_ETH_21048293_VELOOP_PUBLIC",
@@ -393,18 +393,18 @@
     },
     {
       "id": "gw-audio-airpods",
-      "title": "AirPods Pro (2nd Gen)",
-      "name": "AirPods Pro (2nd Gen)",
-      "slug": "airpods-pro",
+      "title": "AirPods Pro 2",
+      "name": "AirPods Pro 2",
+      "slug": "airpods",
       "description": "AirPods Pro (2nd Gen) with MagSafe Case (USB-C), 2x Active Noise Cancellation, and Adaptive Audio.",
-      "subtitle": "Active Noise Cancellation with USB-C MagSafe Charging Case.",
+      "subtitle": "Active Noise Cancellation, Adaptive Audio and MagSafe Charging Case (USB-C).",
       "status": "ENDED",
       "statusLabel": "Giveaway Live",
       "startAt": "2026-08-01T00:00:00.000Z",
-      "endAt": "2026-09-06T19:07:08.806Z",
+      "endAt": "2026-09-09T13:35:07.475Z",
       "startDate": "2026-08-01T00:00:00.000Z",
-      "endDate": "2026-09-12T00:07:08.587Z",
-      "endsAt": "2026-09-12T00:07:08.587Z",
+      "endDate": "2026-09-16T23:35:07.265Z",
+      "endsAt": "2026-09-16T23:35:07.265Z",
       "rules": {
         "terms": [
           "Open to all verified VELOOP users.",
@@ -429,46 +429,46 @@
       "prizes": [
         {
           "id": "PRIZE-003",
-          "title": "AirPods Pro (2nd Gen) USB-C",
-          "name": "AirPods Pro (2nd Gen) USB-C",
+          "title": "AirPods Pro 2 (USB-C)",
+          "name": "AirPods Pro 2 (USB-C)",
           "tier": "3rd Prize",
           "type": "PHYSICAL",
           "value": "₹24,900",
           "valueUSD": 24900,
-          "image": "/assets/images/airpods_pro_2.jpg",
-          "quantity": 2,
+          "image": "/assets/images/airpods_pro_purple.png",
+          "quantity": 5,
           "claimInstructions": "Requires courier delivery address verification."
         }
       ],
       "participationSettings": {
-        "entryFee": 100,
-        "entryFeeUnit": "VEs",
+        "entryFee": 500,
+        "entryFeeUnit": "SVEs",
         "allowsFreeDaily": true,
         "maxTicketsPerBatch": 50,
-        "poolCap": 10000,
-        "currentTickets": 6150
+        "poolCap": 25000,
+        "currentTickets": 9420
       },
       "isHero": false,
       "prizeTier": "3rd Prize",
       "position": 3,
-      "accentTheme": "cyan",
+      "accentTheme": "green",
       "type": "physical",
       "prizeType": "PHYSICAL",
       "claimType": "shipping_address",
-      "category": "Audio Essentials",
+      "category": "Audio & Accessories",
       "filterTag": "active",
       "badge": "3rd Prize",
-      "image": "/assets/images/airpods_pro_2.jpg",
+      "image": "/assets/images/airpods_pro_purple.png",
       "value": "₹24,900",
       "valueUSD": 24900,
-      "winnerCount": 2,
-      "winnerLabel": "2 Winners",
-      "totalTicketsEntered": 6150,
-      "totalTickets": 6150,
-      "poolCap": 10000,
-      "entryFee": 100,
-      "entryFeeUnit": "VEs",
-      "joiningRequirement": "100 VEs",
+      "winnerCount": 5,
+      "winnerLabel": "5 Winners",
+      "totalTicketsEntered": 9420,
+      "totalTickets": 9420,
+      "poolCap": 25000,
+      "entryFee": 500,
+      "entryFeeUnit": "SVEs",
+      "joiningRequirement": "500 SVEs",
       "serverSeed": "c3d4e5f6a1b20718293a4b5c6d7e8f90123456789abcdef0123456789abcdef2",
       "serverSeedHash": "a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8",
       "clientSeed": "BLOCK_ETH_21048294_VELOOP_PUBLIC",
@@ -476,19 +476,101 @@
       "updatedAt": "2026-08-01T00:00:00.000Z"
     },
     {
-      "id": "gw-gift-card-500",
-      "title": "₹500 Amazon Gift Voucher",
-      "name": "₹500 Amazon Gift Voucher",
-      "slug": "amazon-voucher-500",
-      "description": "Instant digital Amazon Pay electronic gift card for shopping, bill payments, and top-ups.",
-      "subtitle": "Instant digital code redeemable on Amazon India for all products.",
+      "id": "gw-gift-card-2000",
+      "title": "VIP Mystery Prize Box",
+      "name": "VIP Mystery Prize Box (₹50,000 Vault)",
+      "slug": "amazon-2000",
+      "description": "Exclusive VIP Mystery Star Box loaded with luxury vouchers and tech accessories.",
+      "subtitle": "Exclusive VIP Mystery Star Box loaded with luxury vouchers.",
       "status": "active",
-      "statusLabel": "Giveaway Live",
+      "statusLabel": "Lucky Draw",
       "startAt": "2026-08-01T00:00:00.000Z",
-      "endAt": "2026-09-08T02:07:08.587Z",
+      "endAt": "2026-09-14T16:35:07.265Z",
       "startDate": "2026-08-01T00:00:00.000Z",
-      "endDate": "2026-09-08T02:07:08.587Z",
-      "endsAt": "2026-09-08T02:07:08.587Z",
+      "endDate": "2026-09-14T16:35:07.265Z",
+      "endsAt": "2026-09-14T16:35:07.265Z",
+      "rules": {
+        "terms": [
+          "Open to all verified VELOOP members.",
+          "Instant digital redemption upon draw conclusion."
+        ],
+        "minAge": 18,
+        "prohibitedRegions": [],
+        "maxEntriesPerUser": 100,
+        "fairnessPolicy": "SHA-256 Provably Fair Commitment"
+      },
+      "eligibility": {
+        "minTier": "Member",
+        "requireVerification": false,
+        "allowedCountries": [
+          "IN",
+          "GLOBAL"
+        ],
+        "minBalanceRequired": 0
+      },
+      "prizes": [
+        {
+          "id": "PRIZE-004",
+          "title": "VIP Mystery Prize Box",
+          "name": "VIP Mystery Prize Box (₹50,000 Vault)",
+          "tier": "Lucky Draw",
+          "type": "GIFT_CARD",
+          "value": "₹50,000",
+          "valueUSD": 50000,
+          "image": "/assets/images/gift_box_purple_gold.jpg",
+          "quantity": 10,
+          "claimInstructions": "Instant digital redemption via email and dashboard."
+        }
+      ],
+      "participationSettings": {
+        "entryFee": 500,
+        "entryFeeUnit": "VEs",
+        "allowsFreeDaily": true,
+        "maxTicketsPerBatch": 50,
+        "poolCap": 50000,
+        "currentTickets": 28900
+      },
+      "isHero": false,
+      "prizeTier": "Lucky Draw",
+      "position": 4,
+      "accentTheme": "orange",
+      "type": "digital",
+      "prizeType": "GIFT_CARD",
+      "claimType": "digital_email",
+      "category": "Gift Cards & Cash",
+      "filterTag": "active",
+      "badge": "Lucky Draw",
+      "image": "/assets/images/gift_box_purple_gold.jpg",
+      "value": "₹50,000",
+      "valueUSD": 50000,
+      "winnerCount": 10,
+      "winnerLabel": "10 Winners",
+      "totalTicketsEntered": 28900,
+      "totalTickets": 28900,
+      "poolCap": 50000,
+      "entryFee": 500,
+      "entryFeeUnit": "VEs",
+      "joiningRequirement": "500 VEs",
+      "serverSeed": "e5f6a1b2c3d40718293a4b5c6d7e8f90123456789abcdef0123456789abcdef4",
+      "serverSeedHash": "c1b0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0",
+      "clientSeed": "BLOCK_ETH_21048296_VELOOP_PUBLIC",
+      "createdAt": "2026-08-01T00:00:00.000Z",
+      "updatedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "gw-gift-card-500",
+      "title": "Amazon Gift Card (₹500)",
+      "name": "₹500 Amazon Gift Card",
+      "slug": "amazon-500",
+      "description": "₹500 Amazon Gift Card digital code for everyday shopping and digital content on Amazon India.",
+      "subtitle": "₹500 Amazon Gift Card redeemable instantly on Amazon India.",
+      "status": "active",
+      "statusLabel": "Community Draw",
+      "startAt": "2026-08-01T00:00:00.000Z",
+      "endAt": "2026-09-15T22:35:07.265Z",
+      "startDate": "2026-08-01T00:00:00.000Z",
+      "endDate": "2026-09-15T22:35:07.265Z",
+      "endsAt": "2026-09-15T22:35:07.265Z",
       "rules": {
         "terms": [
           "Open to all VELOOP members.",
@@ -510,58 +592,225 @@
       },
       "prizes": [
         {
-          "id": "PRIZE-004",
+          "id": "PRIZE-005",
           "title": "₹500 Amazon Gift Card",
           "name": "₹500 Amazon Gift Card",
-          "tier": "Community Prize",
+          "tier": "Community Draw",
           "type": "GIFT_CARD",
           "value": "₹500",
           "valueUSD": 500,
-          "image": "/assets/images/amazon_gift_card.jpg",
-          "quantity": 10,
-          "claimInstructions": "Instant digital code issued to dashboard."
+          "image": "/assets/images/gift_box_purple_gold.jpg",
+          "quantity": 25,
+          "claimInstructions": "Instant digital code issued to dashboard and registered email."
         }
       ],
       "participationSettings": {
-        "entryFee": 50,
+        "entryFee": 300,
         "entryFeeUnit": "VEs",
         "allowsFreeDaily": true,
         "maxTicketsPerBatch": 20,
-        "poolCap": 5000,
-        "currentTickets": 3820
+        "poolCap": 30000,
+        "currentTickets": 19400
       },
       "isHero": false,
-      "prizeTier": "Community Prize",
-      "position": 4,
-      "accentTheme": "amber",
+      "prizeTier": "Community Draw",
+      "position": 5,
+      "accentTheme": "orange",
       "type": "digital",
       "prizeType": "GIFT_CARD",
-      "claimType": "digital_voucher",
-      "category": "Digital Vouchers",
+      "claimType": "digital_email",
+      "category": "Gift Cards & Cash",
       "filterTag": "active",
-      "badge": "Community Prize",
-      "image": "/assets/images/amazon_gift_card.jpg",
+      "badge": "Community Draw",
+      "image": "/assets/images/gift_box_purple_gold.jpg",
       "value": "₹500",
       "valueUSD": 500,
-      "winnerCount": 10,
-      "winnerLabel": "10 Winners",
-      "totalTicketsEntered": 3820,
-      "totalTickets": 3820,
-      "poolCap": 5000,
-      "entryFee": 50,
+      "winnerCount": 25,
+      "winnerLabel": "25 Winners",
+      "totalTicketsEntered": 19400,
+      "totalTickets": 19400,
+      "poolCap": 30000,
+      "entryFee": 300,
       "entryFeeUnit": "VEs",
-      "joiningRequirement": "50 VEs",
+      "joiningRequirement": "300 VEs",
       "serverSeed": "d4e5f6a1b2c30718293a4b5c6d7e8f90123456789abcdef0123456789abcdef3",
       "serverSeedHash": "b0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9",
       "clientSeed": "BLOCK_ETH_21048295_VELOOP_PUBLIC",
+      "createdAt": "2026-08-01T00:00:00.000Z",
+      "updatedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "gw-gift-card-20",
+      "title": "Amazon Gift Card (₹20 Flash)",
+      "name": "₹20 Amazon Gift Card Voucher",
+      "slug": "amazon-20",
+      "description": "₹20 Amazon Gift Card flash voucher drop with guaranteed high winner count.",
+      "subtitle": "₹20 Amazon Gift Card flash drop for daily active quest streak completers.",
+      "status": "active",
+      "statusLabel": "Flash Drop",
+      "startAt": "2026-08-01T00:00:00.000Z",
+      "endAt": "2026-09-12T08:35:07.265Z",
+      "startDate": "2026-08-01T00:00:00.000Z",
+      "endDate": "2026-09-12T08:35:07.265Z",
+      "endsAt": "2026-09-12T08:35:07.265Z",
+      "rules": {
+        "terms": [
+          "Open to all active VELOOP members.",
+          "Instant digital voucher issuance."
+        ],
+        "minAge": 18,
+        "prohibitedRegions": [],
+        "maxEntriesPerUser": 200,
+        "fairnessPolicy": "SHA-256 Provably Fair Commitment"
+      },
+      "eligibility": {
+        "minTier": "Member",
+        "requireVerification": false,
+        "allowedCountries": [
+          "IN",
+          "GLOBAL"
+        ],
+        "minBalanceRequired": 0
+      },
+      "prizes": [
+        {
+          "id": "PRIZE-006",
+          "title": "Amazon Gift Card (₹20 Flash)",
+          "name": "₹20 Amazon Gift Card Voucher",
+          "tier": "Flash Draw",
+          "type": "GIFT_CARD",
+          "value": "₹20",
+          "valueUSD": 20,
+          "image": "/assets/images/rewards_gift_card.jpg",
+          "quantity": 100,
+          "claimInstructions": "Instant digital code dispatched directly to winner dashboard."
+        }
+      ],
+      "participationSettings": {
+        "entryFee": 2000,
+        "entryFeeUnit": "Tokens",
+        "allowsFreeDaily": true,
+        "maxTicketsPerBatch": 100,
+        "poolCap": 60000,
+        "currentTickets": 45000
+      },
+      "isHero": false,
+      "prizeTier": "Flash Draw",
+      "position": 6,
+      "accentTheme": "gold",
+      "type": "digital",
+      "prizeType": "GIFT_CARD",
+      "claimType": "digital_email",
+      "category": "Gift Cards & Cash",
+      "filterTag": "active",
+      "badge": "Flash Drop",
+      "image": "/assets/images/rewards_gift_card.jpg",
+      "value": "₹20",
+      "valueUSD": 20,
+      "winnerCount": 100,
+      "winnerLabel": "100 Winners",
+      "totalTicketsEntered": 45000,
+      "totalTickets": 45000,
+      "poolCap": 60000,
+      "entryFee": 2000,
+      "entryFeeUnit": "Tokens",
+      "joiningRequirement": "2,000 Tokens",
+      "serverSeed": "f6a1b2c3d4e50718293a4b5c6d7e8f90123456789abcdef0123456789abcdef5",
+      "serverSeedHash": "d2c1b0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1",
+      "clientSeed": "BLOCK_ETH_21048297_VELOOP_PUBLIC",
+      "createdAt": "2026-08-01T00:00:00.000Z",
+      "updatedAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "gw-ps5-pro",
+      "title": "Sony PlayStation 5 Pro",
+      "name": "PlayStation 5 Pro Gaming Rig",
+      "slug": "ps5-pro",
+      "description": "Sony PS5 Pro Console with 2TB SSD, DualSense Edge Wireless Controller, and Pulse 3D Wireless Headset.",
+      "subtitle": "Next-gen 4K 120FPS gaming bundle with DualSense Edge controller.",
+      "status": "active",
+      "statusLabel": "Grand Draw",
+      "startAt": "2026-08-01T00:00:00.000Z",
+      "endAt": "2026-09-18T04:35:07.265Z",
+      "startDate": "2026-08-01T00:00:00.000Z",
+      "endDate": "2026-09-18T04:35:07.265Z",
+      "endsAt": "2026-09-18T04:35:07.265Z",
+      "rules": {
+        "terms": [
+          "Open to all verified VELOOP members.",
+          "Limit 1 free entry per day.",
+          "SHA-256 Provably fair draw."
+        ],
+        "minAge": 18,
+        "prohibitedRegions": [],
+        "maxEntriesPerUser": 100,
+        "fairnessPolicy": "SHA-256 Provably Fair Commitment"
+      },
+      "eligibility": {
+        "minTier": "Member",
+        "requireVerification": false,
+        "allowedCountries": [
+          "IN",
+          "US",
+          "GB",
+          "GLOBAL"
+        ],
+        "minBalanceRequired": 0
+      },
+      "prizes": [
+        {
+          "id": "PRIZE-007",
+          "title": "Sony PlayStation 5 Pro",
+          "name": "PlayStation 5 Pro Gaming Rig",
+          "tier": "Grand Prize",
+          "type": "PHYSICAL",
+          "value": "₹69,900",
+          "valueUSD": 69900,
+          "image": "/assets/images/ps5_gaming_bundle.jpg",
+          "quantity": 1,
+          "claimInstructions": "Winner must provide delivery address for express air shipping."
+        }
+      ],
+      "participationSettings": {
+        "entryFee": 400,
+        "entryFeeUnit": "VEs",
+        "allowsFreeDaily": true,
+        "maxTicketsPerBatch": 50,
+        "poolCap": 25000,
+        "currentTickets": 11200
+      },
+      "isHero": false,
+      "prizeTier": "Grand Prize",
+      "position": 7,
+      "accentTheme": "blue",
+      "type": "physical",
+      "prizeType": "PHYSICAL",
+      "claimType": "shipping_address",
+      "category": "Gaming & VR",
+      "filterTag": "active",
+      "badge": "Grand Prize",
+      "image": "/assets/images/ps5_gaming_bundle.jpg",
+      "value": "₹69,900",
+      "valueUSD": 69900,
+      "winnerCount": 1,
+      "winnerLabel": "1 Winner",
+      "totalTicketsEntered": 11200,
+      "totalTickets": 11200,
+      "poolCap": 25000,
+      "entryFee": 400,
+      "entryFeeUnit": "VEs",
+      "joiningRequirement": "400 VEs",
+      "serverSeed": "a7b8c9d0e1f20718293a4b5c6d7e8f90123456789abcdef0123456789abcdef6",
+      "serverSeedHash": "e3d2c1b0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2",
+      "clientSeed": "BLOCK_ETH_21048298_VELOOP_PUBLIC",
       "createdAt": "2026-08-01T00:00:00.000Z",
       "updatedAt": "2026-08-01T00:00:00.000Z"
     }
   ],
   "tickets": [
     {
-      "id": "part_1788725228662_3375",
-      "ticketId": "#VEL-CTWSL-US",
+      "id": "part_1788964507341_6884",
+      "ticketId": "#VEL-XPZ5R-US",
       "userId": "usr_alex_01",
       "userName": "Alex Thorne",
       "giveawayId": "gw-iphone-titanium",
@@ -573,11 +822,11 @@
       "ipAddress": "::1",
       "userAgent": "Unknown",
       "status": "confirmed",
-      "createdAt": "2026-09-06T20:07:08.662Z"
+      "createdAt": "2026-09-09T14:35:07.341Z"
     },
     {
-      "id": "part_1788725228667_4898",
-      "ticketId": "#VEL-NUT6W-US",
+      "id": "part_1788964507345_4260",
+      "ticketId": "#VEL-MXGLY-US",
       "userId": "usr_alex_01",
       "userName": "Alex Thorne",
       "giveawayId": "gw-smartwatch-titanium",
@@ -589,11 +838,11 @@
       "ipAddress": "::1",
       "userAgent": "Unknown",
       "status": "confirmed",
-      "createdAt": "2026-09-06T20:07:08.667Z"
+      "createdAt": "2026-09-09T14:35:07.345Z"
     },
     {
-      "id": "part_1788725228690_8632",
-      "ticketId": "#VEL-P5WRF-US",
+      "id": "part_1788964507365_9975",
+      "ticketId": "#VEL-HX2CJ-US",
       "userId": "usr_alex_01",
       "userName": "Alex Thorne",
       "giveawayId": "gw-iphone-titanium",
@@ -605,11 +854,11 @@
       "ipAddress": "::1",
       "userAgent": "Unknown",
       "status": "confirmed",
-      "createdAt": "2026-09-06T20:07:08.690Z"
+      "createdAt": "2026-09-09T14:35:07.365Z"
     },
     {
-      "id": "part_1788725228697_9902",
-      "ticketId": "#VEL-MZTTY-US",
+      "id": "part_1788964507373_5146",
+      "ticketId": "#VEL-8KLSG-US",
       "userId": "usr_alex_01",
       "userName": "Alex Thorne",
       "giveawayId": "gw-iphone-titanium",
@@ -621,11 +870,11 @@
       "ipAddress": "::1",
       "userAgent": "Unknown",
       "status": "confirmed",
-      "createdAt": "2026-09-06T20:07:08.697Z"
+      "createdAt": "2026-09-09T14:35:07.373Z"
     },
     {
-      "id": "part_1788725228705_9733",
-      "ticketId": "#VEL-5S68U-US",
+      "id": "part_1788964507379_5847",
+      "ticketId": "#VEL-2ZY65-US",
       "userId": "usr_alex_01",
       "userName": "Alex Thorne",
       "giveawayId": "gw-iphone-titanium",
@@ -637,12 +886,12 @@
       "ipAddress": "::1",
       "userAgent": "Unknown",
       "status": "confirmed",
-      "createdAt": "2026-09-06T20:07:08.705Z"
+      "createdAt": "2026-09-09T14:35:07.379Z"
     }
   ],
   "transactions": [
     {
-      "id": "tx_1788725228660_4485",
+      "id": "tx_1788964507339_7154",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
       "giveawayTitle": "iPhone 15 Pro",
@@ -653,10 +902,10 @@
       "balanceBefore": 1000,
       "balanceAfter": 750,
       "ipAddress": "::1",
-      "timestamp": "2026-09-06T20:07:08.660Z"
+      "timestamp": "2026-09-09T14:35:07.339Z"
     },
     {
-      "id": "tx_1788725228688_9293",
+      "id": "tx_1788964507363_5740",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
       "giveawayTitle": "iPhone 15 Pro",
@@ -667,10 +916,10 @@
       "balanceBefore": 750,
       "balanceAfter": 500,
       "ipAddress": "::1",
-      "timestamp": "2026-09-06T20:07:08.688Z"
+      "timestamp": "2026-09-09T14:35:07.363Z"
     },
     {
-      "id": "tx_1788725228695_5989",
+      "id": "tx_1788964507372_2660",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
       "giveawayTitle": "iPhone 15 Pro",
@@ -681,10 +930,10 @@
       "balanceBefore": 500,
       "balanceAfter": 250,
       "ipAddress": "::1",
-      "timestamp": "2026-09-06T20:07:08.695Z"
+      "timestamp": "2026-09-09T14:35:07.372Z"
     },
     {
-      "id": "tx_1788725228703_8071",
+      "id": "tx_1788964507377_1814",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
       "giveawayTitle": "iPhone 15 Pro",
@@ -695,21 +944,21 @@
       "balanceBefore": 250,
       "balanceAfter": 0,
       "ipAddress": "::1",
-      "timestamp": "2026-09-06T20:07:08.703Z"
+      "timestamp": "2026-09-09T14:35:07.377Z"
     }
   ],
   "claims": [
     {
-      "id": "claim_1788725228716",
+      "id": "claim_1788964507388",
       "giveawayId": "gw-smartwatch-titanium",
       "userId": "usr_alex_01",
       "winnerName": "Alex Thorne",
       "prizeTitle": "Apple Watch Series 9",
       "prizeType": "PHYSICAL",
       "claimType": "shipping_address",
-      "trackingNumber": "FDX-82778826-IN",
+      "trackingNumber": "FDX-43333955-IN",
       "carrier": "FedEx Priority",
-      "estimatedDelivery": "2026-09-11",
+      "estimatedDelivery": "2026-09-14",
       "shippingDetails": {
         "fullName": "Alex Thorne",
         "phoneNumber": "+91 98765 43210",
@@ -721,7 +970,7 @@
       },
       "status": "PROCESSING",
       "statusStep": 1,
-      "claimedAt": "2026-09-06T20:07:08.716Z"
+      "claimedAt": "2026-09-09T14:35:07.388Z"
     }
   ],
   "spotlightWinners": [
@@ -831,26 +1080,26 @@
   ],
   "auditLogs": [
     {
-      "id": "audit_1788725228799_8011",
-      "timestamp": "2026-09-06T20:07:08.799Z",
+      "id": "audit_1788964507470_5507",
+      "timestamp": "2026-09-09T14:35:07.470Z",
       "action": "USER_LOGIN_SUCCESS",
       "userId": "usr_alex_01",
       "email": "alex.thorne@veloop.io",
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228718_1975",
-      "timestamp": "2026-09-06T20:07:08.718Z",
+      "id": "audit_1788964507390_1850",
+      "timestamp": "2026-09-09T14:35:07.390Z",
       "action": "PRIZE_CLAIM_SUBMITTED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-smartwatch-titanium",
-      "claimId": "claim_1788725228716",
-      "trackingNumber": "FDX-82778826-IN",
+      "claimId": "claim_1788964507388",
+      "trackingNumber": "FDX-43333955-IN",
       "prizeType": "PHYSICAL"
     },
     {
-      "id": "audit_1788725228711_9166",
-      "timestamp": "2026-09-06T20:07:08.711Z",
+      "id": "audit_1788964507385_2994",
+      "timestamp": "2026-09-09T14:35:07.385Z",
       "action": "FRAUD_ALERT",
       "eventType": "RAPID_FIRE_BURST",
       "userId": "usr_alex_01",
@@ -859,12 +1108,12 @@
       "details": "User triggered 11 requests within 5000ms window."
     },
     {
-      "id": "audit_1788725228706_4669",
-      "timestamp": "2026-09-06T20:07:08.706Z",
+      "id": "audit_1788964507380_6520",
+      "timestamp": "2026-09-09T14:35:07.380Z",
       "action": "PARTICIPATION_CONFIRMED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
-      "ticketId": "#VEL-5S68U-US",
+      "ticketId": "#VEL-2ZY65-US",
       "entryType": "paid",
       "ticketCount": 1,
       "feePaid": 250,
@@ -872,8 +1121,8 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228703_6009",
-      "timestamp": "2026-09-06T20:07:08.703Z",
+      "id": "audit_1788964507378_1415",
+      "timestamp": "2026-09-09T14:35:07.378Z",
       "action": "ENTRY_FEE_DEBITED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
@@ -884,12 +1133,12 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228698_3294",
-      "timestamp": "2026-09-06T20:07:08.698Z",
+      "id": "audit_1788964507374_1598",
+      "timestamp": "2026-09-09T14:35:07.374Z",
       "action": "PARTICIPATION_CONFIRMED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
-      "ticketId": "#VEL-MZTTY-US",
+      "ticketId": "#VEL-8KLSG-US",
       "entryType": "paid",
       "ticketCount": 1,
       "feePaid": 250,
@@ -897,8 +1146,8 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228695_6657",
-      "timestamp": "2026-09-06T20:07:08.695Z",
+      "id": "audit_1788964507372_2727",
+      "timestamp": "2026-09-09T14:35:07.372Z",
       "action": "ENTRY_FEE_DEBITED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
@@ -909,12 +1158,12 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228691_6267",
-      "timestamp": "2026-09-06T20:07:08.691Z",
+      "id": "audit_1788964507366_8217",
+      "timestamp": "2026-09-09T14:35:07.366Z",
       "action": "PARTICIPATION_CONFIRMED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
-      "ticketId": "#VEL-P5WRF-US",
+      "ticketId": "#VEL-HX2CJ-US",
       "entryType": "paid",
       "ticketCount": 1,
       "feePaid": 250,
@@ -922,8 +1171,8 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228689_3875",
-      "timestamp": "2026-09-06T20:07:08.689Z",
+      "id": "audit_1788964507364_6301",
+      "timestamp": "2026-09-09T14:35:07.364Z",
       "action": "ENTRY_FEE_DEBITED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
@@ -934,8 +1183,8 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228685_1179",
-      "timestamp": "2026-09-06T20:07:08.685Z",
+      "id": "audit_1788964507360_5605",
+      "timestamp": "2026-09-09T14:35:07.360Z",
       "action": "FRAUD_ALERT",
       "eventType": "PAYLOAD_TAMPERING_DETECTED",
       "userId": "usr_alex_01",
@@ -944,8 +1193,8 @@
       "details": "Payload tampering detected: Invalid or negative ticket count"
     },
     {
-      "id": "audit_1788725228679_1631",
-      "timestamp": "2026-09-06T20:07:08.679Z",
+      "id": "audit_1788964507356_5133",
+      "timestamp": "2026-09-09T14:35:07.356Z",
       "action": "FRAUD_ALERT",
       "eventType": "DUPLICATE_FREE_ENTRY_ATTEMPT",
       "userId": "usr_alex_01",
@@ -954,12 +1203,12 @@
       "details": "User attempted duplicate free entry for giveaway gw-smartwatch-titanium"
     },
     {
-      "id": "audit_1788725228669_5891",
-      "timestamp": "2026-09-06T20:07:08.669Z",
+      "id": "audit_1788964507346_7882",
+      "timestamp": "2026-09-09T14:35:07.346Z",
       "action": "PARTICIPATION_CONFIRMED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-smartwatch-titanium",
-      "ticketId": "#VEL-NUT6W-US",
+      "ticketId": "#VEL-MXGLY-US",
       "entryType": "free",
       "ticketCount": 1,
       "feePaid": 0,
@@ -967,12 +1216,12 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228664_3925",
-      "timestamp": "2026-09-06T20:07:08.664Z",
+      "id": "audit_1788964507342_2156",
+      "timestamp": "2026-09-09T14:35:07.342Z",
       "action": "PARTICIPATION_CONFIRMED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
-      "ticketId": "#VEL-CTWSL-US",
+      "ticketId": "#VEL-XPZ5R-US",
       "entryType": "paid",
       "ticketCount": 1,
       "feePaid": 250,
@@ -980,8 +1229,8 @@
       "ipAddress": "::1"
     },
     {
-      "id": "audit_1788725228660_9400",
-      "timestamp": "2026-09-06T20:07:08.660Z",
+      "id": "audit_1788964507340_4676",
+      "timestamp": "2026-09-09T14:35:07.340Z",
       "action": "ENTRY_FEE_DEBITED",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
@@ -994,8 +1243,8 @@
   ],
   "fraudIncidents": [
     {
-      "id": "fraud_1788725228710_4461",
-      "timestamp": "2026-09-06T20:07:08.710Z",
+      "id": "fraud_1788964507384_9069",
+      "timestamp": "2026-09-09T14:35:07.384Z",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
       "eventType": "RAPID_FIRE_BURST",
@@ -1007,8 +1256,8 @@
       "metadata": {}
     },
     {
-      "id": "fraud_1788725228683_1257",
-      "timestamp": "2026-09-06T20:07:08.683Z",
+      "id": "fraud_1788964507359_1375",
+      "timestamp": "2026-09-09T14:35:07.359Z",
       "userId": "usr_alex_01",
       "giveawayId": "gw-iphone-titanium",
       "eventType": "PAYLOAD_TAMPERING_DETECTED",
@@ -1023,8 +1272,8 @@
       }
     },
     {
-      "id": "fraud_1788725228672_7742",
-      "timestamp": "2026-09-06T20:07:08.672Z",
+      "id": "fraud_1788964507349_6257",
+      "timestamp": "2026-09-09T14:35:07.349Z",
       "userId": "usr_alex_01",
       "giveawayId": "gw-smartwatch-titanium",
       "eventType": "DUPLICATE_FREE_ENTRY_ATTEMPT",

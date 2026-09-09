@@ -24,7 +24,7 @@ const generateTokens = (user) => {
     expiresIn: config.jwtAccessExpiresIn || '15m'
   });
 
-  const refreshToken = jwt.sign(payload, config.jwtSecret, {
+  const refreshToken = jwt.sign(payload, config.refreshSecret || config.jwtSecret, {
     expiresIn: config.jwtRefreshExpiresIn || '7d'
   });
 
@@ -312,12 +312,16 @@ export const refresh = async (req, res, next) => {
 
     let decoded = null;
     try {
-      decoded = jwt.verify(token, config.jwtSecret);
+      decoded = jwt.verify(token, config.refreshSecret || config.jwtSecret);
     } catch {
-      return res.status(401).json({
-        error: 'INVALID_REFRESH_TOKEN',
-        message: 'Refresh token is expired or invalid.'
-      });
+      try {
+        decoded = jwt.verify(token, config.jwtSecret);
+      } catch {
+        return res.status(401).json({
+          error: 'INVALID_REFRESH_TOKEN',
+          message: 'Refresh token is expired or invalid.'
+        });
+      }
     }
 
     const userId = decoded.id || decoded.userId;

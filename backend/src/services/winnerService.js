@@ -4,12 +4,21 @@ import { CryptoFairEngine } from '../utils/cryptoFair.js';
 import { AuditLogger } from '../utils/logger.js';
 import { GiveawayWinner } from '../models/GiveawayWinner.js';
 import { Giveaway } from '../models/Giveaway.js';
+import { GiveawayService } from './giveawayService.js';
+import { sanitizePublicWinner } from '../utils/sanitizer.js';
 
 const isMongo = () => mongoose.connection.readyState === 1;
 
 export class WinnerService {
   /**
-   * Fetch Spotlight & Archive Winners
+   * Centralized Public Winner Record Sanitizer (Requirement 38)
+   */
+  static sanitizePublicWinner(winner) {
+    return sanitizePublicWinner(winner);
+  }
+
+  /**
+   * Fetch Spotlight & Archive Winners (Strictly Sanitized Public Output)
    */
   static async getWinners() {
     let spotlight = [];
@@ -30,8 +39,8 @@ export class WinnerService {
     }
 
     return {
-      spotlightWinners: spotlight,
-      archiveWinners: archive
+      spotlightWinners: spotlight.map(w => this.sanitizePublicWinner(w)),
+      archiveWinners: archive.map(w => this.sanitizePublicWinner(w))
     };
   }
 
@@ -60,85 +69,15 @@ export class WinnerService {
   }
 
   /**
-   * Draw winner for a completed giveaway deterministically
+   * Authoritative Backend Winner Selection (Requirement 30)
+   * Winner selection is strictly executed and finalized by the backend.
+   * Never select winners using frontend JavaScript.
    */
   static async drawGiveawayWinner(giveawayId, communitySeed = 'VELOOP_COMMUNITY_PUBLIC_SEED') {
-    const giveaway = db.getGiveawayById(giveawayId);
-    if (!giveaway) throw new Error('Giveaway not found');
-
-    const tickets = db.getTicketsByGiveaway(giveaway.id);
-    if (tickets.length === 0) {
-      throw new Error('No tickets participated in this giveaway');
+    const drawResult = await GiveawayService.executeDraw(giveawayId, communitySeed);
+    if (!drawResult.success) {
+      throw new Error(drawResult.message || 'No eligible tickets available for draw');
     }
-
-    const serverSeed = giveaway.serverSeed || CryptoFairEngine.generateServerSeed();
-    const calculation = CryptoFairEngine.calculateWinningTicketIndex(
-      serverSeed,
-      communitySeed,
-      1,
-      tickets.length
-    );
-
-    const winningTicket = tickets[calculation.winningIndex];
-    const winnerUser = db.getUserById(winningTicket.userId);
-
-    const winnerDoc = {
-      id: `win_${Date.now()}`,
-      giveawayId: giveaway.id,
-      giveawayTitle: giveaway.title,
-      userId: winningTicket.userId,
-      userName: winnerUser?.name || winnerUser?.fullName || winningTicket.userName,
-      userAvatar: winnerUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      userLocation: winnerUser?.location || 'Bengaluru, India',
-      ticketNumber: winningTicket.ticketId,
-      prizeTitle: giveaway.title,
-      prizeValue: giveaway.value,
-      prizeType: giveaway.prizeType || 'PHYSICAL',
-      wonAt: new Date().toISOString(),
-      claimed: false,
-      claimStatus: 'unclaimed',
-      serverSeed,
-      serverSeedHash: CryptoFairEngine.hashSeed(serverSeed),
-      clientSeed: communitySeed,
-      resultHash: calculation.resultHash,
-      winningIndex: calculation.winningIndex
-    };
-
-    db.addArchiveWinner(winnerDoc);
-    db.updateGiveaway(giveaway.id, {
-      status: 'ended',
-      statusLabel: 'Giveaway Ended',
-      winnerName: winnerDoc.userName,
-      winningTicket: winningTicket.ticketId
-    });
-
-    if (isMongo()) {
-      try {
-        await GiveawayWinner.create(winnerDoc);
-        await Giveaway.updateOne(
-          { id: giveaway.id },
-          {
-            $set: {
-              status: 'ended',
-              statusLabel: 'Giveaway Ended',
-              winnerName: winnerDoc.userName,
-              winningTicket: winningTicket.ticketId
-            }
-          }
-        );
-      } catch {}
-    }
-
-    db.logAudit({
-      action: 'WINNER_DRAWN_PROVABLY_FAIR',
-      giveawayId: giveaway.id,
-      winnerUserId: winningTicket.userId,
-      winningTicket: winningTicket.ticketId,
-      resultHash: calculation.resultHash
-    });
-
-    AuditLogger.info(`Winner drawn for ${giveaway.title}: ${winnerDoc.userName} (${winningTicket.ticketId})`);
-
-    return winnerDoc;
+    return drawResult;
   }
 }

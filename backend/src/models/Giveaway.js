@@ -52,6 +52,15 @@ const GiveawaySchema = new mongoose.Schema({
     index: true
   },
   statusLabel: { type: String, default: 'Giveaway Live' },
+
+  // Requirement 65: Permanent Human-Readable Giveaway Serial (GW-001, GW-002, etc.)
+  // Never overwritten. Assigned once at giveaway creation. Preserved in all historical queries.
+  giveawaySerial: { type: String, unique: true, sparse: true, index: true },  // e.g., "GW-001"
+
+  // Requirement 63: Participation Lock Timestamp
+  // Set when giveaway ends. After this time, no new participations are accepted for this giveaway event.
+  // A new giveaway creates a fresh event with new participation records.
+  participationLockedAt: { type: Date, default: null },
   
   // Date Fields (with compatibility aliases)
   startAt: { type: Date, default: Date.now },

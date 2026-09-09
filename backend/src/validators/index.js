@@ -86,3 +86,56 @@ export const validateLoginInput = (data) => {
     errors
   };
 };
+
+/**
+ * Requirement 49: Admin Action Validation Suite
+ */
+export const validateCreateGiveawayInput = (data) => {
+  const errors = [];
+  if (!data || typeof data !== 'object') {
+    errors.push('Giveaway payload is required');
+    return { isValid: false, errors };
+  }
+
+  const { title, prize, prizes, prizeTiers, entryFee, totalWinners } = data;
+  if (!title || typeof title !== 'string' || title.trim().length < 3) {
+    errors.push('Giveaway title must be at least 3 characters');
+  }
+
+  const hasPrize = prize || (Array.isArray(prizes) && prizes.length > 0) || (Array.isArray(prizeTiers) && prizeTiers.length > 0) || data.value;
+  if (!hasPrize) {
+    errors.push('Giveaway must define a prize or at least one prize tier');
+  }
+
+  if (entryFee !== undefined && (typeof entryFee !== 'number' || entryFee < 0)) {
+    errors.push('entryFee must be a non-negative number');
+  }
+
+  if (totalWinners !== undefined && (!Number.isInteger(Number(totalWinners)) || Number(totalWinners) <= 0)) {
+    errors.push('totalWinners must be a positive integer');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+export const validateDrawWinnerInput = (data) => {
+  const errors = [];
+  if (data && typeof data === 'object') {
+    const { communitySeed, giveawayId } = data;
+    if (communitySeed !== undefined && (typeof communitySeed !== 'string' || communitySeed.trim().length < 3)) {
+      errors.push('communitySeed must be a valid string of at least 3 characters');
+    }
+    if (giveawayId !== undefined && (typeof giveawayId !== 'string' || !giveawayId.trim())) {
+      errors.push('giveawayId must be a non-empty string identifier');
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+

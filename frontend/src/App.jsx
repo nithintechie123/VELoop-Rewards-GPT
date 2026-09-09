@@ -5,7 +5,9 @@ import GiveawayPage from './pages/Giveaway/GiveawayPage';
 import './styles/customBootstrap.css';
 import './styles/index.css';
 
-const GiveawayDetailsPage = lazy(() => import('./pages/GiveawayDetails/GiveawayDetailsPage'));
+import GiveawayDetailsPage from './pages/GiveawayDetails/GiveawayDetailsPage';
+import GiveawayLoader from './components/GiveawayLoader/GiveawayLoader';
+
 const LoginPage = lazy(() => import('./pages/Auth/LoginPage'));
 
 export default function App() {
@@ -13,7 +15,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <div className="app-root">
-          <Suspense fallback={null}>
+          <Suspense fallback={<GiveawayLoader fullScreen={true} />}>
             <Routes>
               <Route path="/" element={<GiveawayPage />} />
               <Route path="/giveaway/:slug" element={<GiveawayDetailsPage />} />

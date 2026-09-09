@@ -39,6 +39,32 @@ export class CryptoFairEngine {
     };
   }
 
+  static calculateMultipleWinningIndices(serverSeed, clientSeed, winnerCount = 1, totalTickets) {
+    if (!totalTickets || totalTickets <= 0) {
+      throw new Error('Total tickets must be greater than 0');
+    }
+
+    const targetCount = Math.min(winnerCount, totalTickets);
+    const selectedIndices = [];
+    const proofs = [];
+    let currentNonce = 1;
+
+    while (selectedIndices.length < targetCount && currentNonce < 10000) {
+      const proof = this.calculateWinningTicketIndex(serverSeed, clientSeed, currentNonce, totalTickets);
+      if (!selectedIndices.includes(proof.winningIndex)) {
+        selectedIndices.push(proof.winningIndex);
+        proofs.push(proof);
+      }
+      currentNonce++;
+    }
+
+    return {
+      selectedIndices,
+      proofs,
+      winnerCount: selectedIndices.length
+    };
+  }
+
   static verifyProof(serverSeed, clientSeed, nonce, totalTickets, expectedWinningIndex) {
     const calc = this.calculateWinningTicketIndex(serverSeed, clientSeed, nonce, totalTickets);
     return {

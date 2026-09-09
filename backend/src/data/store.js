@@ -17,7 +17,10 @@ class DataStore {
       archiveWinners: [],
       winnerLookup: [],
       auditLogs: [],
-      fraudIncidents: []
+      fraudIncidents: [],
+      idempotencyRecords: [],
+      deviceRegistry: [],
+      failedAttempts: []
     };
 
     // Concurrency lock for atomic transactions
@@ -31,6 +34,14 @@ class DataStore {
         const raw = fs.readFileSync(this.dbPath, 'utf8');
         const parsed = JSON.parse(raw);
         this.state = { ...this.state, ...parsed };
+
+        // Synchronize all giveaways if list was partial or missing items
+        if (!this.state.giveaways || this.state.giveaways.length < initialSeedData.giveaways.length) {
+          this.state.heroGiveaway = JSON.parse(JSON.stringify(initialSeedData.heroGiveaway));
+          this.state.giveaways = JSON.parse(JSON.stringify(initialSeedData.giveaways));
+          this.save();
+        }
+
         AuditLogger.info('Persistent Database loaded successfully from disk.');
       } else {
         this.seed();
@@ -149,6 +160,16 @@ class DataStore {
 
   // --- Ticket & Participation Methods ---
   addTicket(ticket) {
+    // Database-level compound unique index: unique(userId, giveawayId)
+    const duplicate = this.state.tickets.some(
+      t => t.userId === ticket.userId && (t.giveawayId === ticket.giveawayId || (ticket.giveawaySlug && t.giveawayId === ticket.giveawaySlug))
+    );
+    if (duplicate) {
+      const err = new Error('E11000 duplicate key error collection: index: userId_1_giveawayId_1 dup key');
+      err.code = 11000;
+      err.keyPattern = { userId: 1, giveawayId: 1 };
+      throw err;
+    }
     this.state.tickets.push(ticket);
     this.save();
     return ticket;
@@ -162,6 +183,20 @@ class DataStore {
     return this.state.tickets.filter(t => t.userId === userId);
   }
 
+  getTicketsByDevice(deviceHash) {
+    if (!deviceHash) return [];
+    return this.state.tickets.filter(t => t.deviceHash === deviceHash);
+  }
+
+  getTicketByDeviceAndGiveaway(deviceHash, giveawayId) {
+    if (!deviceHash || !giveawayId) return null;
+    const cleanId = giveawayId.toLowerCase().trim();
+    return this.state.tickets.find(
+      t => t.deviceHash === deviceHash && 
+           (t.giveawayId?.toLowerCase() === cleanId || (t.giveawaySlug && t.giveawaySlug.toLowerCase() === cleanId))
+    ) || null;
+  }
+
   // --- Transactions ---
   addTransaction(tx) {
     this.state.transactions.push(tx);
@@ -169,8 +204,45 @@ class DataStore {
     return tx;
   }
 
+  getTransactionById(txId) {
+    return this.state.transactions.find(t => t.id === txId || t.transactionId === txId) || null;
+  }
+
+  updateTransaction(txId, fields) {
+    const idx = this.state.transactions.findIndex(t => t.id === txId || t.transactionId === txId);
+    if (idx !== -1) {
+      this.state.transactions[idx] = { ...this.state.transactions[idx], ...fields, updatedAt: new Date().toISOString() };
+      this.save();
+      return this.state.transactions[idx];
+    }
+    return null;
+  }
+
   getTransactionsByUser(userId) {
-    return this.state.transactions.filter(t => t.userId === userId);
+    return this.state.transactions.filter(t => t.userId === userId || t.userDbId === userId);
+  }
+
+  // --- Idempotency Records ---
+  getIdempotencyRecord(key) {
+    if (!key) return null;
+    if (!this.state.idempotencyRecords) this.state.idempotencyRecords = [];
+    return this.state.idempotencyRecords.find(r => r.key === key) || null;
+  }
+
+  saveIdempotencyRecord(key, result) {
+    if (!key) return null;
+    if (!this.state.idempotencyRecords) this.state.idempotencyRecords = [];
+    const record = {
+      key,
+      result,
+      createdAt: new Date().toISOString()
+    };
+    this.state.idempotencyRecords.push(record);
+    if (this.state.idempotencyRecords.length > 5000) {
+      this.state.idempotencyRecords.shift();
+    }
+    this.save();
+    return record;
   }
 
   // --- Claims ---
@@ -198,6 +270,18 @@ class DataStore {
   }
 
   addArchiveWinner(winner) {
+    const existing = this.state.archiveWinners.find(
+      w => w.giveawayId === winner.giveawayId && (
+        (w.prizeId && winner.prizeId && w.prizeId === winner.prizeId) ||
+        (w.winningTicketId && winner.winningTicketId && w.winningTicketId === winner.winningTicketId) ||
+        (w.ticketNumber && winner.ticketNumber && w.ticketNumber === winner.ticketNumber) ||
+        (!w.prizeId && !winner.prizeId)
+      )
+    );
+    if (existing) {
+      AuditLogger.warn(`Duplicate winner record prevented for giveaway ${winner.giveawayId}`);
+      return existing;
+    }
     this.state.archiveWinners.unshift(winner);
     this.save();
     return winner;
@@ -214,7 +298,10 @@ class DataStore {
       this.save();
       return this.state.winnerLookup[idx];
     }
-    return null;
+    const created = { userId, ...fields };
+    this.state.winnerLookup.push(created);
+    this.save();
+    return created;
   }
 
   // --- Audit & Fraud Logs ---
@@ -252,6 +339,55 @@ class DataStore {
 
   getFraudIncidents(limit = 100) {
     return this.state.fraudIncidents.slice(0, limit);
+  }
+
+  // --- Device & Identity Tracking ---
+  registerDeviceSession(deviceId, userId, ipAddress, userAgent) {
+    if (!deviceId || !userId) return null;
+    if (!this.state.deviceRegistry) this.state.deviceRegistry = [];
+    const entry = {
+      deviceId,
+      userId,
+      ipAddress,
+      userAgent,
+      lastSeen: new Date().toISOString()
+    };
+    const existing = this.state.deviceRegistry.find(d => d.deviceId === deviceId && d.userId === userId);
+    if (existing) {
+      existing.lastSeen = new Date().toISOString();
+      existing.ipAddress = ipAddress;
+    } else {
+      this.state.deviceRegistry.push(entry);
+    }
+    this.save();
+    return entry;
+  }
+
+  getAccountsForDevice(deviceId) {
+    if (!deviceId || !this.state.deviceRegistry) return [];
+    const accounts = this.state.deviceRegistry.filter(d => d.deviceId === deviceId).map(d => d.userId);
+    return Array.from(new Set(accounts));
+  }
+
+  recordFailedAttempt(userId, ipAddress, reason) {
+    if (!this.state.failedAttempts) this.state.failedAttempts = [];
+    this.state.failedAttempts.push({
+      userId,
+      ipAddress,
+      reason,
+      timestamp: Date.now()
+    });
+    if (this.state.failedAttempts.length > 2000) {
+      this.state.failedAttempts.shift();
+    }
+  }
+
+  getFailedAttemptsCount(identifier, windowMs = 300000) {
+    if (!this.state.failedAttempts) return 0;
+    const cutoff = Date.now() - windowMs;
+    return this.state.failedAttempts.filter(
+      a => (a.userId === identifier || a.ipAddress === identifier) && a.timestamp >= cutoff
+    ).length;
   }
 }
 

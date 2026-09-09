@@ -1,8 +1,11 @@
 import mongoose from 'mongoose';
 import { db } from '../data/store.js';
 import { Giveaway } from '../models/Giveaway.js';
+import { GiveawayWinner } from '../models/GiveawayWinner.js';
 import { CryptoFairEngine } from '../utils/cryptoFair.js';
 import { AuditLogger } from '../utils/logger.js';
+import { AuditService } from './auditService.js';
+import { sanitizePublicGiveaway } from '../utils/sanitizer.js';
 
 const isMongo = () => mongoose.connection.readyState === 1;
 
@@ -20,9 +23,11 @@ export class GiveawayService {
     const end = new Date(giveaway.endAt || giveaway.endDate || giveaway.endsAt);
     const rawStatus = (giveaway.status || 'ACTIVE').toUpperCase();
 
+    let resolved = null;
+
     // 1. Explicit Administrative Archive
     if (rawStatus === 'ARCHIVED') {
-      return {
+      resolved = {
         ...giveaway,
         status: 'ARCHIVED',
         statusLabel: 'Giveaway Archived',
@@ -30,11 +35,18 @@ export class GiveawayService {
         isActive: false,
         isEnded: true
       };
-    }
-
-    // 2. Already drawn or manually concluded
-    if (rawStatus === 'ENDED' || giveaway.winnerName) {
-      return {
+    } else if (rawStatus === 'DRAFT' || rawStatus === 'PAUSED' || rawStatus === 'INACTIVE') {
+      resolved = {
+        ...giveaway,
+        status: rawStatus,
+        statusLabel: rawStatus === 'DRAFT' ? 'Draft' : 'Giveaway Paused',
+        isUpcoming: false,
+        isActive: false,
+        isEnded: false
+      };
+    } else if (rawStatus === 'ENDED' || giveaway.winnerName) {
+      // 2. Already drawn or manually concluded
+      resolved = {
         ...giveaway,
         status: 'ENDED',
         statusLabel: 'Giveaway Ended',
@@ -42,11 +54,9 @@ export class GiveawayService {
         isActive: false,
         isEnded: true
       };
-    }
-
-    // 3. Time-based lifecycle resolution (Server is authoritative)
-    if (now < start) {
-      return {
+    } else if (now < start) {
+      // 3. Time-based lifecycle resolution (Server is authoritative)
+      resolved = {
         ...giveaway,
         status: 'UPCOMING',
         statusLabel: 'Starting Soon',
@@ -54,10 +64,8 @@ export class GiveawayService {
         isActive: false,
         isEnded: false
       };
-    }
-
-    if (now >= end) {
-      return {
+    } else if (now >= end) {
+      resolved = {
         ...giveaway,
         status: 'ENDED',
         statusLabel: 'Giveaway Ended',
@@ -65,16 +73,18 @@ export class GiveawayService {
         isActive: false,
         isEnded: true
       };
+    } else {
+      resolved = {
+        ...giveaway,
+        status: 'ACTIVE',
+        statusLabel: 'Giveaway Live',
+        isUpcoming: false,
+        isActive: true,
+        isEnded: false
+      };
     }
 
-    return {
-      ...giveaway,
-      status: 'ACTIVE',
-      statusLabel: 'Giveaway Live',
-      isUpcoming: false,
-      isActive: true,
-      isEnded: false
-    };
+    return sanitizePublicGiveaway(resolved);
   }
 
   /**
@@ -144,20 +154,46 @@ export class GiveawayService {
   }
 
   /**
-   * Zero-Trust Server-Side Validation: Ensures giveaway exists, is ACTIVE, and within entry limits
+   * Zero-Trust Server-Side Validation: Ensures giveaway exists, is ACTIVE, and within entry limits (Requirement 19)
    */
   static validateGiveawayEligibility(giveaway) {
     if (!giveaway) {
       return { eligible: false, error: 'GIVEAWAY_NOT_FOUND', message: 'Giveaway does not exist' };
     }
 
+    const now = new Date();
+    const start = new Date(giveaway.startAt || giveaway.startDate || 0);
+    const end = new Date(giveaway.endAt || giveaway.endDate || giveaway.endsAt);
+    const rawStatus = (giveaway.status || 'ACTIVE').toUpperCase();
+
+    // 1. Authoritative Server Time Check: startAt <= now <= endAt (Requirement 19)
+    // If now > endAt, immediately reject with GIVEAWAY_ENDED even if client shows active button
+    if (now > end || rawStatus === 'ENDED' || rawStatus === 'ARCHIVED') {
+      return {
+        eligible: false,
+        error: 'GIVEAWAY_ENDED',
+        message: 'This giveaway has ended. New participations are not accepted.',
+        details: { serverTime: now.toISOString(), endAt: end.toISOString() }
+      };
+    }
+
+    if (now < start || rawStatus === 'UPCOMING') {
+      return {
+        eligible: false,
+        error: 'GIVEAWAY_UPCOMING',
+        message: 'This giveaway has not started yet.',
+        details: { serverTime: now.toISOString(), startAt: start.toISOString() }
+      };
+    }
+
     const resolved = this.resolveAuthoritativeStatus(giveaway);
 
     if (resolved.status !== 'ACTIVE') {
+      const isEnded = resolved.status === 'ENDED' || resolved.status === 'ARCHIVED';
       return {
         eligible: false,
-        error: 'GIVEAWAY_INACTIVE',
-        message: `Giveaway is currently ${resolved.status}. Participation is only permitted when status is ACTIVE.`
+        error: isEnded ? 'GIVEAWAY_ENDED' : 'GIVEAWAY_NOT_ACTIVE',
+        message: isEnded ? 'This giveaway has ended.' : `Giveaway is currently ${resolved.status}. Participation is only permitted when status is ACTIVE.`
       };
     }
 
@@ -256,5 +292,208 @@ export class GiveawayService {
 
     AuditLogger.info(`Created giveaway: ${giveawayDoc.id} (${giveawayDoc.title}) [Status: ${giveawayDoc.status}]`);
     return this.resolveAuthoritativeStatus(giveawayDoc);
+  }
+
+  /**
+   * Retrieves strictly eligible tickets for winner selection (Requirement 28)
+   * Excludes flagged, rejected, blocked, or revoked tickets so suspicious participations
+   * NEVER generate winner eligibility or additional entries.
+   */
+  static getEligibleDrawTickets(giveawayId) {
+    const rawTickets = db.getTicketsByGiveaway(giveawayId) || [];
+    return rawTickets.filter(t => {
+      // 1. Ticket status must be confirmed
+      if (t.status !== 'confirmed') return false;
+      // 2. Ticket must not have a flagged review or fraud marker
+      if (t.flaggedForReview || t.isFlagged || t.isRevoked) return false;
+      // 3. User account must not be suspended/blocked
+      const user = db.getUserById(t.userId);
+      if (user && (user.status === 'suspended' || user.status === 'blocked')) return false;
+      return true;
+    });
+  }
+
+  /**
+   * Executes a Provably Fair cryptographic draw for a giveaway (Requirement 28)
+   * Only legitimate, confirmed tickets participate in winner selection.
+   */
+  static async executeDraw(giveawayId, clientSeedOverride = null) {
+    return await db.withLock(async () => {
+      const giveaway = await this.getGiveawayById(giveawayId);
+      if (!giveaway) {
+        throw new Error(`Giveaway ${giveawayId} not found`);
+      }
+
+      // Requirement 32: One Winner Enforcement (winnerCount limit)
+      // If multiple requests/processes attempt to assign an iPhone winner, only the configured number of winners is created.
+      const configuredWinnerCount = Number(giveaway.winnerCount || giveaway.prizes?.[0]?.quantity || 1);
+      const existingWinners = db.getArchiveWinners().filter(w => w.giveawayId === giveaway.id);
+
+      if (giveaway.winnerSelected || existingWinners.length >= configuredWinnerCount) {
+        const canonicalWinner = giveaway.winner || existingWinners[0];
+        AuditLogger.info(`Winner limit reached (${existingWinners.length}/${configuredWinnerCount}) for giveaway ${giveaway.id}: returning canonical winner`);
+        return {
+          success: true,
+          alreadyFinalized: true,
+          winnerLimitEnforced: true,
+          configuredWinnerCount,
+          giveawayId: giveaway.id,
+          winner: canonicalWinner,
+          winners: existingWinners,
+          proof: canonicalWinner?.proof,
+          eligibleTicketCount: canonicalWinner?.proof?.totalEligibleTickets || 1
+        };
+      }
+
+      const eligibleTickets = this.getEligibleDrawTickets(giveaway.id);
+      if (eligibleTickets.length === 0) {
+        return {
+          success: false,
+          giveawayId: giveaway.id,
+          message: 'No eligible tickets available for draw (all entries either non-existent or flagged/blocked)',
+          eligibleTicketCount: 0,
+          winners: []
+        };
+      }
+
+      const serverSeed = giveaway.serverSeed || CryptoFairEngine.generateServerSeed();
+      const clientSeed = clientSeedOverride || giveaway.clientSeed || 'VELOOP_PUBLIC_COMMUNITY_SEED';
+
+      // Requirement 33: Multiple Winners Selection via Provably Fair Multiple Indices
+      const multiResult = CryptoFairEngine.calculateMultipleWinningIndices(
+        serverSeed,
+        clientSeed,
+        configuredWinnerCount,
+        eligibleTickets.length
+      );
+
+      const winnerRecords = [];
+      const selectedAtISO = new Date().toISOString();
+
+      for (let i = 0; i < multiResult.selectedIndices.length; i++) {
+        const winningIndex = multiResult.selectedIndices[i];
+        const proof = multiResult.proofs[i];
+        const winningTicket = eligibleTickets[winningIndex];
+        const winningUser = db.getUserById(winningTicket.userId);
+        const prizeObj = giveaway.prizes?.[i] || giveaway.prizes?.[0] || { id: `prize_${giveaway.id}_${i + 1}`, title: giveaway.title, value: giveaway.value };
+        const prizeId = prizeObj.id || giveaway.prizeId || `prize_${giveaway.id}_${i + 1}`;
+
+        const winnerRecord = {
+          id: `win_${giveaway.id}_${i + 1}_${Date.now()}`,
+          giveawayId: giveaway.id,
+          giveawayTitle: giveaway.title,
+          giveawayName: giveaway.title,
+          prizeId,
+          prizeTitle: prizeObj.title || giveaway.title,
+          prizeValue: prizeObj.value || giveaway.value || '₹0',
+          prizeType: prizeObj.type || giveaway.prizeType || 'PHYSICAL',
+          prize: prizeObj,
+          userId: winningTicket.userId,
+          winnerUserId: winningTicket.userId,
+          userName: winningUser?.name || winningTicket.userName || 'Anonymous Member',
+          winnerName: winningUser?.name || winningTicket.userName || 'Anonymous Member',
+          userAvatar: winningUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+          userLocation: winningUser?.location || 'Bengaluru, India',
+          winningTicketId: winningTicket.ticketId || winningTicket.id,
+          ticketNumber: winningTicket.ticketId || winningTicket.id,
+          selectionMethod: 'PROVABLY_FAIR_SHA256',
+          selectedAt: selectedAtISO,
+          wonAt: selectedAtISO,
+          status: 'CONFIRMED',
+          claimed: false,
+          claimStatus: 'unclaimed',
+          serverSeed,
+          serverSeedHash: giveaway.serverSeedHash || CryptoFairEngine.hashSeed(serverSeed),
+          clientSeed,
+          resultHash: proof.resultHash,
+          winningIndex,
+          proof: {
+            serverSeedHashed: proof.serverSeedHashed,
+            serverSeedUnmasked: proof.serverSeedUnmasked,
+            clientSeed: proof.clientSeed,
+            nonce: proof.nonce,
+            winningIndex,
+            totalEligibleTickets: eligibleTickets.length,
+            resultHash: proof.resultHash
+          },
+          drawnAt: selectedAtISO
+        };
+
+        winnerRecords.push(winnerRecord);
+        db.addArchiveWinner(winnerRecord);
+        db.updateWinnerRecord(winnerRecord.winnerUserId, winnerRecord);
+
+        if (isMongo()) {
+          try {
+            await GiveawayWinner.create(winnerRecord);
+          } catch (mongoErr) {
+            AuditLogger.warn(`MongoDB GiveawayWinner create note: ${mongoErr.message}`);
+          }
+        }
+
+        await AuditService.logWinnerSelected({
+          giveawayId: giveaway.id,
+          giveawayTitle: giveaway.title,
+          winningTicketId: winnerRecord.winningTicketId,
+          winnerUserId: winnerRecord.winnerUserId,
+          winnerName: winnerRecord.winnerName,
+          prize: winnerRecord.prize,
+          proof: winnerRecord.proof,
+          clientSeed,
+          serverSeedHash: giveaway.serverSeedHash
+        });
+
+        AuditLogger.info(`[Winner ${i + 1}/${multiResult.selectedIndices.length}] Winner selected for ${giveaway.title}: ${winnerRecord.winnerName} (Ticket: ${winnerRecord.winningTicketId})`);
+      }
+
+      const primaryWinner = winnerRecords[0];
+      const combinedWinnerNames = winnerRecords.map(w => w.winnerName).join(', ');
+
+      giveaway.status = 'ENDED';
+      giveaway.winnerSelected = true;
+      giveaway.winner = primaryWinner;
+      giveaway.winners = winnerRecords;
+      giveaway.winnerName = combinedWinnerNames;
+      giveaway.winningTicket = primaryWinner.ticketNumber;
+
+      db.updateGiveaway(giveaway.id, {
+        status: 'ENDED',
+        winnerSelected: true,
+        winner: primaryWinner,
+        winners: winnerRecords,
+        winnerName: combinedWinnerNames,
+        winningTicket: primaryWinner.ticketNumber
+      });
+
+      if (isMongo()) {
+        try {
+          await Giveaway.updateOne(
+            { id: giveaway.id },
+            {
+              $set: {
+                status: 'ENDED',
+                winnerSelected: true,
+                winner: primaryWinner,
+                winners: winnerRecords,
+                winnerName: combinedWinnerNames,
+                winningTicket: primaryWinner.ticketNumber
+              }
+            }
+          );
+        } catch {}
+      }
+
+      return {
+        success: true,
+        giveawayId: giveaway.id,
+        configuredWinnerCount,
+        winnerCount: winnerRecords.length,
+        winner: primaryWinner,
+        winners: winnerRecords,
+        proofs: multiResult.proofs,
+        proof: primaryWinner.proof,
+        eligibleTicketCount: eligibleTickets.length
+      };
+    });
   }
 }

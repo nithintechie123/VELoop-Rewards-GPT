@@ -1,5 +1,6 @@
 import { WinnerService } from '../services/winnerService.js';
 import { CryptoFairEngine } from '../utils/cryptoFair.js';
+import { db } from '../data/store.js';
 
 export const getWinners = async (req, res, next) => {
   try {
@@ -55,3 +56,55 @@ export const verifyFairness = (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * Get sanitized winners for a specific giveaway (Requirement 39)
+ * GET /api/giveaways/:id/winners
+ */
+export const getGiveawayWinners = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const allArchive = db.getArchiveWinners() || [];
+    const giveaway = db.getGiveawayById(id) || db.getGiveaways().find(g => g.slug === id || g.id === id);
+
+    let winners = [];
+    if (giveaway?.winners && giveaway.winners.length > 0) {
+      winners = giveaway.winners;
+    } else if (giveaway?.winner) {
+      winners = [giveaway.winner];
+    } else {
+      winners = allArchive.filter(w => w.giveawayId === id || (giveaway && w.giveawayId === giveaway.id));
+    }
+
+    const sanitized = winners.map(w => WinnerService.sanitizePublicWinner(w));
+
+    res.json({
+      success: true,
+      giveawayId: giveaway?.id || id,
+      giveawayTitle: giveaway?.title || 'Giveaway Draw',
+      winnerCount: sanitized.length,
+      winners: sanitized,
+      winner: sanitized[0] || null
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Get archive winners from previous giveaways (Requirement 39)
+ * GET /api/giveaways/previous/winners
+ */
+export const getPreviousGiveawayWinners = async (req, res, next) => {
+  try {
+    const allWinners = await WinnerService.getWinners();
+    res.json({
+      success: true,
+      total: allWinners.archiveWinners.length,
+      winners: allWinners.archiveWinners
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+

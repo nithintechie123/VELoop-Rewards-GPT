@@ -42,7 +42,7 @@ export class BalanceService {
     if (currencyUnit === 'SVEs') {
       currentBalance = Number(user.sveCoins ?? 0);
     } else if (currencyUnit === 'Tokens') {
-      currentBalance = Number(user.tokens ?? user.veloopCoins ?? 0);
+      currentBalance = Number(user.tokens ?? 0);
     } else {
       // Default to VEs (veloopCoins)
       currentBalance = Number(user.veloopCoins ?? user.coins ?? 0);
@@ -72,9 +72,13 @@ export class BalanceService {
 
       const balanceCheck = this.verifySufficientBalance(user, amount, currencyUnit);
       if (!balanceCheck.sufficient) {
+        const specificCode = currencyUnit === 'SVEs'
+          ? 'INSUFFICIENT_SVE_BALANCE'
+          : (currencyUnit === 'Tokens' ? 'INSUFFICIENT_TOKEN_BALANCE' : 'INSUFFICIENT_VE_BALANCE');
         const error = new Error(`Insufficient ${currencyUnit} balance`);
-        error.code = 'INSUFFICIENT_BALANCE';
-        error.details = balanceCheck;
+        error.code = specificCode;
+        error.status = 402;
+        error.details = { ...balanceCheck, baseCode: 'INSUFFICIENT_BALANCE' };
         throw error;
       }
 
