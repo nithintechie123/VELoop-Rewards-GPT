@@ -23,7 +23,7 @@ import styles from './LoginPage.module.css';
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login, register, loginWithDemo } = useAuth();
 
   const redirectUrl = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
   const initialMode = searchParams.get('mode') === 'signup' || searchParams.get('mode') === 'register' ? 'signup' : 'login';
@@ -349,6 +349,94 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            {/* Instant Demo Sandbox Access */}
+            <div style={{
+              marginTop: '1.5rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.65rem'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.78rem',
+                color: '#94a3b8',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                <span>⚡ Instant Evaluation Access</span>
+                <span style={{ color: '#10b981', fontSize: '0.72rem' }}>1-Click Login</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginWithDemo({
+                      userId: 'VE10025',
+                      name: 'Alex Thorne',
+                      coins: 1250,
+                      activeTickets: 24,
+                      userEntries: { 'GW-2026-08': { tickets: 24 } }
+                    });
+                    navigate(redirectUrl);
+                  }}
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1px solid rgba(16, 185, 129, 0.35)',
+                    color: '#34d399',
+                    padding: '0.6rem 0.75rem',
+                    borderRadius: '10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    textAlign: 'left',
+                    lineHeight: '1.3'
+                  }}
+                >
+                  👤 Alex Thorne
+                  <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 500 }}>Active Member (1,250 VEs)</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginWithDemo({
+                      userId: 'VE10025',
+                      name: 'Alex Thorne',
+                      coins: 2500,
+                      activeTickets: 42,
+                      userEntries: { 'GW-2026-08': { tickets: 42 } }
+                    });
+                    localStorage.setItem('veloop_claim_state', 'not_submitted');
+                    localStorage.setItem('veloop_user_state_preset', '4');
+                    navigate(redirectUrl);
+                  }}
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    color: '#fbbf24',
+                    padding: '0.6rem 0.75rem',
+                    borderRadius: '10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    textAlign: 'left',
+                    lineHeight: '1.3'
+                  }}
+                >
+                  🏆 Winner Account
+                  <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 500 }}>Apple Watch Winner</div>
+                </button>
+              </div>
+            </div>
           </form>
         </motion.div>
       </div>

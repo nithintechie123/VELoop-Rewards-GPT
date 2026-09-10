@@ -59,9 +59,43 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // Instant Demo Login (for reviewer convenience)
+  const loginWithDemo = useCallback((demoUser = {}) => {
+    const userToSet = {
+      userId: demoUser.userId || 'VE10025',
+      id: demoUser.userId || 'VE10025',
+      fullName: demoUser.name || demoUser.fullName || 'Alex Thorne',
+      name: demoUser.name || demoUser.fullName || 'Alex Thorne',
+      email: demoUser.email || 'alex.thorne@example.com',
+      veloopCoins: demoUser.coins ?? 1250,
+      coins: demoUser.coins ?? 1250,
+      sveCoins: demoUser.sveCoins ?? 500,
+      tokens: demoUser.tokens ?? 1000,
+      activeTickets: demoUser.activeTickets ?? 24,
+      userEntries: demoUser.userEntries || { 'GW-2026-08': { tickets: 24 } }
+    };
+    authService.setCurrentUser(userToSet, true, 'demo-token-jwt-veloop');
+    try {
+      localStorage.setItem('veloop_user_state', JSON.stringify({
+        ...userToSet,
+        isLoggedIn: true
+      }));
+      localStorage.setItem('veloop_current_user_id', userToSet.userId);
+    } catch (e) {}
+    setCurrentUser(userToSet);
+    soundFx.playSuccess();
+    ConfettiManager.burst(window.innerWidth / 2, window.innerHeight / 2, 70);
+    return userToSet;
+  }, []);
+
   // Real Logout handler
   const logout = useCallback(async () => {
     await authService.logout();
+    try {
+      localStorage.removeItem('veloop_auth_current_user');
+      localStorage.removeItem('veloop_auth_token');
+      localStorage.removeItem('veloop_user_state');
+    } catch (e) {}
     setCurrentUser(null);
     soundFx.playClick();
   }, []);
@@ -111,6 +145,7 @@ export function AuthProvider({ children }) {
     authModalConfig,
     login,
     register,
+    loginWithDemo,
     logout,
     updateUser,
     claimDailyBonus,
