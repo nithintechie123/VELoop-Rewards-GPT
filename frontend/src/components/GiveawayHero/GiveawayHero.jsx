@@ -43,6 +43,7 @@ export default function GiveawayHero({
   };
 
   const winnerLabel = giveaway.winnerLabel || (giveaway.winnerCount ? `${giveaway.winnerCount} Winner${giveaway.winnerCount > 1 ? 's' : ''}` : '1 Winner');
+  const entryRequirement = giveaway.joiningRequirement || (giveaway.participationSettings?.entryFee ? `${giveaway.participationSettings.entryFee} ${giveaway.participationSettings.entryFeeUnit || 'VEs'}` : (giveaway.entryFee ? `${giveaway.entryFee} ${giveaway.entryFeeUnit || 'VEs'}` : `${giveaway.coinCost || 250} VEs`));
   const statusUpper = (giveaway.status || 'ACTIVE').toUpperCase();
   const isEnded = statusUpper === 'ENDED' || statusUpper === 'ARCHIVED';
   const isUpcoming = statusUpper === 'UPCOMING';

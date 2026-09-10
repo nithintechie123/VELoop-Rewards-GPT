@@ -60,48 +60,54 @@ export default function GiveawayDetailsPage() {
   const [relatedGiveaways, setRelatedGiveaways] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState(() => localStorage.getItem('veloop_theme') || 'dark');
-  const [userState, setUserState] = useState({
-    name: user?.fullName || 'Guest',
-    userId: user?.userId || null,
-    isLoggedIn: isLoggedIn,
-    coins: user?.coins || user?.veloopCoins || 0,
-    veloopCoins: user?.veloopCoins || 0,
-    sveCoins: user?.sveCoins || 0,
-    tokens: user?.tokens || 0,
-    activeTickets: user?.activeTickets || 0,
-    userEntries: user?.userEntries || {}
+  const [userState, setUserState] = useState(() => {
+    try {
+      const stored = localStorage.getItem('veloop_user_state');
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return {
+      name: user?.fullName || 'Alex Thorne',
+      userId: user?.userId || 'VE10025',
+      isLoggedIn: isLoggedIn !== false,
+      coins: user?.coins || user?.veloopCoins || 1250,
+      veloopCoins: user?.veloopCoins || 1250,
+      sveCoins: user?.sveCoins || 500,
+      tokens: user?.tokens || 1000,
+      activeTickets: user?.activeTickets || 24,
+      userEntries: user?.userEntries || { 'GW-2026-08': { tickets: 24 } }
+    };
   });
+
+  // Sync state changes to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('veloop_user_state', JSON.stringify(userState));
+    } catch (e) {}
+  }, [userState]);
 
   // Keep userState in sync with centralized AuthContext
   useEffect(() => {
     if (user) {
-      setUserState(prev => ({
-        ...prev,
-        name: user.fullName || user.name || 'Member',
-        userId: user.userId || user.id,
-        isLoggedIn: true,
-        coins: user.coins ?? user.veloopCoins ?? 0,
-        veloopCoins: user.veloopCoins ?? 0,
-        sveCoins: user.sveCoins ?? 0,
-        tokens: user.tokens ?? 0,
-        activeTickets: user.activeTickets ?? 0,
-        userEntries: user.userEntries ?? {}
-      }));
-    } else {
-      setUserState(prev => ({
-        ...prev,
-        name: 'Guest',
-        userId: null,
-        isLoggedIn: false,
-        coins: 0,
-        veloopCoins: 0,
-        sveCoins: 0,
-        tokens: 0,
-        activeTickets: 0,
-        userEntries: {}
-      }));
+      setUserState(prev => {
+        const next = {
+          ...prev,
+          name: user.fullName || user.name || prev.name,
+          userId: user.userId || user.id || prev.userId,
+          isLoggedIn: true,
+          coins: user.coins ?? user.veloopCoins ?? prev.coins,
+          veloopCoins: user.veloopCoins ?? prev.veloopCoins,
+          sveCoins: user.sveCoins ?? prev.sveCoins,
+          tokens: user.tokens ?? prev.tokens,
+          activeTickets: user.activeTickets ?? prev.activeTickets,
+          userEntries: user.userEntries ? { ...prev.userEntries, ...user.userEntries } : prev.userEntries
+        };
+        try {
+          localStorage.setItem('veloop_user_state', JSON.stringify(next));
+        } catch (e) {}
+        return next;
+      });
     }
-  }, [user, isLoggedIn]);
+  }, [user]);
 
   const [isParticipationOpen, setIsParticipationOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);

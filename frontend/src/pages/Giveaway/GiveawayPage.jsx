@@ -64,56 +64,104 @@ export default function GiveawayPage() {
   const [isLoading, setIsLoading] = useState(true); // starts true: initial API fetch
   const [hasError, setHasError] = useState(false);
 
-  // User & Identity State
-  const [currentUserId, setCurrentUserId] = useState(user?.userId || null);
-  const [claimState, setClaimState] = useState('not_submitted'); // 'not_submitted' | 'submitted' | 'processing' | 'completed' | 'expired'
+  // Helper to load persistent state from localStorage
+  const loadStoredUserState = () => {
+    try {
+      const stored = localStorage.getItem('veloop_user_state');
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return null;
+  };
 
-  const [userState, setUserState] = useState({
-    name: user?.fullName || 'Guest',
-    userId: user?.userId || null,
-    isLoggedIn: isLoggedIn,
-    coins: user?.coins || user?.veloopCoins || 0,
-    veloopCoins: user?.veloopCoins || 0,
-    sveCoins: user?.sveCoins || 0,
-    tokens: user?.tokens || 0,
-    activeTickets: user?.activeTickets || 0,
-    soundEnabled: true,
-    userEntries: user?.userEntries || {},
-    quests: mockQuestTasks
+  // User & Identity State with Persistent LocalStorage
+  const [currentUserId, setCurrentUserId] = useState(() => {
+    return localStorage.getItem('veloop_current_user_id') || user?.userId || 'VE10025';
   });
+
+  const [claimState, setClaimState] = useState(() => {
+    return localStorage.getItem('veloop_claim_state') || 'not_submitted';
+  });
+
+  const [activeUserStatePreset, setActiveUserStatePreset] = useState(() => {
+    const saved = localStorage.getItem('veloop_user_state_preset');
+    return saved ? Number(saved) : 4;
+  });
+
+  const [lifecycleStage, setLifecycleStage] = useState(() => {
+    const saved = localStorage.getItem('veloop_lifecycle_stage');
+    return saved ? Number(saved) : 1;
+  });
+
+  const [userState, setUserState] = useState(() => {
+    const saved = loadStoredUserState();
+    if (saved) {
+      return {
+        ...saved,
+        quests: saved.quests || mockQuestTasks
+      };
+    }
+    return {
+      name: user?.fullName || 'Alex Thorne',
+      userId: user?.userId || 'VE10025',
+      isLoggedIn: isLoggedIn !== false,
+      coins: user?.coins || user?.veloopCoins || 1250,
+      veloopCoins: user?.veloopCoins || 1250,
+      sveCoins: user?.sveCoins || 500,
+      tokens: user?.tokens || 1000,
+      activeTickets: user?.activeTickets || 24,
+      soundEnabled: true,
+      userEntries: user?.userEntries || { 'GW-2026-08': { tickets: 24 } },
+      quests: mockQuestTasks
+    };
+  });
+
+  // Sync state changes to localStorage for 100% persistence on page refresh
+  useEffect(() => {
+    try {
+      localStorage.setItem('veloop_user_state', JSON.stringify(userState));
+    } catch (e) {}
+  }, [userState]);
+
+  useEffect(() => {
+    localStorage.setItem('veloop_claim_state', claimState);
+  }, [claimState]);
+
+  useEffect(() => {
+    if (currentUserId) localStorage.setItem('veloop_current_user_id', currentUserId);
+  }, [currentUserId]);
+
+  useEffect(() => {
+    localStorage.setItem('veloop_user_state_preset', String(activeUserStatePreset));
+  }, [activeUserStatePreset]);
+
+  useEffect(() => {
+    localStorage.setItem('veloop_lifecycle_stage', String(lifecycleStage));
+  }, [lifecycleStage]);
 
   // Keep userState in sync with centralized AuthContext
   useEffect(() => {
     if (user) {
-      setUserState(prev => ({
-        ...prev,
-        name: user.fullName || user.name || 'Member',
-        userId: user.userId || user.id,
-        isLoggedIn: true,
-        coins: user.coins ?? user.veloopCoins ?? 0,
-        veloopCoins: user.veloopCoins ?? 0,
-        sveCoins: user.sveCoins ?? 0,
-        tokens: user.tokens ?? 0,
-        activeTickets: user.activeTickets ?? 0,
-        userEntries: user.userEntries ?? {}
-      }));
-      setCurrentUserId(user.userId || user.id);
-    } else {
-      setUserState(prev => ({
-        ...prev,
-        name: 'Guest',
-        userId: null,
-        isLoggedIn: false,
-        coins: 0,
-        veloopCoins: 0,
-        sveCoins: 0,
-        tokens: 0,
-        activeTickets: 0,
-        userEntries: {}
-      }));
-      setCurrentUserId(null);
+      setUserState(prev => {
+        const next = {
+          ...prev,
+          name: user.fullName || user.name || prev.name,
+          userId: user.userId || user.id || prev.userId,
+          isLoggedIn: true,
+          coins: user.coins ?? user.veloopCoins ?? prev.coins,
+          veloopCoins: user.veloopCoins ?? prev.veloopCoins,
+          sveCoins: user.sveCoins ?? prev.sveCoins,
+          tokens: user.tokens ?? prev.tokens,
+          activeTickets: user.activeTickets ?? prev.activeTickets,
+          userEntries: user.userEntries ? { ...prev.userEntries, ...user.userEntries } : prev.userEntries
+        };
+        try {
+          localStorage.setItem('veloop_user_state', JSON.stringify(next));
+        } catch (e) {}
+        return next;
+      });
+      setCurrentUserId(user.userId || user.id || 'VE10025');
     }
-  }, [user, isLoggedIn]);
+  }, [user]);
 
   // Current Winner Matching (Requirement 34)
   const winningRecord = mockWinnerLookup.find(w => w.userId === currentUserId) || null;
@@ -411,8 +459,6 @@ export default function GiveawayPage() {
   };
 
   // Simulation Toolbar Controls
-  const [activeUserStatePreset, setActiveUserStatePreset] = useState(4); // Default to State 4 (Winner)
-
   const handleCycleUserStatePreset = () => {
     soundFx.playClick();
     const nextPreset = activeUserStatePreset === 7 ? 1 : activeUserStatePreset + 1;
@@ -582,8 +628,6 @@ export default function GiveawayPage() {
       return { ...prev, isLoggedIn: nextAuth };
     });
   };
-
-  const [lifecycleStage, setLifecycleStage] = useState(1);
 
   // Requirement 61: Previous Winner Transition Lifecycle
   // Current Giveaway -> Giveaway Ends -> Winners Announced -> Move to Previous Winners -> New Giveaway Becomes Current

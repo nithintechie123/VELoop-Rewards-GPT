@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gift, Coins, Sparkles, CheckCircle2, Ticket, Flame, MessageSquare, Twitter, Users, ShieldCheck, Zap, Trophy, Lock, LogIn } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
