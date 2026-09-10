@@ -57,8 +57,11 @@ graph TD
 
 ## ✨ Key Features
 
+- **Mandatory Authentication Gatekeeper**: Secure `ProtectedRoute` architecture ensuring only authenticated users can access the Giveaway Vault.
+- **1-Click Instant Evaluation Access**: Instant reviewer access buttons on the login screen for testing both active members and declared prize winners with zero setup.
+- **100% Client State Persistence**: User balances, allocated ticket codes, completed quests, and simulation states persist seamlessly across browser refreshes.
 - **Real Database Authentication**: Full registration and login workflows with 256-bit Bcrypt hashing and JWT token rotation stored directly in MongoDB Atlas.
-- **Auto-Redirect on Non-Existent Users**: When an unregistered user enters their email on `/login`, the system automatically routes them to `/login?mode=signup` with their email prefilled.
+- **Auto-Redirect on Non-Existent Users**: When an unregistered user enters their email on `/login`, the system automatically routes them to `/login?mode=signup` with their email prefilled and welcome bonus highlighted.
 - **Flagship Grand Prize Hero**: Layered reward showcase with interactive 3D perspective spotlight, live participant tickers, and real-time countdown.
 - **Atomic Multi-Currency Ticket Minting**: Debits user coin balances (`VEs`, `SVEs`, `Tokens`) in an isolated transaction and mints formatted tickets (e.g. `#VEL-9XY82-US`).
 - **Fraud & Velocity Protection**: Throttles rapid-fire burst traffic (HTTP 429), blocks negative ticket tampering, and flags suspicious activity in an immutable audit ledger.
