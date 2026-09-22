@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Zap, Gift, ArrowRight, X, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Zap, Gift, ArrowRight, X, CheckCircle2, Sparkles, KeyRound, Copy, Star } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import { ConfettiManager } from '../../utils/confetti';
 import styles from './ExclusiveBanner.module.css';
@@ -10,6 +10,7 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
   const [code, setCode] = useState('');
   const [codeSuccess, setCodeSuccess] = useState(null);
   const [codeError, setCodeError] = useState('');
+  const [copiedCode, setCopiedCode] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
@@ -29,7 +30,7 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
   };
 
   const handleRedeem = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!code.trim()) {
       setCodeError('Please enter a valid giveaway code.');
       return;
@@ -51,14 +52,21 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
     }
   };
 
+  const handleQuickSelectCode = (c) => {
+    soundFx.playClick();
+    setCode(c);
+    setCopiedCode(c);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   return (
     <section className={styles.sectionWrap}>
       <div className="container-custom">
         <motion.div
           className={styles.bannerCard}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => {
@@ -72,29 +80,41 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
             transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out'
           }}
         >
+          {/* Shimmer Ambient Border Line */}
+          <div className={styles.shimmerBorder} />
+
           {/* Ambient Glows with subtle cursor interaction */}
           <div
             className={styles.glowLeft}
             style={{
-              transform: `translate(${mousePos.x * 20}px, ${mousePos.y * 20}px)`,
+              transform: `translate(${mousePos.x * 25}px, ${mousePos.y * 25}px)`,
               transition: 'transform 0.2s ease-out'
             }}
           />
           <div
             className={styles.glowRight}
             style={{
-              transform: `translate(${-mousePos.x * 20}px, ${-mousePos.y * 20}px)`,
+              transform: `translate(${-mousePos.x * 25}px, ${-mousePos.y * 25}px)`,
               transition: 'transform 0.2s ease-out'
             }}
           />
           <div className={styles.glowCenter} />
 
-          {/* Top Left Tag */}
+          {/* Top Bar with Badge Row */}
           <div className={styles.topBar}>
-            <button className={styles.codePillBtn} onClick={handleOpenCodeModal}>
-              <Gift size={15} className={styles.codeIcon} />
-              <span>Giveaway Code</span>
-            </button>
+            <div className={styles.topBadgesGroup}>
+              <span className={styles.exclusivePill}>
+                <Sparkles size={13} className={styles.sparkleGold} /> EXCLUSIVE VAULT
+              </span>
+              <button className={styles.codePillBtn} onClick={handleOpenCodeModal}>
+                <KeyRound size={13} className={styles.codeIcon} />
+                <span>Secret Promo Code</span>
+                <span className={styles.codePulseDot} />
+              </button>
+            </div>
+            <div className={styles.topVerifiedSeal}>
+              <ShieldCheck size={14} /> Official Verified Partner
+            </div>
           </div>
 
           <div className={styles.mainGrid}>
@@ -102,78 +122,75 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
             <div className={styles.leftVisual}>
               <div className={styles.giftStage}>
                 <div className={styles.giftPedestal} />
+                <div className={styles.energyRing} />
                 
                 {/* SVG 3D Gift Box with Ribbon & Stars */}
                 <motion.div
                   className={styles.giftBoxWrapper}
-                  animate={{ y: [0, -8, 0], rotateZ: [-0.5, 0.5, -0.5] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={{ y: [0, -10, 0], rotateZ: [-1, 1, -1] }}
+                  transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
                 >
                   <svg viewBox="0 0 200 200" className={styles.giftSvg}>
                     <defs>
                       <linearGradient id="purpleFront" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#432280" />
-                        <stop offset="100%" stopColor="#25124d" />
+                        <stop offset="0%" stopColor="#4c1d95" />
+                        <stop offset="100%" stopColor="#1e103c" />
                       </linearGradient>
                       <linearGradient id="purpleTop" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#6c3ce0" />
-                        <stop offset="100%" stopColor="#4b24a3" />
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#5b21b6" />
                       </linearGradient>
                       <linearGradient id="purpleRight" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#301561" />
-                        <stop offset="100%" stopColor="#1b0a3b" />
+                        <stop offset="0%" stopColor="#3b0764" />
+                        <stop offset="100%" stopColor="#13072b" />
                       </linearGradient>
                       <linearGradient id="goldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#ffe685" />
+                        <stop offset="0%" stopColor="#fef08a" />
                         <stop offset="50%" stopColor="#f59e0b" />
                         <stop offset="100%" stopColor="#b45309" />
                       </linearGradient>
                       <filter id="giftGlow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#8b5cf6" floodOpacity="0.5" />
+                        <feDropShadow dx="0" dy="8" stdDeviation="14" floodColor="#a855f7" floodOpacity="0.6" />
                       </filter>
                     </defs>
 
                     {/* Ground Reflection */}
-                    <ellipse cx="100" cy="175" rx="55" ry="14" fill="#a855f7" opacity="0.4" filter="blur(8px)" />
+                    <ellipse cx="100" cy="175" rx="60" ry="16" fill="#c084fc" opacity="0.35" filter="blur(10px)" />
 
                     {/* Box Top Face */}
-                    <polygon points="100,50 155,75 100,100 45,75" fill="url(#purpleTop)" />
+                    <polygon points="100,48 158,74 100,100 42,74" fill="url(#purpleTop)" filter="url(#giftGlow)" />
                     {/* Box Left Face */}
-                    <polygon points="45,75 100,100 100,165 45,138" fill="url(#purpleFront)" />
+                    <polygon points="42,74 100,100 100,166 42,139" fill="url(#purpleFront)" />
                     {/* Box Right Face */}
-                    <polygon points="100,100 155,75 155,138 100,165" fill="url(#purpleRight)" />
+                    <polygon points="100,100 158,74 158,139 100,166" fill="url(#purpleRight)" />
 
-                    {/* Lid Edge */}
-                    <polygon points="40,72 100,98 100,108 40,81" fill="#582cb8" />
-                    <polygon points="100,98 160,72 160,81 100,108" fill="#3b177d" />
-                    <polygon points="100,45 160,72 100,98 40,72" fill="#7947ea" />
+                    {/* Lid Overhang Edges */}
+                    <polygon points="38,72 100,99 100,109 38,82" fill="#6d28d9" />
+                    <polygon points="100,99 162,72 162,82 100,109" fill="#4c1d95" />
+                    <polygon points="100,44 162,72 100,99 38,72" fill="#7c3aed" />
 
                     {/* Gold Ribbons on Box */}
-                    {/* Top Ribbons */}
-                    <polygon points="94,48 106,53 106,95 94,90" fill="url(#goldRibbon)" />
-                    <polygon points="45,72 55,77 145,72 155,67" fill="url(#goldRibbon)" />
-
-                    {/* Left Front Ribbon */}
-                    <polygon points="68,85 78,90 78,154 68,149" fill="url(#goldRibbon)" />
-                    {/* Right Front Ribbon */}
-                    <polygon points="122,88 132,83 132,147 122,152" fill="url(#goldRibbon)" />
+                    <polygon points="94,46 106,51 106,96 94,91" fill="url(#goldRibbon)" />
+                    <polygon points="42,72 53,77 147,72 158,67" fill="url(#goldRibbon)" />
+                    <polygon points="67,86 78,91 78,155 67,150" fill="url(#goldRibbon)" />
+                    <polygon points="122,89 133,84 133,148 122,153" fill="url(#goldRibbon)" />
 
                     {/* Bow on Top */}
-                    <path d="M100,48 C85,25 60,35 80,48 C90,55 98,50 100,48 Z" fill="url(#goldRibbon)" />
-                    <path d="M100,48 C115,25 140,35 120,48 C110,55 102,50 100,48 Z" fill="url(#goldRibbon)" />
-                    <circle cx="100" cy="48" r="7" fill="#fde68a" />
+                    <path d="M100,46 C82,20 55,32 78,46 C89,53 98,48 100,46 Z" fill="url(#goldRibbon)" />
+                    <path d="M100,46 C118,20 145,32 122,46 C111,53 102,48 100,46 Z" fill="url(#goldRibbon)" />
+                    <circle cx="100" cy="46" r="7.5" fill="#fef08a" />
 
-                    {/* Sparkle stars on box */}
-                    <text x="58" y="125" fill="#fbbf24" fontSize="9">★</text>
-                    <text x="82" y="115" fill="#fde68a" fontSize="7">✦</text>
-                    <text x="85" y="145" fill="#fbbf24" fontSize="8">★</text>
-                    <text x="110" y="130" fill="#fde68a" fontSize="8">✦</text>
-                    <text x="138" y="120" fill="#fbbf24" fontSize="9">★</text>
-                    <text x="142" y="140" fill="#fde68a" fontSize="7">✦</text>
+                    {/* Sparkles on box */}
+                    <text x="56" y="125" fill="#fbbf24" fontSize="10">★</text>
+                    <text x="82" y="115" fill="#fde68a" fontSize="8">✦</text>
+                    <text x="85" y="146" fill="#fbbf24" fontSize="9">★</text>
+                    <text x="112" y="130" fill="#fde68a" fontSize="8">✦</text>
+                    <text x="140" y="120" fill="#fbbf24" fontSize="10">★</text>
+                    <text x="144" y="142" fill="#fde68a" fontSize="8">✦</text>
                   </svg>
                 </motion.div>
 
-                {/* Floating Gold Confetti */}
+                {/* Floating Particle Accents */}
                 <div className={styles.particle1}>✦</div>
                 <div className={styles.particle2}>★</div>
                 <div className={styles.particle3}>◆</div>
@@ -185,16 +202,16 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
             <div className={styles.centerContent}>
               <div className={styles.subtag}>
                 <span className={styles.sparkleStar}>✦</span>
-                <span>Unlock Amazing Rewards</span>
+                <span>UNLOCK EXCLUSIVE REWARD TIERS</span>
                 <span className={styles.sparkleStar}>✦</span>
               </div>
 
               <h2 className={styles.mainHeading}>
-                Exclusive Giveaway <span className={styles.purpleGradientText}>Rewards</span>
+                Exclusive Giveaway <span className={styles.purpleGradientText}>Vault Rewards</span>
               </h2>
 
               <p className={styles.description}>
-                Enter special giveaway codes and unlock exciting <strong>VELoop Rewards</strong> instantly. Complete eligible activities and collect daily guaranteed entries.
+                Redeem partner promo codes, claim your guaranteed <strong>Free Daily Tickets</strong>, and enter high-tier flagship draws with transparent cryptographic odds.
               </p>
 
               {/* 3 Trust / Feature Badges */}
@@ -204,8 +221,8 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
                     <ShieldCheck size={16} className={styles.cyanIcon} />
                   </div>
                   <div className={styles.featureText}>
-                    <strong>100% Safe</strong>
-                    <span>Secure & Trusted</span>
+                    <strong>100% Provably Fair</strong>
+                    <span>SHA-256 Verified Draws</span>
                   </div>
                 </div>
 
@@ -214,18 +231,18 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
                     <Zap size={16} className={styles.goldIcon} />
                   </div>
                   <div className={styles.featureText}>
-                    <strong>Instant Rewards</strong>
-                    <span>Get Rewards Fast</span>
+                    <strong>Free Daily Entry</strong>
+                    <span>No Purchase Necessary</span>
                   </div>
                 </div>
 
                 <div className={styles.featurePill}>
                   <div className={styles.featureIconWrap}>
-                    <Gift size={16} className={styles.goldIcon} />
+                    <Gift size={16} className={styles.purpleIcon} />
                   </div>
                   <div className={styles.featureText}>
-                    <strong>Exclusive VELoops</strong>
-                    <span>Special for You</span>
+                    <strong>Instant Bonus Drops</strong>
+                    <span>Coins & VIP Tickets</span>
                   </div>
                 </div>
               </div>
@@ -238,15 +255,17 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
                   whileTap={{ scale: 0.96 }}
                   onClick={() => {
                     soundFx.playClick();
-                    if (onOpenParticipation) onOpenParticipation('gw-apple-studio');
+                    if (onOpenParticipation) onOpenParticipation('creator-bundle');
                   }}
                 >
-                  <span>Enter Giveaway</span>
-                  <ArrowRight size={18} className={styles.btnArrow} />
+                  <Sparkles size={17} />
+                  <span>Enter Giveaway Vault</span>
+                  <ArrowRight size={17} className={styles.btnArrow} />
                 </motion.button>
 
                 <button className={styles.quickCodeBtn} onClick={handleOpenCodeModal}>
-                  Have a Promo Code? Redeem Here
+                  <KeyRound size={15} />
+                  <span>Have a Promo Code? Redeem Here</span>
                 </button>
               </div>
             </div>
@@ -255,40 +274,49 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
             <div className={styles.rightVisual}>
               <motion.div
                 className={styles.ticketHolder}
-                animate={{ y: [0, -6, 0], rotateZ: [0, 2, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                animate={{ y: [0, -8, 0], rotateZ: [0, 2.5, 0] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
               >
                 {/* SVG Golden Cutout VIP Ticket */}
                 <svg viewBox="0 0 180 120" className={styles.ticketSvg}>
                   <defs>
                     <linearGradient id="goldTicketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#ffd700" />
-                      <stop offset="50%" stopColor="#f59e0b" />
-                      <stop offset="100%" stopColor="#b45309" />
+                      <stop offset="35%" stopColor="#f59e0b" />
+                      <stop offset="70%" stopColor="#d97706" />
+                      <stop offset="100%" stopColor="#92400e" />
                     </linearGradient>
                     <linearGradient id="darkTicketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#1f1435" />
+                      <stop offset="0%" stopColor="#22153e" />
                       <stop offset="100%" stopColor="#0f071d" />
                     </linearGradient>
+                    <filter id="ticketShadow">
+                      <feDropShadow dx="0" dy="12" stdDeviation="14" floodColor="#f59e0b" floodOpacity="0.35" />
+                    </filter>
                   </defs>
 
-                  {/* Golden Ticket Body */}
-                  <rect x="10" y="10" width="160" height="95" rx="8" fill="url(#goldTicketGrad)" filter="drop-shadow(0 10px 18px rgba(0,0,0,0.6))" />
+                  {/* Golden Ticket Outer Body */}
+                  <rect x="10" y="10" width="160" height="98" rx="10" fill="url(#goldTicketGrad)" filter="url(#ticketShadow)" />
                   
                   {/* Perforated Inner Ticket */}
-                  <rect x="16" y="16" width="148" height="83" rx="6" fill="url(#darkTicketGrad)" />
+                  <rect x="16" y="16" width="148" height="86" rx="8" fill="url(#darkTicketGrad)" />
 
                   {/* Ticket Notch Cutouts */}
-                  <circle cx="10" cy="57" r="8" fill="#0e0720" />
-                  <circle cx="170" cy="57" r="8" fill="#0e0720" />
+                  <circle cx="10" cy="59" r="8" fill="#080314" />
+                  <circle cx="170" cy="59" r="8" fill="#080314" />
 
-                  {/* Golden Star & Giveaway Text */}
-                  <circle cx="132" cy="57" r="18" fill="url(#goldTicketGrad)" />
-                  <path d="M132,46 L135,53 L142,54 L137,59 L138,66 L132,62 L126,66 L127,59 L122,54 L129,53 Z" fill="#1f1435" />
+                  {/* Perforated Line */}
+                  <line x1="120" y1="18" x2="120" y2="100" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
 
-                  <text x="35" y="44" fill="#fbbf24" fontSize="8" letterSpacing="2">★★★</text>
-                  <text x="35" y="62" fill="#ffd700" fontSize="11" fontWeight="900" fontFamily="sans-serif" letterSpacing="1">GIVEAWAY</text>
-                  <text x="35" y="76" fill="#9ca3af" fontSize="7" fontFamily="monospace">#VEL-VIP-2026</text>
+                  {/* Golden Star Circle */}
+                  <circle cx="142" cy="59" r="14" fill="url(#goldTicketGrad)" />
+                  <path d="M142,50 L145,56 L151,57 L147,61 L148,67 L142,64 L136,67 L137,61 L133,57 L139,56 Z" fill="#1f1435" />
+
+                  {/* Texts */}
+                  <text x="30" y="40" fill="#fbbf24" fontSize="8" letterSpacing="2">★★★ VIP PASS</text>
+                  <text x="30" y="58" fill="#ffd700" fontSize="11" fontWeight="900" fontFamily="sans-serif" letterSpacing="1">GIVEAWAY</text>
+                  <text x="30" y="74" fill="#cbd5e1" fontSize="7.5" fontFamily="monospace">#VEL-VIP-2026</text>
+                  <text x="30" y="88" fill="#34d399" fontSize="6.5" fontWeight="700">✓ VERIFIED DRAW</text>
                 </svg>
 
                 {/* Ambient Particles */}
@@ -319,57 +347,83 @@ export default function ExclusiveBanner({ onClaimCodeSuccess, onOpenParticipatio
             >
               <div className={styles.modalHeader}>
                 <div className={styles.modalTitleWrap}>
-                  <Gift size={20} className={styles.goldIcon} />
-                  <h3>Redeem Giveaway Code</h3>
+                  <div className={styles.modalIconCircle}>
+                    <KeyRound size={20} className={styles.goldIcon} />
+                  </div>
+                  <div>
+                    <h3>Redeem Giveaway Promo Code</h3>
+                    <span className={styles.modalSubtitle}>Unlock bonus tickets & loyalty reward coins</span>
+                  </div>
                 </div>
-                <button className={styles.modalCloseBtn} onClick={() => setIsCodeModalOpen(false)}>
+                <button className={styles.modalCloseBtn} onClick={() => setIsCodeModalOpen(false)} aria-label="Close modal">
                   <X size={18} />
                 </button>
               </div>
 
               <form onSubmit={handleRedeem} className={styles.modalBody}>
                 <p className={styles.modalDesc}>
-                  Enter an official VELoop promo or creator partner code to unlock instant bonus tickets and reward coins.
+                  Enter an official VELoop partner or creator reward code to unlock instant bonus tickets and +500 VELoop Coins.
                 </p>
 
                 <div className={styles.inputGroup}>
-                  <label>Enter Secret Code</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. VELOOP2026 or VIPREWARD"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className={styles.codeInput}
-                    autoFocus
-                  />
+                  <label htmlFor="giveaway-code-input">Secret Promo Code</label>
+                  <div className={styles.inputWrap}>
+                    <input
+                      id="giveaway-code-input"
+                      type="text"
+                      placeholder="e.g. VELOOP2026"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      className={styles.codeInput}
+                      autoFocus
+                    />
+                    {code && (
+                      <button type="button" className={styles.clearInputBtn} onClick={() => setCode('')}>
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {codeSuccess && (
-                  <div className={styles.successBox}>
-                    <CheckCircle2 size={16} />
+                  <motion.div className={styles.successBox} initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}>
+                    <CheckCircle2 size={18} />
                     <span>{codeSuccess}</span>
-                  </div>
+                  </motion.div>
                 )}
 
                 {codeError && (
-                  <div className={styles.errorBox}>
+                  <motion.div className={styles.errorBox} initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}>
                     <span>{codeError}</span>
-                  </div>
+                  </motion.div>
                 )}
 
                 <div className={styles.codePillsQuick}>
-                  <span>Try Codes:</span>
-                  <button type="button" onClick={() => setCode('VELOOP2026')}>VELOOP2026</button>
-                  <button type="button" onClick={() => setCode('VIPREWARD')}>VIPREWARD</button>
-                  <button type="button" onClick={() => setCode('LUCKY100')}>LUCKY100</button>
+                  <span className={styles.quickSelectLabel}>
+                    <Sparkles size={12} className={styles.sparkleGold} /> Quick Tap Test Codes:
+                  </span>
+                  <div className={styles.pillGroup}>
+                    {['VELOOP2026', 'VIPREWARD', 'LUCKY100', 'BONUS'].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        className={`${styles.codePill} ${code === c ? styles.codePillActive : ''}`}
+                        onClick={() => handleQuickSelectCode(c)}
+                      >
+                        <code>{c}</code>
+                        {copiedCode === c ? <CheckCircle2 size={12} /> : <Copy size={11} />}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className={styles.modalActions}>
                   <button type="button" className="btn-outline-custom" onClick={() => setIsCodeModalOpen(false)}>
                     Close
                   </button>
-                  <button type="submit" className="btn-primary-glow">
-                    Redeem Code →
+                  <button type="submit" className="btn-gold-glow">
+                    <Sparkles size={16} />
+                    <span>Redeem Code →</span>
                   </button>
                 </div>
               </form>

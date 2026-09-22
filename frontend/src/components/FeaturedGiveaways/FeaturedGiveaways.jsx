@@ -11,7 +11,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Trophy,
-  Layers
+  X,
+  Layers,
+  Crown
 } from 'lucide-react';
 import PrizeCard from '../PrizeCard/PrizeCard';
 import EmptyState from '../EmptyState/EmptyState';
@@ -35,11 +37,12 @@ export default function FeaturedGiveaways({
   const scrollRef = useRef(null);
 
   const filterTabs = [
-    { id: 'all', label: 'All Rewards', icon: <Gift size={14} /> },
-    { id: 'Flagship Mobile', label: 'Flagship Mobile', icon: <Flame size={14} /> },
-    { id: 'Luxury Lifestyle', label: 'Luxury Wearables', icon: <Shield size={14} /> },
-    { id: 'Audio & Accessories', label: 'Audio & Studio', icon: <Zap size={14} /> },
-    { id: 'Gift Cards & Cash', label: 'VIP Mystery Vault', icon: <Sparkles size={14} /> }
+    { id: 'all', label: 'All Rewards', icon: <Gift size={15} /> },
+    { id: 'Flagship Mobile', label: 'Flagship Mobile', icon: <Flame size={15} /> },
+    { id: 'Luxury Lifestyle', label: 'Luxury Wearables', icon: <Crown size={15} /> },
+    { id: 'Audio & Accessories', label: 'Audio & Studio', icon: <Zap size={15} /> },
+    { id: 'Gaming & VR', label: 'Gaming & Rig', icon: <Trophy size={15} /> },
+    { id: 'Gift Cards & Cash', label: 'VIP Mystery Vault', icon: <Sparkles size={15} /> }
   ];
 
   // Filtering & Sorting
@@ -67,7 +70,7 @@ export default function FeaturedGiveaways({
   });
 
   if (sortBy === 'value') {
-    filtered.sort((a, b) => b.valueUSD - a.valueUSD);
+    filtered.sort((a, b) => (b.valueUSD || 0) - (a.valueUSD || 0));
   } else if (sortBy === 'ending') {
     filtered.sort((a, b) => new Date(a.endsAt || a.endAt) - new Date(b.endsAt || b.endAt));
   } else {
@@ -121,7 +124,7 @@ export default function FeaturedGiveaways({
           <div className={styles.titleWrap}>
             <div className={styles.badgeRow}>
               <span className={styles.sectionTag}>
-                <Sparkles size={14} className={styles.sparkleGold} /> OFFICIAL PRIZE VAULT
+                <Sparkles size={14} className={styles.sparkleGold} /> OFFICIAL REWARD VAULT
               </span>
               <span className={styles.verifiedTag}>
                 <Trophy size={13} /> 100% Provably Fair SHA-256
@@ -131,7 +134,7 @@ export default function FeaturedGiveaways({
               Featured <span className={styles.titleGradient}>Giveaway Pools</span>
             </h2>
             <p className={styles.sectionSubtitle}>
-              Explore certified flagship hardware, luxury wearables, and high-tier mystery drops. Join free daily or stake VEs.
+              Explore certified flagship hardware, luxury wearables, and high-tier mystery drops. Join free daily or stake VEs for maximum odds.
             </p>
           </div>
 
@@ -144,7 +147,7 @@ export default function FeaturedGiveaways({
               aria-label="Scroll giveaways left"
               title="Previous giveaways"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={22} />
             </button>
             <button
               className={`${styles.navArrowBtn} ${!canScrollRight ? styles.navArrowDisabled : ''}`}
@@ -153,7 +156,7 @@ export default function FeaturedGiveaways({
               aria-label="Scroll giveaways right"
               title="Next giveaways"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={22} />
             </button>
           </div>
         </div>
@@ -189,6 +192,16 @@ export default function FeaturedGiveaways({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className={styles.clearSearchBtn}
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
 
             <div className={styles.sortWrap}>

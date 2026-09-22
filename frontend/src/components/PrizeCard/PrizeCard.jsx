@@ -11,7 +11,8 @@ import {
   CheckCircle2,
   Clock,
   Gift,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import Countdown from '../Countdown/Countdown';
 import { soundFx } from '../../utils/soundFx';
@@ -174,7 +175,10 @@ export default function PrizeCard({ giveaway, userEntryCount = 0, onEnter, onVie
           <div className={styles.categorySubhead}>
             <span>{giveaway.category}</span>
             <span className={styles.bulletDot}>•</span>
-            <span className={styles.verifiedText}>SHA-256 Verified</span>
+            <span className={styles.verifiedText}>
+              <ShieldCheck size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '2px' }} />
+              SHA-256 Verified
+            </span>
           </div>
           <h3 className={styles.cardTitle} onClick={handleDetailsClick}>
             {giveaway.title}

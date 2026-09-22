@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { UserCheck, Target, Ticket, Trophy, BookOpen, Sparkles, ArrowRight } from 'lucide-react';
+import { UserCheck, Target, Ticket, Trophy, BookOpen, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { soundFx } from '../../utils/soundFx';
 import styles from './HowToParticipate.module.css';
 
@@ -11,28 +11,32 @@ export default function HowToParticipate({ onOpenRules }) {
       title: 'Sign Up / Login',
       desc: 'Create your VELoop account or sign in to activate your daily free entry tier.',
       color: 'purple',
-      icon: <UserCheck size={18} />
+      icon: <UserCheck size={20} />,
+      highlight: 'Instant Access'
     },
     {
       code: '02',
       title: 'Complete Tasks',
       desc: 'Engage in daily login streaks, community channels, and partner activities.',
       color: 'blue',
-      icon: <Target size={18} />
+      icon: <Target size={20} />,
+      highlight: 'Daily Boosters'
     },
     {
       code: '03',
       title: 'Earn Entries',
       desc: 'Collect guaranteed serialized tickets (#VEL-XXXXX-IN) & coin booster packs.',
       color: 'green',
-      icon: <Ticket size={18} />
+      icon: <Ticket size={20} />,
+      highlight: 'Serialized Tickets'
     },
     {
       code: '04',
       title: 'Win Rewards',
       desc: 'Winners are selected randomly through transparent, unalterable SHA-256 draws.',
-      color: 'orange',
-      icon: <Trophy size={18} />
+      color: 'gold',
+      icon: <Trophy size={20} />,
+      highlight: 'SHA-256 Proof'
     }
   ];
 
@@ -51,7 +55,7 @@ export default function HowToParticipate({ onOpenRules }) {
                 How To <span className={styles.gradientText}>Participate & Win</span>
               </h2>
               <p className={styles.subtitle}>
-                Participating in VELoop official giveaways is fast, 100% transparent, and provably fair.
+                Participating in VELoop official giveaways is fast, 100% transparent, and provably fair with zero hidden fees.
               </p>
             </div>
 
@@ -64,10 +68,16 @@ export default function HowToParticipate({ onOpenRules }) {
               title="Read complete platform rules & odds specification"
             >
               <BookOpen size={16} />
-              <span>Official Rules & Odds Specification</span>
+              <span>Official Rules & Odds</span>
               <ArrowRight size={15} />
             </button>
           </div>
+        </div>
+
+        {/* Laser Flow Pipeline Track */}
+        <div className={styles.pipelineTrack} aria-hidden="true">
+          <div className={styles.pipelineLine}></div>
+          <div className={styles.pipelineGlow}></div>
         </div>
 
         {/* 4-Step Process Grid */}
@@ -75,9 +85,16 @@ export default function HowToParticipate({ onOpenRules }) {
           {steps.map((step, idx) => (
             <motion.div
               key={idx}
-              className={styles.stepCard}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className={`${styles.stepCard} ${styles[`card_${step.color}`]}`}
+              whileHover={{ y: -6, transition: { duration: 0.22 } }}
+              onMouseEnter={() => soundFx.playHover()}
             >
+              {/* Giant Watermark Numeral */}
+              <span className={styles.watermarkNum}>{step.code}</span>
+
+              {/* Step Glow Accent */}
+              <div className={`${styles.glowAccent} ${styles[`glow_${step.color}`]}`} />
+
               <div className={styles.stepCardTop}>
                 <div className={`${styles.circleNode} ${styles[`node_${step.color}`]}`}>
                   {step.icon}
@@ -89,6 +106,11 @@ export default function HowToParticipate({ onOpenRules }) {
 
               <h3 className={styles.stepTitle}>{step.title}</h3>
               <p className={styles.stepDesc}>{step.desc}</p>
+
+              <div className={styles.cardFooterTag}>
+                <CheckCircle2 size={13} className={styles.checkIcon} />
+                <span>{step.highlight}</span>
+              </div>
             </motion.div>
           ))}
         </div>

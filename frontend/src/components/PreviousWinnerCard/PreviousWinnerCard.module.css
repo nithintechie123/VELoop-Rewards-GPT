@@ -1,36 +1,41 @@
+/* PreviousWinnerCard.module.css - Luxury Archive Register & Cards */
+
 .winnerListWrapper {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .topBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  gap: 1.25rem;
+  padding: 1rem 1.35rem;
+  background: linear-gradient(145deg, rgba(28, 22, 54, 0.8) 0%, rgba(16, 12, 34, 0.9) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   flex-wrap: wrap;
 }
 
 .listHeadingRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .trophyCircle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
 }
 
 .trophyGold {
@@ -38,77 +43,78 @@
 }
 
 .listMainTitle {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--text-heading);
+  font-size: 1.12rem;
+  font-weight: 900;
+  color: #ffffff;
   margin: 0;
+  letter-spacing: -0.015em;
 }
 
 .listSubText {
-  font-size: 0.76rem;
-  color: var(--text-muted);
+  font-size: 0.78rem;
+  color: #94a3b8;
 }
 
 .viewToggleGroup {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-full);
-  padding: 0.2rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 0.25rem;
 }
 
 .toggleBtn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.76rem;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: #94a3b8;
   background: transparent;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: 9999px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .toggleBtn:hover {
-  color: var(--text-heading);
+  color: #ffffff;
 }
 
 .toggleActive {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   color: #ffffff;
   font-weight: 800;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);
 }
 
-/* =========================================================================
-   CARDS GRID VIEW (Requirement 60)
-   ========================================================================= */
+/* CARDS GRID VIEW */
 .cardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
 .winnerItemCard {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-lg);
-  padding: 1.35rem;
+  background: linear-gradient(165deg, rgba(26, 20, 52, 0.75) 0%, rgba(13, 10, 28, 0.92) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  border-radius: 20px;
+  padding: 1.45rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.1rem;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 12px 30px -6px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .winnerItemCard:hover {
-  border-color: rgba(245, 158, 11, 0.45);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35), 0 0 15px rgba(245, 158, 11, 0.12);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 158, 11, 0.15);
 }
 
 .cardHeader {
@@ -121,37 +127,39 @@
 .userBadgeWrap {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .userAvatarCircle {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.5);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25) 0%, rgba(168, 85, 247, 0.35) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
   font-weight: 900;
   color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
 }
 
 .userLabel {
   display: block;
   font-size: 0.65rem;
   font-weight: 800;
-  color: var(--text-muted);
+  color: #94a3b8;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .maskedUserName {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
   font-size: 1.05rem;
   font-weight: 900;
-  color: var(--text-heading);
+  color: #ffffff;
   margin: 0;
   letter-spacing: 0.04em;
 }
@@ -162,18 +170,18 @@
   gap: 0.35rem;
   font-size: 0.72rem;
   font-weight: 800;
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--radius-full);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
   background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  border: 1px solid rgba(16, 185, 129, 0.45);
   color: #34d399;
 }
 
 .prizeDetailsBlock {
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 0.9rem 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 0.95rem 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -181,18 +189,18 @@
 
 .prizeMiniTag {
   font-size: 0.7rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #c084fc;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .cardPrizeName {
   font-size: 1.15rem;
-  font-weight: 850;
+  font-weight: 900;
   color: #fbbf24;
   margin: 0;
 }
@@ -205,13 +213,13 @@
 }
 
 .cardPrizeVal {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 800;
-  color: var(--text-heading);
+  color: #ffffff;
 }
 
 .cardCampaignName {
-  color: var(--text-muted);
+  color: #94a3b8;
   font-size: 0.78rem;
 }
 
@@ -221,9 +229,9 @@
   justify-content: space-between;
   gap: 0.5rem;
   font-size: 0.78rem;
-  color: var(--text-secondary);
-  border-top: 1px solid var(--border-subtle);
-  padding-top: 0.75rem;
+  color: #cbd5e1;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.85rem;
 }
 
 .dateMeta {
@@ -234,7 +242,7 @@
 }
 
 .calendarIcon {
-  color: var(--color-cyan);
+  color: #38bdf8;
 }
 
 .ticketMeta {
@@ -244,83 +252,82 @@
 }
 
 .ticketMeta code {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   color: #38bdf8;
-  background: rgba(56, 189, 248, 0.1);
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 0.18rem 0.45rem;
+  border-radius: 6px;
 }
 
 .shieldIcon {
   color: #34d399;
 }
 
-/* =========================================================================
-   TABLE VIEW
-   ========================================================================= */
+/* TABLE VIEW */
 .tableContainer {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: linear-gradient(165deg, rgba(26, 20, 52, 0.75) 0%, rgba(13, 10, 28, 0.92) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  border-radius: 20px;
   overflow-x: auto;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 12px 32px -6px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.86rem;
+  font-size: 0.88rem;
 }
 
 .table th {
-  background: var(--bg-surface-elevated);
-  padding: 1rem 1.25rem;
-  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1.1rem 1.35rem;
+  color: #94a3b8;
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 800;
-  border-bottom: 1px solid var(--border-medium);
+  letter-spacing: 0.08em;
+  font-weight: 900;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 .table td {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  padding: 1.1rem 1.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
 }
 
 .table tr:hover td {
-  background: var(--bg-surface-hover);
-  color: var(--text-heading);
+  background: rgba(168, 85, 247, 0.08);
+  color: #ffffff;
 }
 
 .giveawayCell {
-  color: var(--text-heading);
+  color: #ffffff;
 }
 
 .giveawayTitle {
   font-weight: 800;
-  font-size: 0.88rem;
-  color: var(--text-heading);
-  letter-spacing: -0.01em;
+  font-size: 0.9rem;
+  color: #ffffff;
 }
 
 .categoryPill {
   font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
+  font-weight: 800;
+  padding: 0.22rem 0.6rem;
+  border-radius: 9999px;
   background: rgba(168, 85, 247, 0.15);
-  border: 1px solid rgba(168, 85, 247, 0.35);
+  border: 1px solid rgba(168, 85, 247, 0.4);
   color: #c084fc;
   display: inline-block;
   white-space: nowrap;
 }
 
 .maskedUser {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 800;
   color: #38bdf8;
   letter-spacing: 0.05em;
@@ -329,39 +336,39 @@
 .userCell {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   font-weight: 800;
-  color: var(--text-heading);
+  color: #ffffff;
 }
 
 .avatarMini {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 800;
   color: #38bdf8;
 }
 
 .prizeCell {
-  color: var(--text-heading);
-  font-weight: 700;
+  color: #ffffff;
+  font-weight: 800;
 }
 
 .valCell {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 800;
-  color: var(--color-gold);
+  color: #fbbf24;
 }
 
 .dateCell {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: #94a3b8;
 }
 
 .statusBadge {
@@ -370,24 +377,25 @@
   gap: 0.35rem;
   font-size: 0.72rem;
   font-weight: 800;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
+  padding: 0.22rem 0.6rem;
+  border-radius: 9999px;
 }
 
 .statusDelivered {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .statusDigital {
   background: rgba(6, 182, 212, 0.15);
   color: #38bdf8;
-  border: 1px solid rgba(6, 182, 212, 0.35);
+  border: 1px solid rgba(6, 182, 212, 0.4);
 }
 
 .emptyWrap {
-  padding: 2.5rem;
+  padding: 3rem;
   text-align: center;
-  color: var(--text-muted);
+  color: #94a3b8;
 }
+

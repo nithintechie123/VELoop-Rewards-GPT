@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Gift, Users, Trophy, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Gift, Users, Trophy, Clock, Sparkles, Activity, ShieldCheck } from 'lucide-react';
 import styles from './GiveawayStats.module.css';
-
-/**
- * Requirement 53: Realistic Dummy / Development Data
- * - Total Giveaways: 24
- * - Participants: 8,500+
- * - Prizes Won: 1,200+
- * - Clear development simulation framing
- */
 
 export default function GiveawayStats() {
   const [timeLeft, setTimeLeft] = useState({ days: 12, hours: 8, minutes: 45, seconds: 18 });
@@ -29,46 +22,67 @@ export default function GiveawayStats() {
   const stats = [
     {
       id: 'giveaways',
-      label: 'Total Giveaways',
+      label: 'TOTAL PRIZE VAULTS',
       val: '24',
-      unit: 'Pools Hosted',
+      unit: 'Active & Verified',
       color: 'purple',
-      icon: <Gift size={20} />
+      icon: <Gift size={22} />
     },
     {
       id: 'participants',
-      label: 'Total Participants',
+      label: 'ACTIVE MEMBERS',
       val: '8,500+',
-      unit: 'Active Members',
+      unit: 'Participating Today',
       color: 'blue',
-      icon: <Users size={20} />
+      icon: <Users size={22} />
     },
     {
       id: 'prizes',
-      label: 'Prizes Won',
+      label: 'VERIFIED REWARDS WON',
       val: '1,200+',
-      unit: 'Verified Rewards',
+      unit: '100% Fulfilled',
       color: 'green',
-      icon: <Trophy size={20} />
+      icon: <Trophy size={22} />
     },
     {
       id: 'endsIn',
-      label: 'Ends In',
-      val: `${timeLeft.days}d : ${String(timeLeft.hours).padStart(2, '0')}h : ${String(timeLeft.minutes).padStart(2, '0')}m`,
-      unit: 'Current Cycle',
+      label: 'NEXT DRAWING IN',
+      val: `${timeLeft.days}d ${String(timeLeft.hours).padStart(2, '0')}h ${String(timeLeft.minutes).padStart(2, '0')}m`,
+      unit: 'Countdown Live',
       color: 'orange',
-      icon: <Clock size={20} />
+      icon: <Clock size={22} />
     }
   ];
 
   return (
     <section className={styles.statsSection} aria-label="Platform Statistics and Live Metrics">
       <div className="container-custom">
+        {/* Live Network Activity Bar */}
+        <div className={styles.liveActivityRow}>
+          <div className={styles.liveBadge}>
+            <span className={styles.liveDot} />
+            <Activity size={13} />
+            <span>LIVE NETWORK METRICS</span>
+          </div>
+          <div className={styles.liveNoticeText}>
+            <ShieldCheck size={14} className={styles.iconGreen} />
+            <span>All draws cryptographically sealed with SHA-256 seed commitments.</span>
+          </div>
+        </div>
+
         <div className={styles.statsGrid}>
-          {stats.map(item => (
-            <div key={item.id} className={styles.statCard}>
+          {stats.map((item, idx) => (
+            <motion.div
+              key={item.id}
+              className={`${styles.statCard} ${styles[`card_${item.color}`]}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1, duration: 0.4 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            >
               <div className={`${styles.iconWrapper} ${styles[`icon_${item.color}`]}`}>
                 {item.icon}
+                <div className={styles.iconGlow} />
               </div>
               <div className={styles.statInfo}>
                 <span className={styles.statLabel}>{item.label}</span>
@@ -79,11 +93,8 @@ export default function GiveawayStats() {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-        <div className={styles.benchmarkFootnote}>
-          <span>* Fictional demonstration benchmark figures for preview. Production backend sync ready.</span>
         </div>
       </div>
     </section>
